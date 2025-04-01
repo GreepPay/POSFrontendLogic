@@ -45,6 +45,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@capacitor/push-notifications": "^7.0.0",
+    "@ionic/vue": "^8.5.2",
     "@urql/exchange-multipart-fetch": "^1.0.1",
     "@urql/exchange-persisted-fetch": "^2.0.0",
     "currency.js": "^2.0.4",

@@ -1,189 +1,224 @@
-import { BaseApiService } from './common/BaseService'
-import { OperationResult } from 'urql'
+import { BaseApiService } from "./common/BaseService";
+import { OperationResult } from "urql";
 import {
-  SignUpForm,
-  SignInForm,
-  VerifyPhoneOTPForm,
-  ResendPhoneOTPForm,
-  PersonalizeAccountForm,
-  ResendVerifyEmailForm,
-  SendResetPasswordEmailForm,
-  UpdatePasswordForm,
-} from '../logic/types/forms/auth'
+  AuthResponse,
+  MutationResetPasswordArgs,
+  MutationSignInArgs,
+  MutationSignUpArgs,
+  MutationUpdatePasswordArgs,
+  MutationVerifyUserOtpArgs,
+  User,
+} from "src/gql/graphql";
 
 export default class AuthApi extends BaseApiService {
-  public SignUp = (data: SignUpForm) => {
+  // Queries
+  public GetAuthUser = () => {
     const requestData = `
-		mutation SignUp(
-			$phone_number: String!,
-			$password: String!
-		) {
-			SignUp(phone_number: $phone_number, password: $password) {
-				id,
-				uuid,
-				phone
-			}
-		}
-		`
-
-    const response: Promise<OperationResult<{
-      SignUp: any
-    }>> = this.mutation(requestData, data)
-
-    return response
-  }
-
-  public SignIn = (data: SignInForm) => {
-    const requestData = `
-		mutation SignIn(
-			$email: String!,
-			  $password: String!
-		  ) {
-			SignIn(email: $email, password: $password) {
-			  token,
-			  user {
-				id,
+		query GetAuthUser {
+			GetAuthUser {
 				uuid,
 				first_name,
 				last_name,
 				phone,
 				email_verified_at,
 				phone_verified_at
-			  }
+				username
+				profile {
+				  profile_picture
+					verification_status
+					default_currency
+					business {
+					  banner
+						business_name
+						city
+						country
+						description
+						logo
+					}
+				}
 			}
-		  }
-		`
+		}
+		`;
 
-    const response: Promise<OperationResult<{
-      SignIn: any
-    }>> = this.mutation(requestData, data)
+    const response: Promise<
+      OperationResult<{
+        GetAuthUser: User;
+      }>
+    > = this.query(requestData, {});
 
-    return response
-  }
+    return response;
+  };
 
-  public VerifyPhoneOTP = (data: VerifyPhoneOTPForm) => {
+  //  Mutations
+  public SignUp = (
+    data: MutationSignUpArgs,
+    progressCallback: (progress: number) => void,
+  ) => {
     const requestData = `
-		mutation VerifyPhoneOTP(
-			$user_uuid: String!,
-			  $otp: String!
-		  ) {
-			VerifyPhoneOTP(user_uuid: $user_uuid, otp: $otp) {
-			  uuid,
-			  phone,
-			  phone_verified_at
-			}
-		  }
-		`
+      mutation SignUp(
+        $first_name: String!
+        $last_name: String!
+        $email: String!
+        $password: String!
+        $state: String!
+        $country: String!
+        $default_currency: String!
+        $business_name: String!
+        $documents: [Upload!]!
+      ) {
+        SignUp(
+          first_name: $first_name
+          last_name: $last_name
+          email: $email
+          password: $password
+          state: $state
+          country: $country
+          default_currency: $default_currency
+          business_name: $business_name
+          documents: $documents
+        ) {
+          uuid
+          first_name
+          last_name
+          email
+          email_verified_at
+          status
+          username
+          profile {
+            default_currency
+            verification_status
+            business {
+              city
+              country
+              business_name
+            }
+          }
+        }
+      }
+		`;
 
-    const response: Promise<OperationResult<{
-      VerifyPhoneOTP: any
-    }>> = this.mutation(requestData, data)
+    const response: Promise<
+      OperationResult<{
+        SignUp: User;
+      }>
+    > = this.mutationWithProgress(requestData, data, progressCallback);
 
-    return response
-  }
+    return response;
+  };
 
-  public ResendPhoneOTP = (data: ResendPhoneOTPForm) => {
+  public SignIn = (data: MutationSignInArgs) => {
     const requestData = `
-		mutation ResendPhoneOTP(
-			$user_uuid: String!,
-			  $phone_number: String!
-		  ) {
-			ResendPhoneOTP(user_uuid: $user_uuid, phone_number: $phone_number) 
-		  }
-		`
+      mutation SignIn($email: String!, $password: String!) {
+        SignIn(email: $email, password: $password) {
+          token
+          user {
+            uuid
+            first_name
+            last_name
+            email_verified_at
+            phone_verified_at
+          }
+        }
+      }
 
-    const response: Promise<OperationResult<{
-      ResendPhoneOTP: boolean
-    }>> = this.mutation(requestData, data)
+		`;
 
-    return response
-  }
+    const response: Promise<
+      OperationResult<{
+        SignIn: AuthResponse;
+      }>
+    > = this.mutation(requestData, data);
 
-  public PersonalizeAccount = (data: PersonalizeAccountForm) => {
+    return response;
+  };
+
+  public ResendEmailOTP = (email: string) => {
     const requestData = `
-		mutation PersonalizeAccount($user_uuid: String!, $first_name: String!, $last_name: String!, $email: String!, $password: String!) {
-			PersonalizeAccount(
-			  user_uuid: $user_uuid
-			  first_name: $first_name
-			  last_name: $last_name
-			  email: $email
-			  password: $password
-			) {
-			  token
-			  user {
-				id
-				uuid
-				first_name
-				last_name
-				email
-				phone
-				phone_verified_at
-				email_verified_at
-			  }
-			}
-		  }
-		`
+      mutation ResendEmailOTP($email: String!) {
+        ResendEmailOTP(email: $email)
+      }
 
-    const response: Promise<OperationResult<{
-      PersonalizeAccount: any
-    }>> = this.mutation(requestData, data)
+		`;
 
-    return response
-  }
+    const response: Promise<
+      OperationResult<{
+        ResendEmailOTP: Boolean;
+      }>
+    > = this.mutation(requestData, { email });
 
-  public ResendVerifyEmail = (data: ResendVerifyEmailForm) => {
+    return response;
+  };
+
+  public ResetPassword = (data: MutationResetPasswordArgs) => {
     const requestData = `
-		mutation ResendVerifyEmail(
-			$user_uuid: String!
-		  ) {
-			ResendVerifyEmail(
-			  user_uuid: $user_uuid,
-			)
-		  }
-		`
+      mutation ResetPassword(
+        $userUuid: String!
+        $otpCode: String!
+        $newPassword: String!
+      ) {
+        ResetPassword(
+          user_uuid: $userUuid
+          otp_code: $otpCode
+          new_password: $newPassword
+        )
+      }
+		`;
 
-    const response: Promise<OperationResult<{
-      ResendVerifyEmail: boolean
-    }>> = this.mutation(requestData, data)
+    const response: Promise<
+      OperationResult<{
+        ResetPassword: Boolean;
+      }>
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
-  public SendResetPasswordEmail = (data: SendResetPasswordEmailForm) => {
+  public SendResetPasswordOTP = (email: string) => {
     const requestData = `
-		mutation SendResetPasswordEmail(
-			$user_uuid: String!
-		  ) {
-			SendResetPasswordEmail(
-			  user_uuid: $user_uuid,
-			)
-		  }
-		`
+      mutation SendResetPasswordOTP($email: String!) {
+        SendResetPasswordOTP(email: $email)
+      }
 
-    const response: Promise<OperationResult<{
-      SendResetPasswordEmail: boolean
-    }>> = this.mutation(requestData, data)
+		`;
 
-    return response
-  }
+    const response: Promise<
+      OperationResult<{
+        SendResetPasswordOTP: Boolean;
+      }>
+    > = this.mutation(requestData, { email });
 
-  public UpdatePassword = (data: UpdatePasswordForm) => {
+    return response;
+  };
+
+  public UpdatePassword = (data: MutationUpdatePasswordArgs) => {
+    const request_data = `
+        mutation UpdatePassword($currentPassword: String!, $newPassword: String!) {
+          UpdatePassword(current_password: $currentPassword, new_password: $newPassword)
+        }
+      `;
+
+    const response: Promise<
+      OperationResult<{
+        UpdatePassword: Boolean;
+      }>
+    > = this.mutation(request_data, data);
+
+    return response;
+  };
+
+  public VerifyUserOTP = (data: MutationVerifyUserOtpArgs) => {
     const requestData = `
-		mutation UpdatePassword(
-			$user_uuid: String!,
-			$password: String!
-		  ) {
-			UpdatePassword(
-			  user_uuid: $user_uuid,
-			  password: $password
-			)
-		  }
-		`
+      mutation VerifyUserOTP($user_uuid: String!, $otp: String!) {
+        VerifyUserOTP(user_uuid: $user_uuid, otp: $otp)
+      }
+    `;
 
-    const response: Promise<OperationResult<{
-      UpdatePassword: boolean
-    }>> = this.mutation(requestData, data)
+    const response: Promise<
+      OperationResult<{
+        VerifyUserOTP: Boolean;
+      }>
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 }
