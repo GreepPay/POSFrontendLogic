@@ -15,6 +15,7 @@ import {
   LoaderSetup,
   ModalSetup,
 } from "../types/common";
+import CryptoJS from "crypto-js";
 
 export default class Common {
   public router: Router | undefined = undefined;
@@ -81,6 +82,15 @@ export default class Common {
     message: "",
     type: "success",
   });
+
+  public encryptData = (jsonData: object, secretKey: string): string => {
+    return CryptoJS.AES.encrypt(JSON.stringify(jsonData), secretKey).toString();
+  };
+
+  public decryptData = (encryptedData: string, secretKey: string): object => {
+    const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  };
 
   public showAlert = (alertSetup: AlertSetup) => {
     const showAlertHandler = (wait_until_next_alert = false) => {

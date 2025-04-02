@@ -87,6 +87,7 @@ export default class Auth extends Common {
         .then((response) => {
           if (response.data?.SignIn) {
             this.SetUpAuth(response.data.SignIn);
+
             return response.data;
           }
         })
