@@ -14,30 +14,36 @@ export default class AuthApi extends BaseApiService {
   // Queries
   public GetAuthUser = () => {
     const requestData = `
-		query GetAuthUser {
-			GetAuthUser {
-				uuid,
-				first_name,
-				last_name,
-				phone,
-				email_verified_at,
-				phone_verified_at
-				username
-				profile {
-				  profile_picture
-					verification_status
-					default_currency
-					business {
-					  banner
-						business_name
-						city
-						country
-						description
-						logo
-					}
-				}
-			}
-		}
+      query GetAuthUser {
+        GetAuthUser {
+          uuid
+          first_name
+          last_name
+          phone
+          email_verified_at
+          phone_verified_at
+          username
+          profile {
+            profile_picture
+            verification_status
+            default_currency
+            business {
+              banner
+              business_name
+              city
+              country
+              description
+              logo
+            }
+          }
+          wallet {
+            total_balance
+            point_balance
+            currency
+            state
+          }
+        }
+      }
 		`;
 
     const response: Promise<

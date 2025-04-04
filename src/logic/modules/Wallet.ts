@@ -1,5 +1,6 @@
 import {
   ExchangeRate,
+  GlobalExchangeRate,
   MutationCreateSavedAccountArgs,
   MutationInitiateWithdrawalArgs,
   PointTransaction,
@@ -27,6 +28,7 @@ export default class Wallet extends Common {
   public ManySavedAccounts: UserBankPaginator | undefined;
   public SinglePointTransaction: PointTransaction | undefined;
   public SingleTransaction: Transaction | undefined;
+  public CurrentGlobalExchangeRate: GlobalExchangeRate | undefined;
 
   // Mutation Variables
   public CreateSavedAccountForm: MutationCreateSavedAccountArgs | undefined;
@@ -45,11 +47,24 @@ export default class Wallet extends Common {
       });
   };
 
+  public GetGlobalExchangeRate = async (
+    base = "USD",
+    target = "",
+  ): Promise<GlobalExchangeRate | undefined> => {
+    if (!target) {
+      target = Logic.Auth.AuthUser?.profile?.default_currency || "USD";
+    }
+    return $api.wallet.GetGlobalExchangeRate(base, target).then((response) => {
+      this.CurrentGlobalExchangeRate = response.data?.GetGlobalExchangeRate;
+      return this.CurrentGlobalExchangeRate;
+    });
+  };
+
   public GetPointTransactions = async (
     page: number,
     count: number,
     orderType: "CREATED_AT",
-    order: "DESC",
+    order = "DESC" as "DESC" | "ASC",
     whereQuery = "",
   ) => {
     return $api.wallet
@@ -64,7 +79,7 @@ export default class Wallet extends Common {
     page: number,
     count: number,
     orderType: "CREATED_AT",
-    order: "DESC",
+    order = "DESC" as "DESC" | "ASC",
     whereQuery = "",
   ) => {
     return $api.wallet

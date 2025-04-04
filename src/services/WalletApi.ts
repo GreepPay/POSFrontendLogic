@@ -1,5 +1,6 @@
 import {
   ExchangeRate,
+  GlobalExchangeRate,
   MutationCreateSavedAccountArgs,
   MutationInitiateWithdrawalArgs,
   PointTransaction,
@@ -9,7 +10,7 @@ import {
   TransactionPaginator,
   UserBank,
   UserBankPaginator,
-} from "src/gql/graphql";
+} from "../gql/graphql";
 import { OperationResult } from "urql";
 import { BaseApiService } from "./common/BaseService";
 
@@ -39,6 +40,30 @@ export default class WalletApi extends BaseApiService {
     > = this.query(requestData, {
       from_currency,
       to_currency,
+    });
+
+    return response;
+  };
+
+  public GetGlobalExchangeRate = (base: string, target: string) => {
+    const requestData = `
+      query GetGlobalExchangeRate($base: String!, $target: String!) {
+        GetGlobalExchangeRate(base: $base, target: $target) {
+          base
+          target
+          mid
+          unit
+        }
+      }
+		`;
+
+    const response: Promise<
+      OperationResult<{
+        GetGlobalExchangeRate: GlobalExchangeRate;
+      }>
+    > = this.query(requestData, {
+      base,
+      target,
     });
 
     return response;
@@ -312,9 +337,7 @@ export default class WalletApi extends BaseApiService {
       OperationResult<{
         CreateSavedAccount: UserBank;
       }>
-    > = this.mutation(requestData, {
-      data,
-    });
+    > = this.mutation(requestData, data);
 
     return response;
   };
@@ -338,9 +361,7 @@ export default class WalletApi extends BaseApiService {
       OperationResult<{
         InitiateWithdrawal: Boolean;
       }>
-    > = this.mutation(requestData, {
-      data,
-    });
+    > = this.mutation(requestData, data);
 
     return response;
   };

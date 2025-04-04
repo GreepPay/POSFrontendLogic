@@ -131,15 +131,15 @@ export default class Common {
     fallbackMsg = "",
   ) => {
     const message = error.graphQLErrors[0].message;
-    this.showLoader({
-      show: true,
-      useModal: true,
-      loading: false,
-      hasError: true,
-      message: message != "null" ? message : fallbackMsg,
-      icon,
-      title,
-    });
+    // this.showLoader({
+    //   show: true,
+    //   useModal: true,
+    //   loading: false,
+    //   hasError: true,
+    //   message: message != "null" ? message : fallbackMsg,
+    //   icon,
+    //   title,
+    // });
 
     this.showAlert({
       show: true,
@@ -525,10 +525,10 @@ export default class Common {
     };
 
     if (allActions.length > 0) {
-      // this.showLoader({
-      //   loading: true,
-      //   show: false,
-      // })
+      this.showLoader({
+        loading: true,
+        show: true,
+      });
 
       Promise.all(allActions).then(() => {
         this.hideLoader();

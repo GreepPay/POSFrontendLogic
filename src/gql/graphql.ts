@@ -107,6 +107,20 @@ export type ExchangeRateItem = {
   updatedAt: Scalars['String'];
 };
 
+export type GlobalExchangeRate = {
+  __typename?: 'GlobalExchangeRate';
+  /** Base Currency */
+  base: Scalars['String'];
+  /** Mid Rate */
+  mid: Scalars['Float'];
+  /** Target Currency */
+  target: Scalars['String'];
+  /** Timestamp */
+  timestamp: Scalars['DateTime'];
+  /** Unit */
+  unit: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   /** Create a saved account */
@@ -392,6 +406,8 @@ export type Query = {
   GetAuthUser?: Maybe<User>;
   /** Get the current exchange rate between two currencies */
   GetExchangeRate: ExchangeRate;
+  /** Get the global exchange rate between two currencies */
+  GetGlobalExchangeRate: GlobalExchangeRate;
   /** Get a paginated list of notifications for the authenticated user */
   GetNotifications: NotificationPaginator;
   /** Get the currently supported off-ramp currencies */
@@ -412,6 +428,12 @@ export type Query = {
 export type QueryGetExchangeRateArgs = {
   from_currency: Scalars['String'];
   to_currency: Scalars['String'];
+};
+
+
+export type QueryGetGlobalExchangeRateArgs = {
+  base: Scalars['String'];
+  target: Scalars['String'];
 };
 
 
