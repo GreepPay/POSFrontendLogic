@@ -48,11 +48,20 @@ export default class Auth extends Common {
 
   // Queries
   public GetAuthUser = async (): Promise<User | undefined> => {
-    return $api.auth.GetAuthUser().then((response) => {
-      this.AuthUser = response.data?.GetAuthUser;
-      localStorage.setItem("auth_user", JSON.stringify(this.AuthUser));
-      return this.AuthUser;
-    });
+    return $api.auth
+      .GetAuthUser()
+      .then((response) => {
+        this.AuthUser = response.data?.GetAuthUser;
+        localStorage.setItem("auth_user", JSON.stringify(this.AuthUser));
+        return this.AuthUser;
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(error, "Oops!", "error-alert");
+        localStorage.clear();
+        this.AccessToken = "";
+        this.AuthUser = undefined;
+        throw error;
+      });
   };
 
   // Mutations
