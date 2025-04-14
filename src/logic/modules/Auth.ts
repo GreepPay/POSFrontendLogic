@@ -169,4 +169,18 @@ export default class Auth extends Common {
         });
     }
   };
+
+  public SignOut = () => {
+    Logic.Common.showLoader({ loading: true, show: true });
+    $api.auth
+      .SignOut()
+      .then(() => {
+        localStorage.clear();
+        Logic.Common.hideLoader();
+        Logic.Common.GoToRoute("/auth/login");
+      })
+      .catch((error) => {
+        Logic.Common.showError(error, "Oops!", "error-alert");
+      });
+  };
 }

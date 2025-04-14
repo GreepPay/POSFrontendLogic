@@ -227,4 +227,17 @@ export default class AuthApi extends BaseApiService {
 
     return response;
   };
+
+  public SignOut = () => {
+    const requestData = `
+    mutation SignOut {
+       SignOut
+    }
+  `;
+
+    const response: Promise<OperationResult<{ SignOut: boolean }>> =
+      this.mutation(requestData, {});
+
+    return response;
+  };
 }
