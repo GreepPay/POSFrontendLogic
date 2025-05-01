@@ -55,6 +55,8 @@ export type Business = {
   banner?: Maybe<Scalars['String']>;
   /** Business name. */
   business_name?: Maybe<Scalars['String']>;
+  /** Business category. */
+  category?: Maybe<Scalars['String']>;
   /** Business city */
   city?: Maybe<Scalars['String']>;
   /** Business country */
@@ -107,6 +109,18 @@ export type ExchangeRateItem = {
   updatedAt: Scalars['String'];
 };
 
+export type FinancialSummaryInput = {
+  from: Scalars['String'];
+  to: Scalars['String'];
+  type: Scalars['String'];
+};
+
+export type FinancialSummaryResponse = {
+  __typename?: 'FinancialSummaryResponse';
+  credit: Scalars['Float'];
+  debit: Scalars['Float'];
+};
+
 export type GlobalExchangeRate = {
   __typename?: 'GlobalExchangeRate';
   /** Base Currency */
@@ -143,6 +157,8 @@ export type Mutation = {
   SendResetPasswordOTP: Scalars['Boolean'];
   /** Sign in a user */
   SignIn: AuthResponse;
+  /** Sign out a user */
+  SignOut: Scalars['Boolean'];
   /** Sign up a new user */
   SignUp: User;
   /** Update user password */
@@ -213,6 +229,9 @@ export type MutationSignInArgs = {
 
 
 export type MutationSignUpArgs = {
+  business_category?: InputMaybe<Scalars['String']>;
+  business_description?: InputMaybe<Scalars['String']>;
+  business_logo?: InputMaybe<Scalars['Upload']>;
   business_name: Scalars['String'];
   country: Scalars['String'];
   default_currency: Scalars['String'];
@@ -221,6 +240,7 @@ export type MutationSignUpArgs = {
   first_name: Scalars['String'];
   last_name: Scalars['String'];
   password: Scalars['String'];
+  phone_number?: InputMaybe<Scalars['String']>;
   state: Scalars['String'];
 };
 
@@ -232,12 +252,16 @@ export type MutationUpdatePasswordArgs = {
 
 
 export type MutationUpdateProfileArgs = {
+  business_category?: InputMaybe<Scalars['String']>;
+  business_description?: InputMaybe<Scalars['String']>;
+  business_logo?: InputMaybe<Scalars['Upload']>;
   business_name?: InputMaybe<Scalars['String']>;
   country?: InputMaybe<Scalars['String']>;
   default_currency?: InputMaybe<Scalars['String']>;
   documents?: InputMaybe<Array<Scalars['Upload']>>;
   first_name?: InputMaybe<Scalars['String']>;
   last_name?: InputMaybe<Scalars['String']>;
+  phone_number?: InputMaybe<Scalars['String']>;
   profile_photo?: InputMaybe<Scalars['Upload']>;
   state?: InputMaybe<Scalars['String']>;
 };
@@ -406,6 +430,8 @@ export type Query = {
   GetAuthUser?: Maybe<User>;
   /** Get the current exchange rate between two currencies */
   GetExchangeRate: ExchangeRate;
+  /** Get financial summary */
+  GetFinancialSummary: FinancialSummaryResponse;
   /** Get the global exchange rate between two currencies */
   GetGlobalExchangeRate: GlobalExchangeRate;
   /** Get a paginated list of notifications for the authenticated user */
@@ -428,6 +454,11 @@ export type Query = {
 export type QueryGetExchangeRateArgs = {
   from_currency: Scalars['String'];
   to_currency: Scalars['String'];
+};
+
+
+export type QueryGetFinancialSummaryArgs = {
+  input: FinancialSummaryInput;
 };
 
 
@@ -645,6 +676,8 @@ export type Transaction = {
   dr_or_cr: Scalars['String'];
   /** Gateway (default: 'Greep-wallet') */
   gateway: Scalars['String'];
+  /** The associated point transaction */
+  point_transaction?: Maybe<PointTransaction>;
   /** Transaction Reference */
   reference: Scalars['String'];
   /** State of the transaction ('active' or 'archived') */

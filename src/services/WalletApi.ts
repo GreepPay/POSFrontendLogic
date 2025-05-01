@@ -1,5 +1,7 @@
 import {
   ExchangeRate,
+  FinancialSummaryInput,
+  FinancialSummaryResponse,
   GlobalExchangeRate,
   MutationCreateSavedAccountArgs,
   MutationInitiateWithdrawalArgs,
@@ -127,6 +129,7 @@ export default class WalletApi extends BaseApiService {
             charge_id
             chargeable_type
             created_at
+            updated_at
             currency
             description
             dr_or_cr
@@ -145,6 +148,26 @@ export default class WalletApi extends BaseApiService {
     > = this.query(requestData, {
       page,
       count,
+    });
+
+    return response;
+  };
+
+  public GetFinancialSummary = (input: FinancialSummaryInput) => {
+    const requestData = `
+      query GetFinancialSummary($input: FinancialSummaryInput!) {
+        GetFinancialSummary(input: $input) {
+         credit
+         debit
+        }
+      }
+    `;
+    const response: Promise<
+      OperationResult<{
+        GetFinancialSummary: FinancialSummaryResponse;
+      }>
+    > = this.query(requestData, {
+      input,
     });
 
     return response;
@@ -194,6 +217,8 @@ export default class WalletApi extends BaseApiService {
             status
             wallet_balance
             uuid
+            updated_at
+            created_at
           }
         }
       }
@@ -300,6 +325,10 @@ export default class WalletApi extends BaseApiService {
           updated_at
           uuid
           wallet_balance
+          point_transaction {
+           uuid
+           amount
+          }
         }
       }
     `;

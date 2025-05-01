@@ -1,5 +1,7 @@
 import {
   ExchangeRate,
+  FinancialSummaryInput,
+  FinancialSummaryResponse,
   GlobalExchangeRate,
   MutationCreateSavedAccountArgs,
   MutationInitiateWithdrawalArgs,
@@ -29,6 +31,8 @@ export default class Wallet extends Common {
   public SinglePointTransaction: PointTransaction | undefined;
   public SingleTransaction: Transaction | undefined;
   public CurrentGlobalExchangeRate: GlobalExchangeRate | undefined;
+  public NormalFinancialSummary: FinancialSummaryResponse | undefined;
+  public PointFinancialSummary: FinancialSummaryResponse | undefined;
 
   // Mutation Variables
   public CreateSavedAccountForm: MutationCreateSavedAccountArgs | undefined;
@@ -66,13 +70,40 @@ export default class Wallet extends Common {
     orderType: "CREATED_AT",
     order = "DESC" as "DESC" | "ASC",
     whereQuery = "",
+    isSearch = false,
   ) => {
     return $api.wallet
       .GetPointTransactions(page, count, orderType, order, whereQuery)
       .then((response) => {
-        this.ManyPointTransactions = response.data?.GetPointTransactions;
-        return this.ManyPointTransactions;
+        if (!isSearch) {
+          this.ManyPointTransactions = response.data?.GetPointTransactions;
+        }
+        return response.data?.GetPointTransactions;
       });
+  };
+
+  public GetPointFinancialSummary = async (from = "", to = "") => {
+    const input: FinancialSummaryInput = {
+      type: "point",
+      from,
+      to,
+    };
+    return $api.wallet.GetFinancialSummary(input).then((response) => {
+      this.PointFinancialSummary = response.data?.GetFinancialSummary;
+      return this.PointFinancialSummary;
+    });
+  };
+
+  public GetNormalFinancialSummary = async (from = "", to = "") => {
+    const input: FinancialSummaryInput = {
+      type: "normal",
+      from,
+      to,
+    };
+    return $api.wallet.GetFinancialSummary(input).then((response) => {
+      this.NormalFinancialSummary = response.data?.GetFinancialSummary;
+      return this.NormalFinancialSummary;
+    });
   };
 
   public GetTransactions = async (
@@ -81,12 +112,15 @@ export default class Wallet extends Common {
     orderType: "CREATED_AT",
     order = "DESC" as "DESC" | "ASC",
     whereQuery = "",
+    isSearch = false,
   ) => {
     return $api.wallet
       .GetTransactions(page, count, orderType, order, whereQuery)
       .then((response) => {
-        this.ManyTransactions = response.data?.GetTransactions;
-        return this.ManyTransactions;
+        if (!isSearch) {
+          this.ManyTransactions = response.data?.GetTransactions;
+        }
+        return response.data?.GetTransactions;
       });
   };
 

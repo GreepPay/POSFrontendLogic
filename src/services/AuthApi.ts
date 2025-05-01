@@ -21,6 +21,7 @@ export default class AuthApi extends BaseApiService {
           last_name
           phone
           email_verified_at
+          email
           phone_verified_at
           username
           profile {
@@ -34,6 +35,7 @@ export default class AuthApi extends BaseApiService {
               country
               description
               logo
+              category
             }
           }
           wallet {
@@ -64,23 +66,31 @@ export default class AuthApi extends BaseApiService {
       mutation SignUp(
         $first_name: String!
         $last_name: String!
+        $phone_number: String
         $email: String!
         $password: String!
         $state: String!
         $country: String!
         $default_currency: String!
         $business_name: String!
+        $business_logo: Upload
+        $business_category: String
+        $business_description: String
         $documents: [Upload!]!
       ) {
         SignUp(
           first_name: $first_name
           last_name: $last_name
+          phone_number: $phone_number
           email: $email
           password: $password
           state: $state
           country: $country
           default_currency: $default_currency
           business_name: $business_name
+          business_logo: $business_logo
+          business_category: $business_category
+          business_description: $business_description
           documents: $documents
         ) {
           uuid

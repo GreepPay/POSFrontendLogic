@@ -28,6 +28,7 @@ export default class User extends Common {
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
         });
     }
   };

@@ -185,6 +185,17 @@ export default class Common {
 
   public momentInstance = moment;
 
+  public makeid = (length: number) => {
+    let result = "";
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
+
   public convertToMoney = (
     float: any,
     withZeros = true,
@@ -343,7 +354,7 @@ export default class Common {
 
         if (rule.requireAuth) {
           if (!Logic.Auth.AuthUser) {
-            window.location.href = "/auth/login";
+            window.location.href = "/start";
 
             throw BreakException;
           }
