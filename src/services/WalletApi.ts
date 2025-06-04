@@ -5,6 +5,7 @@ import {
   GlobalExchangeRate,
   MutationCreateSavedAccountArgs,
   MutationInitiateWithdrawalArgs,
+  OffRamp,
   PointTransaction,
   PointTransactionPaginator,
   SupportedCurrency,
@@ -12,6 +13,8 @@ import {
   TransactionPaginator,
   UserBank,
   UserBankPaginator,
+  WithdrawInfo,
+  YellowcardNetwork,
 } from "../gql/graphql";
 import { OperationResult } from "urql";
 import { BaseApiService } from "./common/BaseService";
@@ -42,6 +45,35 @@ export default class WalletApi extends BaseApiService {
     > = this.query(requestData, {
       from_currency,
       to_currency,
+    });
+
+    return response;
+  };
+
+  public GetWithdrawInfo = (amount: number, currency: string) => {
+    const requestData = `
+      query GetWithdrawInfo($amount: Float!, $currency: String!) {
+        GetWithdrawInfo(amount: $amount, currency: $currency) {
+          currency
+          methods {
+            name
+            description
+            fee
+            min_amount
+            max_amount
+            unique_id
+          }
+        }
+      }
+		`;
+
+    const response: Promise<
+      OperationResult<{
+        GetWithdrawInfo: WithdrawInfo;
+      }>
+    > = this.query(requestData, {
+      amount,
+      currency,
     });
 
     return response;
@@ -88,6 +120,53 @@ export default class WalletApi extends BaseApiService {
         GetOffRampCurrencies: SupportedCurrency[];
       }>
     > = this.query(requestData, {});
+
+    return response;
+  };
+
+  public GetYellowCardNetwork = (country_code: string) => {
+    const requestData = `
+        query GetYellowCardNetwork($country_code: String!) {
+          GetYellowCardNetwork(country_code: $country_code) {
+            id
+            code
+            hasBranch
+            name
+            country
+            accountNumberType
+            countryAccountNumberType
+            status
+            channelIds
+          }
+        }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetYellowCardNetwork: YellowcardNetwork[];
+      }>
+    > = this.query(requestData, {
+      country_code,
+    });
+
+    return response;
+  };
+
+  public GetBankAccountDetails = (accountNumber: string, networkId: string) => {
+    const requestData = `
+        query GetBankAccountDetails($accountNumber: String!, $networkId: String!) {
+          GetBankAccountDetails(accountNumber: $accountNumber, networkId: $networkId)
+        }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetBankAccountDetails: string;
+      }>
+    > = this.query(requestData, {
+      accountNumber,
+      networkId,
+    });
 
     return response;
   };
@@ -344,12 +423,61 @@ export default class WalletApi extends BaseApiService {
     return response;
   };
 
+  public GetOfframp = (uuid: string) => {
+    const requestData = `
+      query GetOfframp($uuid: String!) {
+        GetOfframp(uuid: $uuid) {
+        id
+        uuid
+        amount
+        payment_reference
+        yellow_card_payment {
+          currency
+          amount
+          convertedAmount
+          status
+          rate
+          destination {
+            accountName
+            accountNumber
+            accountType
+          }
+          expiresAt
+        }
+        state
+        payment_channel
+        description
+        status
+        currency
+        extra_data
+        senderName
+        senderCountry
+        senderPhone
+        senderAddress
+        senderBusinessName
+        created_at
+        updated_at
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetOfframp: OffRamp;
+      }>
+    > = this.query(requestData, {
+      uuid,
+    });
+
+    return response;
+  };
+
   // Mutations
 
   public CreateSavedAccount = (data: MutationCreateSavedAccountArgs) => {
     const requestData = `
-        mutation CreateSavedAccount($type: String!, $unique_id: String!, $metadata: String!) {
-          CreateSavedAccount(type: $type, unique_id: $unique_id, metadata: $metadata) {
+        mutation CreateSavedAccount($type: String!, $unique_id: String!, $metadata: String!, $uploads: [Upload!]) {
+          CreateSavedAccount(type: $type, unique_id: $unique_id, metadata: $metadata, uploads: $uploads) {
             account_no
             bank_code
             bank_name
@@ -382,15 +510,113 @@ export default class WalletApi extends BaseApiService {
             saved_account_uuid: $saved_account_uuid
             amount: $amount
             withdrawal_currency: $withdrawal_currency
-          )
+          ) {
+             id
+             uuid
+             amount
+             payment_reference
+             yellow_card_payment {
+               currency
+               amount
+               convertedAmount
+               status
+               rate
+               destination {
+                 accountName
+                 accountNumber
+                 accountType
+               }
+               expiresAt
+             }
+             state
+             payment_channel
+             description
+             status
+             currency
+             extra_data
+             senderName
+             senderCountry
+             senderPhone
+             senderAddress
+             senderBusinessName
+             created_at
+             updated_at
+          }
         }
       `;
 
     const response: Promise<
       OperationResult<{
-        InitiateWithdrawal: Boolean;
+        InitiateWithdrawal: OffRamp;
       }>
     > = this.mutation(requestData, data);
+
+    return response;
+  };
+
+  public ConfirmWithdrawal = (
+    uuid: string,
+    currency: string,
+    amount: number,
+    metadata = "",
+  ) => {
+    const requestData = `
+        mutation ConfirmWithdrawal(
+          $uuid: String!
+          $currency: String!
+          $amount: Float!
+          $metadata: String
+        ) {
+          ConfirmWithdrawal(
+            uuid: $uuid
+            currency: $currency
+            amount: $amount
+            metadata: $metadata
+          ) {
+             id
+             uuid
+             amount
+             payment_reference
+             yellow_card_payment {
+               currency
+               amount
+               convertedAmount
+               status
+               rate
+               destination {
+                 accountName
+                 accountNumber
+                 accountType
+               }
+               expiresAt
+             }
+             state
+             payment_channel
+             description
+             status
+             currency
+             extra_data
+             senderName
+             senderCountry
+             senderPhone
+             senderAddress
+             senderBusinessName
+             created_at
+             updated_at
+          }
+        }
+      `;
+
+    const response: Promise<
+      OperationResult<{
+        ConfirmWithdrawal: OffRamp;
+      }>
+    > = this.mutation(requestData, {
+      uuid,
+      currency,
+      amount,
+      metadata,
+    });
 
     return response;
   };
@@ -426,6 +652,24 @@ export default class WalletApi extends BaseApiService {
       }>
     > = this.mutation(requestData, {
       saved_account_uuid,
+    });
+
+    return response;
+  };
+
+  public InitiateWalletKYC = (currency: string) => {
+    const requestData = `
+        mutation InitiateWalletKYC($currency: String!) {
+          InitiateWalletKYC(currency: $currency)
+        }
+      `;
+
+    const response: Promise<
+      OperationResult<{
+        InitiateWalletKYC: string;
+      }>
+    > = this.mutation(requestData, {
+      currency,
     });
 
     return response;

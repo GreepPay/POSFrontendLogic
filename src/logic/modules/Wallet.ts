@@ -5,12 +5,15 @@ import {
   GlobalExchangeRate,
   MutationCreateSavedAccountArgs,
   MutationInitiateWithdrawalArgs,
+  OffRamp,
   PointTransaction,
   PointTransactionPaginator,
   SupportedCurrency,
   Transaction,
   TransactionPaginator,
   UserBankPaginator,
+  WithdrawInfo,
+  YellowcardNetwork,
 } from "../../gql/graphql";
 import { $api } from "../../services";
 import { CombinedError } from "urql";
@@ -33,6 +36,9 @@ export default class Wallet extends Common {
   public CurrentGlobalExchangeRate: GlobalExchangeRate | undefined;
   public NormalFinancialSummary: FinancialSummaryResponse | undefined;
   public PointFinancialSummary: FinancialSummaryResponse | undefined;
+  public CurrentWithdrawalInfo: WithdrawInfo | undefined;
+  public CurrentYellowCardNetworks: YellowcardNetwork[] | undefined;
+  public CurrentOfframp: OffRamp | undefined;
 
   // Mutation Variables
   public CreateSavedAccountForm: MutationCreateSavedAccountArgs | undefined;
@@ -51,12 +57,39 @@ export default class Wallet extends Common {
       });
   };
 
+  public GetWithdrawInfo = async (
+    amount: number,
+    currency: string,
+  ): Promise<WithdrawInfo | undefined> => {
+    return $api.wallet.GetWithdrawInfo(amount, currency).then((response) => {
+      this.CurrentWithdrawalInfo = response.data?.GetWithdrawInfo;
+      return this.CurrentWithdrawalInfo;
+    });
+  };
+
+  public GetYellowCardNetwork = async (
+    country_code: string,
+  ): Promise<YellowcardNetwork[] | undefined> => {
+    return $api.wallet.GetYellowCardNetwork(country_code).then((response) => {
+      this.CurrentYellowCardNetworks = response.data?.GetYellowCardNetwork;
+      return this.CurrentYellowCardNetworks;
+    });
+  };
+
   public GetGlobalExchangeRate = async (
     base = "USD",
     target = "",
   ): Promise<GlobalExchangeRate | undefined> => {
     if (!target) {
       target = Logic.Auth.AuthUser?.profile?.default_currency || "USD";
+    }
+
+    if (target == "USDC" || target == "USDT") {
+      target = "USD";
+    }
+
+    if (target == "EURC") {
+      target = "EUR";
     }
     return $api.wallet.GetGlobalExchangeRate(base, target).then((response) => {
       this.CurrentGlobalExchangeRate = response.data?.GetGlobalExchangeRate;
@@ -92,6 +125,17 @@ export default class Wallet extends Common {
       this.PointFinancialSummary = response.data?.GetFinancialSummary;
       return this.PointFinancialSummary;
     });
+  };
+
+  public GetBankAccountDetails = async (
+    accountNumber: string,
+    networkId: string,
+  ) => {
+    return $api.wallet
+      .GetBankAccountDetails(accountNumber, networkId)
+      .then((response) => {
+        return response.data?.GetBankAccountDetails;
+      });
   };
 
   public GetNormalFinancialSummary = async (from = "", to = "") => {
@@ -145,6 +189,17 @@ export default class Wallet extends Common {
     });
   };
 
+  public GetOfframp = async (uuid: string) => {
+    if (!uuid) {
+      this.CurrentOfframp = undefined;
+      return Promise.resolve(true);
+    }
+    return $api.wallet.GetOfframp(uuid).then((response) => {
+      this.CurrentOfframp = response.data?.GetOfframp;
+      return this.CurrentOfframp;
+    });
+  };
+
   // Mutations
   public CreateSavedAccount = async () => {
     if (this.CreateSavedAccountForm) {
@@ -167,11 +222,35 @@ export default class Wallet extends Common {
         .InitiateWithdrawal(this.InitiateWithdrawalForm)
         .then((response) => {
           if (response.data?.InitiateWithdrawal) {
+            this.CurrentOfframp = response.data.InitiateWithdrawal;
             return response.data.InitiateWithdrawal;
           }
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
+        });
+    }
+  };
+
+  public ConfirmWithdrawal = async (
+    uuid: string,
+    currency: string,
+    amount: number,
+    metadata = "",
+  ) => {
+    if (uuid) {
+      return $api.wallet
+        .ConfirmWithdrawal(uuid, currency, amount, metadata)
+        .then((response) => {
+          if (response.data?.ConfirmWithdrawal) {
+            this.CurrentOfframp = response.data.ConfirmWithdrawal;
+            return response.data.ConfirmWithdrawal;
+          }
+        })
+        .catch((error: CombinedError) => {
+          Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
         });
     }
   };
@@ -187,6 +266,24 @@ export default class Wallet extends Common {
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+        });
+    }
+  };
+
+  public InitiateWalletKYC = (currency: string) => {
+    if (currency) {
+      return $api.wallet
+        .InitiateWalletKYC(currency)
+        .then((response) => {
+          if (response.data?.InitiateWalletKYC) {
+            Logic.Common.hideLoader();
+            return response.data.InitiateWalletKYC;
+          }
+        })
+        .catch((error: CombinedError) => {
+          Logic.Common.hideLoader();
+          Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
         });
     }
   };

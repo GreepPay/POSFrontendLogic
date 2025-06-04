@@ -16,6 +16,7 @@ import {
   ModalSetup,
 } from "../types/common";
 import CryptoJS from "crypto-js";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 
 export default class Common {
   public router: Router | undefined = undefined;
@@ -73,8 +74,12 @@ export default class Common {
     this.apiUrl = apiUrl;
   };
 
-  public GoToRoute = (path: string) => {
-    this.router?.push(path);
+  public GoToRoute = (path: string, forceReload = false) => {
+    if (forceReload) {
+      window.location.pathname = path;
+    } else {
+      this.router?.push(path);
+    }
   };
 
   public alertSetup = reactive<AlertSetup>({
@@ -194,6 +199,17 @@ export default class Common {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+  };
+
+  public makeTouchSensation = async (style: "HEAVY" | "MEDIUM" | "LIGHT") => {
+    let currentStyle = ImpactStyle.Light;
+
+    if (style == "MEDIUM") {
+      currentStyle = ImpactStyle.Medium;
+    } else if (style == "HEAVY") {
+      currentStyle = ImpactStyle.Heavy;
+    }
+    await Haptics.impact({ style: currentStyle });
   };
 
   public convertToMoney = (

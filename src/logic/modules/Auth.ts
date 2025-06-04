@@ -189,6 +189,9 @@ export default class Auth extends Common {
         Logic.Common.GoToRoute("/auth/login");
       })
       .catch((error) => {
+        localStorage.clear();
+        Logic.Common.hideLoader();
+        Logic.Common.GoToRoute("/auth/login");
         Logic.Common.showError(error, "Oops!", "error-alert");
       });
   };
