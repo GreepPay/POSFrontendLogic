@@ -1,10 +1,15 @@
 import {
+  ExchangeAd,
+  ExchangeAdPaginator,
   ExchangeRate,
   FinancialSummaryInput,
   FinancialSummaryResponse,
   GlobalExchangeRate,
+  MutationCreateExchangeAdArgs,
+  MutationCreateProductArgs,
   MutationCreateSavedAccountArgs,
   MutationInitiateWithdrawalArgs,
+  MutationUpdateExchangeAdArgs,
   OffRamp,
   PointTransaction,
   PointTransactionPaginator,
@@ -314,6 +319,104 @@ export default class WalletApi extends BaseApiService {
     return response;
   };
 
+  public GetExchangeAds = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC",
+    whereQuery = "",
+  ) => {
+    const requestData = `
+      query GetExchangeAds(
+        $page: Int!,
+        $count: Int!
+      ){
+        GetExchangeAds(
+          first: $count,
+          page: $page,
+          orderBy: {
+            column: ${orderType ? orderType : "CREATED_AT"},
+            order: ${order}
+          }
+          ${whereQuery ? `where: ${whereQuery}` : ""}
+        ) {
+          paginatorInfo {
+            total
+            perPage
+            lastPage
+            lastItem
+            hasMorePages
+            firstItem
+            currentPage
+            count
+          }
+          data {
+          uuid
+          business {
+           id
+          }
+          from_currency
+          to_currency
+          rate
+          min_amount
+          max_amount
+          payout_address
+          address_details
+          payout_banks
+          business_id
+          status
+          created_at
+          updated_at
+          }
+        }
+      }
+    `;
+    const response: Promise<
+      OperationResult<{
+        GetExchangeAds: ExchangeAdPaginator;
+      }>
+    > = this.query(requestData, {
+      page,
+      count,
+    });
+
+    return response;
+  };
+
+  public GetExchangeAd = (uuid: string) => {
+    const requestData = `
+      query GetExchangeAd($uuid: String!) {
+        GetExchangeAd(uuid: $uuid) {
+          uuid
+          business {
+          id
+          }
+          from_currency
+          to_currency
+          rate
+          min_amount
+          max_amount
+          payout_address
+          address_details
+          payout_banks
+          business_id
+          status
+          created_at
+          updated_at
+        }
+      }
+    `;
+    const response: Promise<
+      OperationResult<{
+        GetExchangeAd: ExchangeAd;
+      }>
+    > = this.query(requestData, {
+      uuid,
+    });
+
+    return response;
+  };
+
   public GetSavedAccounts = (first: number, page: number) => {
     const requestData = `
       query GetSavedAccounts($first: Int!, $page: Int) {
@@ -617,6 +720,110 @@ export default class WalletApi extends BaseApiService {
       amount,
       metadata,
     });
+
+    return response;
+  };
+
+  public CreateExchangeAd = (data: MutationCreateExchangeAdArgs) => {
+    const requestData = `
+      mutation CreateExchangeAd(
+            $from_currency: String!
+            $to_currency: String!
+            $rate: Float!
+            $min_amount: Float!
+            $max_amount: Float!
+            $payout_address: String!
+            $address_details: String!
+            $business_id: String!
+            $payout_banks: String
+          ) {
+            CreateExchangeAd(
+              from_currency: $from_currency
+              to_currency: $to_currency
+              rate: $rate
+              min_amount: $min_amount
+              max_amount: $max_amount
+              payout_address: $payout_address
+              address_details: $address_details
+              business_id: $business_id
+              payout_banks: $payout_banks
+            ) {
+              uuid
+              business {
+                id
+              }
+              from_currency
+              to_currency
+              rate
+              min_amount
+              max_amount
+              payout_address
+              address_details
+              payout_banks
+              business_id
+              status
+              created_at
+              updated_at
+            }
+          }
+        `;
+
+    const response: Promise<
+      OperationResult<{
+        CreateExchangeAd: ExchangeAd;
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  };
+
+  public UpdateExchangeAd = (data: MutationUpdateExchangeAdArgs) => {
+    const requestData = `
+      mutation UpdateExchangeAd(
+            $exchange_ad_uuid: String!
+            $rate: Float
+            $min_amount: Float
+            $max_amount: Float
+            $payout_address: String
+            $address_details: String
+            $payout_banks: String
+            $status: String
+          ) {
+            UpdateExchangeAd(
+              exchange_ad_uuid: $exchange_ad_uuid
+              rate: $rate
+              min_amount: $min_amount
+              max_amount: $max_amount
+              payout_address: $payout_address
+              address_details: $address_details
+              payout_banks: $payout_banks
+              status: $status
+            ) {
+              uuid
+              business {
+                id
+              }
+              from_currency
+              to_currency
+              rate
+              min_amount
+              max_amount
+              payout_address
+              address_details
+              payout_banks
+              business_id
+              status
+              created_at
+              updated_at
+            }
+          }
+        `;
+
+    const response: Promise<
+      OperationResult<{
+        UpdateExchangeAd: ExchangeAd;
+      }>
+    > = this.mutation(requestData, data);
 
     return response;
   };

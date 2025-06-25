@@ -12,14 +12,6 @@ import {
 } from "src/gql/graphql";
 
 export default class Auth extends Common {
-  constructor() {
-    super();
-    this.AccessToken = localStorage.getItem("access_token");
-    this.AuthUser = localStorage.getItem("auth_user")
-      ? JSON.parse(localStorage.getItem("auth_user") || "{}")
-      : undefined;
-  }
-
   // Base Variables
   public AccessToken: string | null = null;
   public AuthUser: User | undefined = undefined;
@@ -31,6 +23,19 @@ export default class Auth extends Common {
   public ResetPasswordForm: MutationResetPasswordArgs | undefined;
   public UpdatePasswordForm: MutationUpdatePasswordArgs | undefined;
   public VerifyUserOTPForm: MutationVerifyUserOtpArgs | undefined;
+
+  constructor() {
+    super();
+
+    this.defineReactiveProperty("AccessToken", null);
+    this.defineReactiveProperty("AuthUser", undefined);
+    this.defineReactiveProperty("RequestUuid", null);
+
+    this.AccessToken = localStorage.getItem("access_token");
+    this.AuthUser = localStorage.getItem("auth_user")
+      ? JSON.parse(localStorage.getItem("auth_user") || "{}")
+      : undefined;
+  }
 
   // Private methods
   private SetUpAuth = (AuthResponse: any | undefined) => {
@@ -57,11 +62,13 @@ export default class Auth extends Common {
       })
       .catch((error: CombinedError) => {
         Logic.Common.showError(error, "Oops!", "error-alert");
-        localStorage.clear();
-        this.AccessToken = "";
-        this.AuthUser = undefined;
+        Logic.Auth.SignOut();
         throw error;
       });
+  };
+
+  public GetDefaultBusiness = () => {
+    return this.AuthUser?.businesses?.[0];
   };
 
   // Mutations
@@ -132,6 +139,7 @@ export default class Auth extends Common {
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+          throw new Error(error.message);
         });
     }
   };
@@ -146,6 +154,7 @@ export default class Auth extends Common {
       })
       .catch((error: CombinedError) => {
         Logic.Common.showError(error, "Oops!", "error-alert");
+        throw new Error(error.message);
       });
   };
 
@@ -160,6 +169,7 @@ export default class Auth extends Common {
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+          throw new Error(error.message);
         });
     }
   };
@@ -175,6 +185,7 @@ export default class Auth extends Common {
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+          throw new Error(error.message);
         });
     }
   };
@@ -186,12 +197,12 @@ export default class Auth extends Common {
       .then(() => {
         localStorage.clear();
         Logic.Common.hideLoader();
-        Logic.Common.GoToRoute("/auth/login");
+        Logic.Common.GoToRoute("/auth/login", true);
       })
       .catch((error) => {
         localStorage.clear();
         Logic.Common.hideLoader();
-        Logic.Common.GoToRoute("/auth/login");
+        Logic.Common.GoToRoute("/auth/login", true);
         Logic.Common.showError(error, "Oops!", "error-alert");
       });
   };

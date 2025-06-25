@@ -1,10 +1,14 @@
 import {
+  ExchangeAd,
+  ExchangeAdPaginator,
   ExchangeRate,
   FinancialSummaryInput,
   FinancialSummaryResponse,
   GlobalExchangeRate,
+  MutationCreateExchangeAdArgs,
   MutationCreateSavedAccountArgs,
   MutationInitiateWithdrawalArgs,
+  MutationUpdateExchangeAdArgs,
   OffRamp,
   PointTransaction,
   PointTransactionPaginator,
@@ -21,10 +25,6 @@ import Common from "./Common";
 import { Logic } from "..";
 
 export default class Wallet extends Common {
-  constructor() {
-    super();
-  }
-
   // Base Variables
   public CurrentExchangeRate: ExchangeRate | undefined;
   public ManyOffRampCurrencies: SupportedCurrency[] | undefined;
@@ -39,10 +39,34 @@ export default class Wallet extends Common {
   public CurrentWithdrawalInfo: WithdrawInfo | undefined;
   public CurrentYellowCardNetworks: YellowcardNetwork[] | undefined;
   public CurrentOfframp: OffRamp | undefined;
+  public ManyExchangeAds: ExchangeAdPaginator | undefined;
+  public SingleExchangeAd: ExchangeAd | undefined;
 
   // Mutation Variables
   public CreateSavedAccountForm: MutationCreateSavedAccountArgs | undefined;
   public InitiateWithdrawalForm: MutationInitiateWithdrawalArgs | undefined;
+  public CreateExchangeAdForm: MutationCreateExchangeAdArgs | undefined;
+  public UpdateExchangeAdForm: MutationUpdateExchangeAdArgs | undefined;
+
+  constructor() {
+    super();
+
+    this.defineReactiveProperty("CurrentExchangeRate", undefined);
+    this.defineReactiveProperty("ManyOffRampCurrencies", undefined);
+    this.defineReactiveProperty("ManyPointTransactions", undefined);
+    this.defineReactiveProperty("ManyTransactions", undefined);
+    this.defineReactiveProperty("ManySavedAccounts", undefined);
+    this.defineReactiveProperty("SinglePointTransaction", undefined);
+    this.defineReactiveProperty("SingleTransaction", undefined);
+    this.defineReactiveProperty("CurrentGlobalExchangeRate", undefined);
+    this.defineReactiveProperty("NormalFinancialSummary", undefined);
+    this.defineReactiveProperty("PointFinancialSummary", undefined);
+    this.defineReactiveProperty("CurrentWithdrawalInfo", undefined);
+    this.defineReactiveProperty("CurrentYellowCardNetworks", undefined);
+    this.defineReactiveProperty("CurrentOfframp", undefined);
+    this.defineReactiveProperty("ManyExchangeAds", undefined);
+    this.defineReactiveProperty("SingleExchangeAd", undefined);
+  }
 
   // Queries
   public GetExchangeRate = async (
@@ -100,7 +124,7 @@ export default class Wallet extends Common {
   public GetPointTransactions = async (
     page: number,
     count: number,
-    orderType: "CREATED_AT",
+    orderType = "CREATED_AT",
     order = "DESC" as "DESC" | "ASC",
     whereQuery = "",
     isSearch = false,
@@ -112,6 +136,24 @@ export default class Wallet extends Common {
           this.ManyPointTransactions = response.data?.GetPointTransactions;
         }
         return response.data?.GetPointTransactions;
+      });
+  };
+
+  public GetExchangeAds = async (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order = "DESC" as "DESC" | "ASC",
+    whereQuery = "",
+    isSearch = false,
+  ) => {
+    return $api.wallet
+      .GetExchangeAds(page, count, orderType, order, whereQuery)
+      .then((response) => {
+        if (!isSearch) {
+          this.ManyExchangeAds = response.data?.GetExchangeAds;
+        }
+        return response.data?.GetExchangeAds;
       });
   };
 
@@ -182,6 +224,13 @@ export default class Wallet extends Common {
     });
   };
 
+  public GetExchangeAd = async (uuid: string) => {
+    return $api.wallet.GetExchangeAd(uuid).then((response) => {
+      this.SingleExchangeAd = response.data?.GetExchangeAd;
+      return this.SingleExchangeAd;
+    });
+  };
+
   public GetSingleTransaction = async (uuid: string) => {
     return $api.wallet.GetSingleTransaction(uuid).then((response) => {
       this.SingleTransaction = response.data?.GetSingleTransaction;
@@ -212,6 +261,41 @@ export default class Wallet extends Common {
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
+        });
+    }
+  };
+
+  public CreateExchangeAd = async () => {
+    if (this.CreateExchangeAdForm) {
+      return $api.wallet
+        .CreateExchangeAd(this.CreateExchangeAdForm)
+        .then((response) => {
+          if (response.data?.CreateExchangeAd) {
+            this.SingleExchangeAd = response.data.CreateExchangeAd;
+            return response.data.CreateExchangeAd;
+          }
+        })
+        .catch((error: CombinedError) => {
+          Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
+        });
+    }
+  };
+
+  public UpdateExchangeAd = async () => {
+    if (this.UpdateExchangeAdForm) {
+      return $api.wallet
+        .UpdateExchangeAd(this.UpdateExchangeAdForm)
+        .then((response) => {
+          if (response.data?.UpdateExchangeAd) {
+            this.SingleExchangeAd = response.data.UpdateExchangeAd;
+            return response.data.UpdateExchangeAd;
+          }
+        })
+        .catch((error: CombinedError) => {
+          Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
         });
     }
   };
@@ -266,6 +350,7 @@ export default class Wallet extends Common {
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
         });
     }
   };
@@ -299,6 +384,7 @@ export default class Wallet extends Common {
         })
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
         });
     }
   };
