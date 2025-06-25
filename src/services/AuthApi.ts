@@ -24,6 +24,28 @@ export default class AuthApi extends BaseApiService {
           email
           phone_verified_at
           username
+          transaction_pin
+          businesses {
+            uuid
+            id
+            business_name
+            logo
+            category
+            banner
+            description
+            created_at
+            country
+            city
+            business_type
+            address
+            default_currency
+            wallet {
+              total_balance
+              point_balance
+              currency
+              state
+            }
+          }
           profile {
             profile_picture
             verification_status
@@ -64,19 +86,19 @@ export default class AuthApi extends BaseApiService {
   ) => {
     const requestData = `
       mutation SignUp(
-        $first_name: String!
-        $last_name: String!
+        $first_name: String
+        $last_name: String
         $phone_number: String
         $email: String!
         $password: String!
-        $state: String!
-        $country: String!
+        $state: String
+        $country: String
         $default_currency: String!
-        $business_name: String!
+        $business_name: String
         $business_logo: Upload
         $business_category: String
         $business_description: String
-        $documents: [Upload!]!
+        $documents: [Upload!]
       ) {
         SignUp(
           first_name: $first_name

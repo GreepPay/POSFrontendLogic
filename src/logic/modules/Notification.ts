@@ -8,10 +8,6 @@ import { PushNotifications } from "@capacitor/push-notifications";
 import { getPlatforms } from "@ionic/vue";
 
 export default class Notification extends Common {
-  constructor() {
-    super();
-  }
-
   // Base Variables
   public UnreadNotification = 0;
   public ManyNotifications: NotificationPaginator | undefined;
@@ -25,6 +21,12 @@ export default class Notification extends Common {
   public reset = () => {
     this.ManyNotifications = undefined;
   };
+
+  constructor() {
+    super();
+    this.defineReactiveProperty("UnreadNotification", 0);
+    this.defineReactiveProperty("ManyNotifications", undefined);
+  }
 
   // Queries
   public GetNotifications = async (first: number, page: number) => {

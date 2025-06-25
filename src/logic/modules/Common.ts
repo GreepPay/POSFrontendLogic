@@ -16,11 +16,15 @@ import {
   ModalSetup,
 } from "../types/common";
 import CryptoJS from "crypto-js";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
+import { Observable } from "./Observable";
 
 export default class Common {
   public router: Router | undefined = undefined;
 
   public route: RouteLocationNormalizedLoaded | undefined = undefined;
+
+  private _observables = new Map<string, Observable<any>>();
 
   public apiUrl: string | undefined = undefined;
 
@@ -40,14 +44,6 @@ export default class Common {
       path: "",
     },
   });
-
-  public SetRouter = (router: Router) => {
-    this.router = router;
-  };
-
-  public SetRoute = (route: RouteLocationNormalizedLoaded) => {
-    this.route = route;
-  };
 
   public loaderSetup: LoaderSetup = reactive({
     show: false,
@@ -69,19 +65,74 @@ export default class Common {
     action: () => {},
   });
 
-  public SetApiUrl = (apiUrl: string) => {
-    this.apiUrl = apiUrl;
-  };
-
-  public GoToRoute = (path: string) => {
-    this.router?.push(path);
-  };
-
   public alertSetup = reactive<AlertSetup>({
     show: false,
     message: "",
     type: "success",
   });
+
+  constructor() {
+    // Init observable wrappers only for selected properties
+    this.defineReactiveProperty("router", undefined);
+    this.defineReactiveProperty("route", undefined);
+    this.defineReactiveProperty("apiUrl", undefined);
+    this.defineReactiveProperty("watchInterval", undefined);
+    this.defineReactiveProperty("loadingState", false);
+    this.defineReactiveProperty("showBottomNav", false);
+    this.defineReactiveProperty("forcePageTransparency", false);
+    this.defineReactiveProperty("loaderSetup", this.loaderSetup);
+    this.defineReactiveProperty("modalSetup", this.modalSetup);
+    this.defineReactiveProperty("alertSetup", this.alertSetup);
+    this.defineReactiveProperty("currentLayout", this.currentLayout);
+  }
+
+  protected defineReactiveProperty<T = any>(prop: string, initialValue: T) {
+    const obs = new Observable<T>(initialValue);
+    this._observables.set(prop, obs);
+
+    Object.defineProperty(this, prop, {
+      get() {
+        return obs.value;
+      },
+      set(val: T) {
+        obs.value = val;
+      },
+      configurable: true,
+      enumerable: true,
+    });
+  }
+
+  public watchProperty = (prop: string, targetRef: { value: any }) => {
+    const obs = this._observables.get(prop);
+    if (obs) {
+      return obs.subscribe((val) => {
+        targetRef.value = val;
+      });
+    } else {
+      targetRef.value = (this as any)[prop];
+      return () => {};
+    }
+  };
+
+  public SetApiUrl = (apiUrl: string) => {
+    this.apiUrl = apiUrl;
+  };
+
+  public SetRouter = (router: Router) => {
+    this.router = router;
+  };
+
+  public SetRoute = (route: RouteLocationNormalizedLoaded) => {
+    this.route = route;
+  };
+
+  public GoToRoute = (path: string, forceReload = false) => {
+    if (forceReload) {
+      window.location.pathname = path;
+    } else {
+      this.router?.push(path);
+    }
+  };
 
   public encryptData = (jsonData: object, secretKey: string): string => {
     return CryptoJS.AES.encrypt(JSON.stringify(jsonData), secretKey).toString();
@@ -90,6 +141,17 @@ export default class Common {
   public decryptData = (encryptedData: string, secretKey: string): object => {
     const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  };
+
+  public makeid = (length: number) => {
+    var result = "";
+    var characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
   };
 
   public showAlert = (alertSetup: AlertSetup) => {
@@ -165,7 +227,23 @@ export default class Common {
   };
 
   public goBack = () => {
-    window.history.length > 1 ? this.router?.go(-1) : this.router?.push("/");
+    const ignoreBackRoute = this.route?.query.ignoreBackRoute
+      ? this.route.query.ignoreBackRoute.toString()
+      : null;
+    const routeMiddlewares: any = this.route?.meta.middlewares;
+    const goBackRoute = routeMiddlewares?.goBackRoute;
+
+    const backRouteFromQuery = this.route?.query.backRoute?.toString();
+
+    if (backRouteFromQuery) {
+      this.GoToRoute(backRouteFromQuery);
+    } else if (typeof goBackRoute == "function" && !ignoreBackRoute) {
+      this.GoToRoute(goBackRoute());
+    } else if (typeof goBackRoute == "string" && !ignoreBackRoute) {
+      this.GoToRoute(goBackRoute);
+    } else {
+      window.history.length > 1 ? this.router?.go(-1) : this.router?.push("/");
+    }
   };
 
   public hideLoader = () => {
@@ -185,15 +263,15 @@ export default class Common {
 
   public momentInstance = moment;
 
-  public makeid = (length: number) => {
-    let result = "";
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  public makeTouchSensation = async (style: "HEAVY" | "MEDIUM" | "LIGHT") => {
+    let currentStyle = ImpactStyle.Light;
+
+    if (style == "MEDIUM") {
+      currentStyle = ImpactStyle.Medium;
+    } else if (style == "HEAVY") {
+      currentStyle = ImpactStyle.Heavy;
     }
-    return result;
+    await Haptics.impact({ style: currentStyle });
   };
 
   public convertToMoney = (
@@ -253,26 +331,7 @@ export default class Common {
     }, delay);
   };
 
-  public watchProperty = (objectToWatch: string, objectToUpdate: any) => {
-    let upatedValue = (this as any)[`${objectToWatch}`];
-    const watchAction = () => {
-      upatedValue = (this as any)[`${objectToWatch}`];
-      if (objectToUpdate) {
-        objectToUpdate.value = upatedValue;
-      }
-      this.watchInterval = window.requestAnimationFrame(watchAction);
-    };
-
-    watchAction();
-  };
-
-  public stopWatchAction = () => {
-    if (this.watchInterval != undefined) {
-      window.cancelAnimationFrame(this.watchInterval);
-    }
-  };
-
-  private fetchFile = (url: string) => {
+  private fetchFile = async (url: string) => {
     return new Promise(function (resolve, reject) {
       // Get file name from url.
       const xhr = new XMLHttpRequest();

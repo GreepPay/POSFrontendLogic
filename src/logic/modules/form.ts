@@ -24,6 +24,12 @@ export default class Form {
       "Password must contain at least 8 characters that includes alphabets, symbols and numbers",
   };
 
+  public URLRule: FormRule = {
+    type: "isRegex",
+    value: /^(ftp|http|https):\/\/[^ "]+$/,
+    errorMessage: "URL must be valid",
+  };
+
   public handleConfirmPassword = (
     password: string,
     comfirm_password: string,
