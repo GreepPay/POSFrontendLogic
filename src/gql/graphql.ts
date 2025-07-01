@@ -1231,6 +1231,8 @@ export type Query = {
   GetProduct?: Maybe<Product>;
   /** Get many products - paginated list of products for the authenticated business */
   GetProducts: ProductPaginator;
+  /** Get Recommended Exchange Ads */
+  GetRecommendedExchangeAds: ExchangeAdPaginator;
   /** Get a paginated list of saved accounts for the authenticated user */
   GetSavedAccounts: UserBankPaginator;
   /** Get a single point transaction by UUID */
@@ -1329,6 +1331,14 @@ export type QueryGetProductsArgs = {
   orderBy?: InputMaybe<Array<QueryGetProductsOrderByOrderByClause>>;
   page?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<QueryGetProductsWhereWhereConditions>;
+};
+
+
+export type QueryGetRecommendedExchangeAdsArgs = {
+  first: Scalars['Int'];
+  orderBy?: InputMaybe<Array<QueryGetRecommendedExchangeAdsOrderByOrderByClause>>;
+  page?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<QueryGetRecommendedExchangeAdsWhereWhereConditions>;
 };
 
 
@@ -1571,6 +1581,57 @@ export type QueryGetProductsWhereWhereConditionsRelation = {
   amount?: InputMaybe<Scalars['Int']>;
   /** Additional condition logic. */
   condition?: InputMaybe<QueryGetProductsWhereWhereConditions>;
+  /** The comparison operator to test against the amount. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The relation that is checked. */
+  relation: Scalars['String'];
+};
+
+/** Allowed column names for Query.GetRecommendedExchangeAds.orderBy. */
+export enum QueryGetRecommendedExchangeAdsOrderByColumn {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Order by clause for Query.GetRecommendedExchangeAds.orderBy. */
+export type QueryGetRecommendedExchangeAdsOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetRecommendedExchangeAdsOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetRecommendedExchangeAds.where. */
+export enum QueryGetRecommendedExchangeAdsWhereColumn {
+  CreatedAt = 'CREATED_AT',
+  FromCurrency = 'FROM_CURRENCY',
+  Status = 'STATUS',
+  ToCurrency = 'TO_CURRENCY',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Dynamic WHERE conditions for the `where` argument of the query `GetRecommendedExchangeAds`. */
+export type QueryGetRecommendedExchangeAdsWhereWhereConditions = {
+  /** A set of conditions that requires all conditions to match. */
+  AND?: InputMaybe<Array<QueryGetRecommendedExchangeAdsWhereWhereConditions>>;
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied. */
+  HAS?: InputMaybe<QueryGetRecommendedExchangeAdsWhereWhereConditionsRelation>;
+  /** A set of conditions that requires at least one condition to match. */
+  OR?: InputMaybe<Array<QueryGetRecommendedExchangeAdsWhereWhereConditions>>;
+  /** The column that is used for the condition. */
+  column?: InputMaybe<QueryGetRecommendedExchangeAdsWhereColumn>;
+  /** The operator that is used for the condition. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The value that is used for the condition. */
+  value?: InputMaybe<Scalars['Mixed']>;
+};
+
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `GetRecommendedExchangeAds`. */
+export type QueryGetRecommendedExchangeAdsWhereWhereConditionsRelation = {
+  /** The amount to test. */
+  amount?: InputMaybe<Scalars['Int']>;
+  /** Additional condition logic. */
+  condition?: InputMaybe<QueryGetRecommendedExchangeAdsWhereWhereConditions>;
   /** The comparison operator to test against the amount. */
   operator?: InputMaybe<SqlOperator>;
   /** The relation that is checked. */

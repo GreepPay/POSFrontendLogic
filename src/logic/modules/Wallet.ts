@@ -40,6 +40,7 @@ export default class Wallet extends Common {
   public CurrentYellowCardNetworks: YellowcardNetwork[] | undefined;
   public CurrentOfframp: OffRamp | undefined;
   public ManyExchangeAds: ExchangeAdPaginator | undefined;
+  public ManyRecommendedExchangeAds: ExchangeAdPaginator | undefined;
   public SingleExchangeAd: ExchangeAd | undefined;
 
   // Mutation Variables
@@ -66,6 +67,7 @@ export default class Wallet extends Common {
     this.defineReactiveProperty("CurrentOfframp", undefined);
     this.defineReactiveProperty("ManyExchangeAds", undefined);
     this.defineReactiveProperty("SingleExchangeAd", undefined);
+    this.defineReactiveProperty("ManyRecommendedExchangeAds", undefined);
   }
 
   // Queries
@@ -154,6 +156,25 @@ export default class Wallet extends Common {
           this.ManyExchangeAds = response.data?.GetExchangeAds;
         }
         return response.data?.GetExchangeAds;
+      });
+  };
+
+  public GetRecommendedExchangeAds = async (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order = "DESC" as "DESC" | "ASC",
+    whereQuery = "",
+    isSearch = false,
+  ) => {
+    return $api.wallet
+      .GetRecommendedExchangeAds(page, count, orderType, order, whereQuery)
+      .then((response) => {
+        if (!isSearch) {
+          this.ManyRecommendedExchangeAds =
+            response.data?.GetRecommendedExchangeAds;
+        }
+        return response.data?.GetRecommendedExchangeAds;
       });
   };
 
