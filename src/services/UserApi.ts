@@ -1,5 +1,6 @@
 import {
   MutationCreateBusinessProfileArgs,
+  MutationVerifyUserIdentityArgs,
   MutationUpdateBusinessProfileArgs,
   MutationUpdateProfileArgs,
 } from "src/gql/graphql";
@@ -157,4 +158,29 @@ export default class UserApi extends BaseApiService {
 
     return response;
   };
+
+
+  public VerifyUserIdentity = (data: MutationVerifyUserIdentityArgs) => {
+  const  requestData = `
+    mutation VerifyUserIdentity(
+      $user_uuid: String
+      $id_type: String!
+      $id_number: String!
+      $id_country: String!
+    ) {
+      VerifyUserIdentity(
+        user_uuid: $user_uuid
+        id_type: $id_type
+        id_number: $id_number
+        id_country: $id_country
+      )
+    }
+  `;
+
+  const response: Promise<OperationResult<{ VerifyUserIdentity: boolean }>> =
+    this.mutation( requestData, data);
+
+  return response;
+};
+
 }

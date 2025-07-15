@@ -562,6 +562,12 @@ export type MutationCreateBusinessProfileArgs = {
   website?: InputMaybe<Scalars['String']>;
 };
 
+export type MutationVerifyUserIdentityArgs ={
+  user_uuid?:InputMaybe<Scalars['String']>;
+   id_type:Scalars['String'];
+   id_number:Scalars['String'];
+   id_country:Scalars['String'];
+}
 
 export type MutationCreateExchangeAdArgs = {
   address_details: Scalars['String'];
