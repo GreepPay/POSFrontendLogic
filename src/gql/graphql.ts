@@ -563,7 +563,6 @@ export type MutationCreateBusinessProfileArgs = {
 };
 
 export type MutationVerifyUserIdentityArgs ={
-  user_uuid?:InputMaybe<Scalars['String']>;
    id_type:Scalars['String'];
    id_number:Scalars['String'];
    id_country:Scalars['String'];

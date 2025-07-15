@@ -163,13 +163,11 @@ export default class UserApi extends BaseApiService {
   public VerifyUserIdentity = (data: MutationVerifyUserIdentityArgs) => {
   const  requestData = `
     mutation VerifyUserIdentity(
-      $user_uuid: String
       $id_type: String!
       $id_number: String!
       $id_country: String!
     ) {
       VerifyUserIdentity(
-        user_uuid: $user_uuid
         id_type: $id_type
         id_number: $id_number
         id_country: $id_country
