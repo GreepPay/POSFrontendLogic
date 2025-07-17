@@ -166,11 +166,13 @@ export default class UserApi extends BaseApiService {
       $id_type: String!
       $id_number: String!
       $id_country: String!
+      $checks: VerifyChecksInput
     ) {
       VerifyUserIdentity(
         id_type: $id_type
         id_number: $id_number
         id_country: $id_country
+        checks: $checks
       )
     }
   `;

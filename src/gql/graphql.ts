@@ -561,11 +561,16 @@ export type MutationCreateBusinessProfileArgs = {
   resident_permit?: InputMaybe<Scalars['Upload']>;
   website?: InputMaybe<Scalars['String']>;
 };
-
+export type VerifyChecksInput = {
+  dob: boolean;
+  name: boolean;
+  phone: boolean;
+};
 export type MutationVerifyUserIdentityArgs ={
    id_type:Scalars['String'];
    id_number:Scalars['String'];
    id_country:Scalars['String'];
+   checks: VerifyChecksInput;
 }
 
 export type MutationCreateExchangeAdArgs = {
