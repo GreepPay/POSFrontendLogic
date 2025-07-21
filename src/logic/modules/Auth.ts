@@ -58,6 +58,8 @@ export default class Auth extends Common {
       .then((response) => {
         this.AuthUser = response.data?.GetAuthUser;
         localStorage.setItem("auth_user", JSON.stringify(this.AuthUser));
+
+        Logic.Common.initiateWebSocket();
         return this.AuthUser;
       })
       .catch((error: CombinedError) => {

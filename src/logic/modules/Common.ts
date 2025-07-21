@@ -18,9 +18,16 @@ import {
 import CryptoJS from "crypto-js";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { Observable } from "./Observable";
+import Echo from "laravel-echo";
+
+import Pusher from "pusher-js";
+// @ts-ignore
+window.Pusher = Pusher;
 
 export default class Common {
   public router: Router | undefined = undefined;
+
+  public laravelEcho: Echo<any> | undefined;
 
   public route: RouteLocationNormalizedLoaded | undefined = undefined;
 
@@ -79,6 +86,7 @@ export default class Common {
     this.defineReactiveProperty("watchInterval", undefined);
     this.defineReactiveProperty("loadingState", false);
     this.defineReactiveProperty("showBottomNav", false);
+    this.defineReactiveProperty("laravelEcho", undefined);
     this.defineReactiveProperty("forcePageTransparency", false);
     this.defineReactiveProperty("loaderSetup", this.loaderSetup);
     this.defineReactiveProperty("modalSetup", this.modalSetup);
@@ -111,6 +119,34 @@ export default class Common {
     } else {
       targetRef.value = (this as any)[prop];
       return () => {};
+    }
+  };
+
+  public initiateWebSocket = () => {
+    try {
+      if (!this.laravelEcho) {
+        this.laravelEcho = new Echo({
+          broadcaster: "pusher",
+          key: (import.meta as any).env.VITE_PUSHER_APP_KEY,
+          cluster: "mt1",
+          // forceTLS: true,
+          // encrypted: true,
+          forceTLS: true,
+          disableStats: true,
+          wsPort: (import.meta as any).env.VITE_PUSHER_PORT,
+          wsHost: (import.meta as any).env.VITE_PUSHER_HOST,
+          auth: {
+            headers: {
+              authorization: `Bearer ${Logic.Auth.AccessToken}`,
+            },
+          },
+          authEndpoint: `${
+            (import.meta as any).env.VITE_SOCKET_AUTH_URL
+          }/broadcasting/auth`,
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
