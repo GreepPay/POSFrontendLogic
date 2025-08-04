@@ -383,6 +383,73 @@ export default class WalletApi extends BaseApiService {
     return response;
   };
 
+  public GetRecommendedExchangeAds = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC",
+    whereQuery = "",
+  ) => {
+    const requestData = `
+      query GetRecommendedExchangeAds(
+        $page: Int!,
+        $count: Int!
+      ){
+        GetRecommendedExchangeAds(
+          first: $count,
+          page: $page,
+          orderBy: {
+            column: ${orderType ? orderType : "CREATED_AT"},
+            order: ${order}
+          }
+          ${whereQuery ? `where: ${whereQuery}` : ""}
+        ) {
+          paginatorInfo {
+            total
+            perPage
+            lastPage
+            lastItem
+            hasMorePages
+            firstItem
+            currentPage
+            count
+          }
+          data {
+          uuid
+          business {
+           id
+           uuid
+           logo
+           business_name
+          }
+          from_currency
+          to_currency
+          rate
+          min_amount
+          max_amount
+          payout_address
+          address_details
+          payout_banks
+          business_id
+          status
+          created_at
+          updated_at
+          }
+        }
+      }
+    `;
+    const response: Promise<
+      OperationResult<{
+        GetRecommendedExchangeAds: ExchangeAdPaginator;
+      }>
+    > = this.query(requestData, {
+      page,
+      count,
+    });
+
+    return response;
+  };
+
   public GetExchangeAd = (uuid: string) => {
     const requestData = `
       query GetExchangeAd($uuid: String!) {

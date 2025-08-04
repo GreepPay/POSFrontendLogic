@@ -1,5 +1,5 @@
-import { BaseApiService } from "./common/BaseService";
-import { OperationResult } from "urql";
+import { BaseApiService } from "./common/BaseService"
+import { OperationResult } from "urql"
 import {
   AuthResponse,
   MutationResetPasswordArgs,
@@ -8,7 +8,8 @@ import {
   MutationUpdatePasswordArgs,
   MutationVerifyUserOtpArgs,
   User,
-} from "src/gql/graphql";
+  MutationVerifyUserIdentityArgs,
+} from "src/gql/graphql"
 
 export default class AuthApi extends BaseApiService {
   // Queries
@@ -68,21 +69,21 @@ export default class AuthApi extends BaseApiService {
           }
         }
       }
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        GetAuthUser: User;
+        GetAuthUser: User
       }>
-    > = this.query(requestData, {});
+    > = this.query(requestData, {})
 
-    return response;
-  };
+    return response
+  }
 
   //  Mutations
   public SignUp = (
     data: MutationSignUpArgs,
-    progressCallback: (progress: number) => void,
+    progressCallback: (progress: number) => void
   ) => {
     const requestData = `
       mutation SignUp(
@@ -133,16 +134,16 @@ export default class AuthApi extends BaseApiService {
           }
         }
       }
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        SignUp: User;
+        SignUp: User
       }>
-    > = this.mutationWithProgress(requestData, data, progressCallback);
+    > = this.mutationWithProgress(requestData, data, progressCallback)
 
-    return response;
-  };
+    return response
+  }
 
   public SignIn = (data: MutationSignInArgs) => {
     const requestData = `
@@ -159,16 +160,16 @@ export default class AuthApi extends BaseApiService {
         }
       }
 
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        SignIn: AuthResponse;
+        SignIn: AuthResponse
       }>
-    > = this.mutation(requestData, data);
+    > = this.mutation(requestData, data)
 
-    return response;
-  };
+    return response
+  }
 
   public ResendEmailOTP = (email: string) => {
     const requestData = `
@@ -176,16 +177,16 @@ export default class AuthApi extends BaseApiService {
         ResendEmailOTP(email: $email)
       }
 
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        ResendEmailOTP: Boolean;
+        ResendEmailOTP: Boolean
       }>
-    > = this.mutation(requestData, { email });
+    > = this.mutation(requestData, { email })
 
-    return response;
-  };
+    return response
+  }
 
   public ResetPassword = (data: MutationResetPasswordArgs) => {
     const requestData = `
@@ -200,16 +201,16 @@ export default class AuthApi extends BaseApiService {
           new_password: $newPassword
         )
       }
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        ResetPassword: Boolean;
+        ResetPassword: Boolean
       }>
-    > = this.mutation(requestData, data);
+    > = this.mutation(requestData, data)
 
-    return response;
-  };
+    return response
+  }
 
   public SendResetPasswordOTP = (email: string) => {
     const requestData = `
@@ -217,59 +218,94 @@ export default class AuthApi extends BaseApiService {
         SendResetPasswordOTP(email: $email)
       }
 
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        SendResetPasswordOTP: Boolean;
+        SendResetPasswordOTP: Boolean
       }>
-    > = this.mutation(requestData, { email });
+    > = this.mutation(requestData, { email })
 
-    return response;
-  };
+    return response
+  }
 
   public UpdatePassword = (data: MutationUpdatePasswordArgs) => {
     const request_data = `
         mutation UpdatePassword($currentPassword: String!, $newPassword: String!) {
           UpdatePassword(current_password: $currentPassword, new_password: $newPassword)
         }
-      `;
+      `
 
     const response: Promise<
       OperationResult<{
-        UpdatePassword: Boolean;
+        UpdatePassword: Boolean
       }>
-    > = this.mutation(request_data, data);
+    > = this.mutation(request_data, data)
 
-    return response;
-  };
+    return response
+  }
 
   public VerifyUserOTP = (data: MutationVerifyUserOtpArgs) => {
     const requestData = `
       mutation VerifyUserOTP($user_uuid: String!, $otp: String!) {
         VerifyUserOTP(user_uuid: $user_uuid, otp: $otp)
       }
-    `;
+    `
 
     const response: Promise<
       OperationResult<{
-        VerifyUserOTP: Boolean;
+        VerifyUserOTP: Boolean
       }>
-    > = this.mutation(requestData, data);
+    > = this.mutation(requestData, data)
 
-    return response;
-  };
+    return response
+  }
+
+  public VerifyUserIdentity = (data: MutationVerifyUserIdentityArgs) => {
+    const requestData = `
+    mutation VerifyUserIdentity(
+      $user_uuid: String!
+      $id_type: String!
+      $id_number: String!
+      $id_country: String!
+      $full_name: String!
+      $phone_number: String!
+      $date_of_birth: String!
+      $address: String!
+      $additional_ids: [AdditionalIdInput!]
+      $checks: VerifyChecksInput!
+    ) {
+      VerifyUserIdentity(
+        user_uuid: $user_uuid
+        id_type: $id_type
+        id_number: $id_number
+        id_country: $id_country
+        full_name: $full_name
+        phone_number: $phone_number
+        date_of_birth: $date_of_birth
+        address: $address
+        additional_ids: $additional_ids
+        checks: $checks
+      )
+    }
+  `
+
+    const response: Promise<OperationResult<{ VerifyUserIdentity: boolean }>> =
+      this.mutation(requestData, data)
+
+    return response
+  }
 
   public SignOut = () => {
     const requestData = `
     mutation SignOut {
        SignOut
     }
-  `;
+  `
 
     const response: Promise<OperationResult<{ SignOut: boolean }>> =
-      this.mutation(requestData, {});
+      this.mutation(requestData, {})
 
-    return response;
-  };
+    return response
+  }
 }
