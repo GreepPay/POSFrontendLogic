@@ -16,8 +16,15 @@ export default class CommerceApi extends BaseApiService {
     count: number,
     orderType = "CREATED_AT",
     order: "ASC" | "DESC",
-    whereQuery = "",
+    whereQuery = ""
   ) => {
+    console.log("GetProducts called with:", {
+      page,
+      count,
+      orderType,
+      order,
+      whereQuery,
+    });
     const requestData = `
       query GetProducts(
         $page: Int!,
@@ -172,7 +179,7 @@ export default class CommerceApi extends BaseApiService {
     count: number,
     orderType = "CREATED_AT",
     order: "ASC" | "DESC",
-    whereQuery = "",
+    whereQuery = ""
   ) => {
     const requestData = `
       query GetOrders(

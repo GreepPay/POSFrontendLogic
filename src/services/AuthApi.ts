@@ -17,6 +17,7 @@ export default class AuthApi extends BaseApiService {
     const requestData = `
       query GetAuthUser {
         GetAuthUser {
+          id
           uuid
           first_name
           last_name

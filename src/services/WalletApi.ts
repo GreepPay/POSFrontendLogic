@@ -1,13 +1,17 @@
 import {
+  AnchorTransation,
   ExchangeAd,
   ExchangeAdPaginator,
   ExchangeRate,
   FinancialSummaryInput,
   FinancialSummaryResponse,
   GlobalExchangeRate,
+  InteractiveWithdrawalResponse,
   MutationCreateExchangeAdArgs,
   MutationCreateProductArgs,
   MutationCreateSavedAccountArgs,
+  MutationExtractAnchorTransactionArgs,
+  MutationInitiateInteractiveWithdrawalArgs,
   MutationInitiateWithdrawalArgs,
   MutationUpdateExchangeAdArgs,
   OffRamp,
@@ -948,4 +952,62 @@ export default class WalletApi extends BaseApiService {
 
     return response;
   };
+
+  public InitiateInteractiveWithdrawal = (data: MutationInitiateInteractiveWithdrawalArgs) => {
+    const requestData = `
+      mutation InitiateInteractiveWithdrawal($amount: Float!, $withdrawal_currency: String!) {
+        InitiateInteractiveWithdrawal(amount: $amount, withdrawal_currency: $withdrawal_currency) {
+          type
+          url
+          id
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        InitiateInteractiveWithdrawal: InteractiveWithdrawalResponse;
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  }
+
+  public ExtractAnchorTransaction = (data: MutationExtractAnchorTransactionArgs) => {
+    const requestData = `
+      mutation ExtractAnchorTransaction($transaction_id: String!, $withdrawal_currency: String!) {
+        ExtractAnchorTransaction(transaction_id: $transaction_id, withdrawal_currency: $withdrawal_currency) {
+          id
+          kind
+          status
+          status_eta
+          more_info_url
+          amount_in
+          amount_out
+          amount_fee
+          started_at
+          completed_at
+          stellar_transaction_id
+          external_transaction_id
+          message
+          refunded
+          deposit_memo
+          deposit_memo_type
+          from
+          to
+          withdraw_anchor_account
+          withdraw_memo
+          withdraw_memo_type
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        ExtractAnchorTransaction:  AnchorTransation;
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  }
 }

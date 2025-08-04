@@ -58,9 +58,11 @@ export default class Auth extends Common {
     return $api.auth
       .GetAuthUser()
       .then((response) => {
-        this.AuthUser = response.data?.GetAuthUser
-        localStorage.setItem("auth_user", JSON.stringify(this.AuthUser))
-        return this.AuthUser
+        this.AuthUser = response.data?.GetAuthUser;
+        localStorage.setItem("auth_user", JSON.stringify(this.AuthUser));
+
+        Logic.Common.initiateWebSocket();
+        return this.AuthUser;
       })
       .catch((error: CombinedError) => {
         Logic.Common.showError(error, "Oops!", "error-alert")

@@ -77,7 +77,7 @@ export type AnchorTransation = {
   /** Whether the transaction was refunded */
   refunded: Scalars['Boolean'];
   /** Transaction start timestamp */
-  started_at: Scalars['String'];
+  started_at: Scalars['DateTime'];
   /** Current status of the transaction */
   status: Scalars['String'];
   /** Estimated time for completion */

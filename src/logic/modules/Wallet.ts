@@ -7,6 +7,8 @@ import {
   GlobalExchangeRate,
   MutationCreateExchangeAdArgs,
   MutationCreateSavedAccountArgs,
+  MutationExtractAnchorTransactionArgs,
+  MutationInitiateInteractiveWithdrawalArgs,
   MutationInitiateWithdrawalArgs,
   MutationUpdateExchangeAdArgs,
   OffRamp,
@@ -48,6 +50,8 @@ export default class Wallet extends Common {
   public InitiateWithdrawalForm: MutationInitiateWithdrawalArgs | undefined;
   public CreateExchangeAdForm: MutationCreateExchangeAdArgs | undefined;
   public UpdateExchangeAdForm: MutationUpdateExchangeAdArgs | undefined;
+  public InitiateInteractiveWithdrawalForm: MutationInitiateInteractiveWithdrawalArgs | undefined;
+  public ExtractAnchorTransactionForm: MutationExtractAnchorTransactionArgs | undefined;
 
   constructor() {
     super();
@@ -107,7 +111,8 @@ export default class Wallet extends Common {
     target = "",
   ): Promise<GlobalExchangeRate | undefined> => {
     if (!target) {
-      target = Logic.Auth.AuthUser?.profile?.default_currency || "USD";
+      const currentBusiness = Logic.Auth?.GetDefaultBusiness();
+      target = currentBusiness?.default_currency || "USD";
     }
 
     if (target == "USDC" || target == "USDT") {
@@ -278,6 +283,40 @@ export default class Wallet extends Common {
         .then((response) => {
           if (response.data?.CreateSavedAccount) {
             return response.data.CreateSavedAccount;
+          }
+        })
+        .catch((error: CombinedError) => {
+          Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
+        });
+    }
+  };
+
+  public InitiateInteractiveWithdrawal = async () => {
+    if (this.InitiateInteractiveWithdrawalForm) {
+      return $api.wallet
+        .InitiateInteractiveWithdrawal(this.InitiateInteractiveWithdrawalForm)
+        .then((response) => {
+          if (response.data?.InitiateInteractiveWithdrawal) {
+            return response.data.InitiateInteractiveWithdrawal;
+          }
+        })
+        .catch((error: CombinedError) => {
+          Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
+        });
+    }
+  }
+
+  public ExtractAnchorTransaction = async () => {
+    if (this.ExtractAnchorTransactionForm) {
+      return $api.wallet
+        .ExtractAnchorTransaction(
+          this.ExtractAnchorTransactionForm,
+        )
+        .then((response) => {
+          if (response.data?.ExtractAnchorTransaction) {
+            return response.data.ExtractAnchorTransaction;
           }
         })
         .catch((error: CombinedError) => {
