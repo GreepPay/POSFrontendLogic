@@ -16,6 +16,7 @@ export interface SelectOption {
   key: any
   value: string
   extras?: string
+  extraInfo?: string[]
   hasIcon?: boolean
   isImage?: boolean
   isForm?: boolean
@@ -23,7 +24,7 @@ export interface SelectOption {
   useSlot?: boolean
   disabled?: boolean
   formField?: {
-    type: 'text' | 'tel' | 'select'
+    type: "text" | "tel" | "select"
     placeholder: string
     value: string
     validations: FormRule[]
