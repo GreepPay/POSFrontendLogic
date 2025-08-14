@@ -210,6 +210,21 @@ export default class Auth extends Common {
     }
   }
 
+  public DeleteUser = () => {
+    Logic.Common.showLoader({ loading: true })
+    return $api.auth
+      .DeleteUser()
+      .then((response) => {
+        Logic.Common.hideLoader()
+        Logic.Common.GoToRoute("/start", true);
+        return response.data?.DeleteUser
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(error, "Oops!", "error-alert")
+        throw new Error(error.message)
+      })
+  }
+
   public SignOut = () => {
     Logic.Common.showLoader({ loading: true, show: true })
     $api.auth
