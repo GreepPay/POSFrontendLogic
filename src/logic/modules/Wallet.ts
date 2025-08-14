@@ -1,6 +1,7 @@
 import {
   ExchangeAd,
   ExchangeAdPaginator,
+  ExchangeOrder,
   ExchangeRate,
   FinancialSummaryInput,
   FinancialSummaryResponse,
@@ -44,6 +45,8 @@ export default class Wallet extends Common {
   public ManyExchangeAds: ExchangeAdPaginator | undefined;
   public ManyRecommendedExchangeAds: ExchangeAdPaginator | undefined;
   public SingleExchangeAd: ExchangeAd | undefined;
+  public ManyP2pOrders: { data: ExchangeOrder[]; paginatorInfo: any } | undefined;
+  public SingleP2pOrder: ExchangeOrder | undefined;
 
   // Mutation Variables
   public CreateSavedAccountForm: MutationCreateSavedAccountArgs | undefined;
@@ -72,6 +75,8 @@ export default class Wallet extends Common {
     this.defineReactiveProperty("ManyExchangeAds", undefined);
     this.defineReactiveProperty("SingleExchangeAd", undefined);
     this.defineReactiveProperty("ManyRecommendedExchangeAds", undefined);
+    this.defineReactiveProperty("ManyP2pOrders", undefined);
+    this.defineReactiveProperty("SingleP2pOrder", undefined);
   }
 
   // Queries
@@ -447,5 +452,82 @@ export default class Wallet extends Common {
           throw error;
         });
     }
+  };
+
+  // P2P Orders
+  public GetP2pOrders = async (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order = "DESC" as "DESC" | "ASC",
+    whereQuery = "",
+    isSearch = false,
+  ) => {
+    return $api.wallet
+      .GetP2pOrders(page, count, orderType, order, whereQuery)
+      .then((response) => {
+        this.ManyP2pOrders = response.data?.GetP2pOrders;
+        return this.ManyP2pOrders;
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(error, "Oops!", "error-alert");
+        throw error;
+      });
+  };
+
+  public GetP2pOrder = async (uuid: string) => {
+    return $api.wallet
+      .GetP2pOrder(uuid)
+      .then((response) => {
+        this.SingleP2pOrder = response.data?.GetP2pOrder;
+        return this.SingleP2pOrder;
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(error, "Oops!", "error-alert");
+        throw error;
+      });
+  };
+
+  public CreateP2pOrder = async (orderData: {
+    exchange_ad_uuid: string;
+    amount: number;
+    delivery_address: string;
+    city: string;
+    country: string;
+    payment_type: string;
+    payout_option: string;
+    conversation_uuid: string;
+    metadata?: string;
+  }) => {
+    return $api.wallet
+      .CreateP2pOrder(orderData)
+      .then((response) => {
+        if (response.data?.CreateP2pOrder) {
+          Logic.Common.hideLoader();
+          return response.data.CreateP2pOrder;
+        }
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.hideLoader();
+        Logic.Common.showError(error, "Oops!", "error-alert");
+        throw error;
+      });
+  };
+
+  public UploadFile = async (file: File) => {
+    Logic.Common.showLoader({ loading: true, show: true });
+    return $api.wallet
+      .UploadFile(file)
+      .then((response) => {
+        if (response.data?.UploadFile) {
+          Logic.Common.hideLoader();
+          return response.data.UploadFile;
+        }
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.hideLoader();
+        Logic.Common.showError(error, "Oops!", "error-alert");
+        throw error;
+      });
   };
 }
