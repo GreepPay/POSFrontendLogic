@@ -42,6 +42,15 @@ export type Account = {
   uuid: Scalars['String'];
 };
 
+<<<<<<< HEAD
+=======
+export type AddParticipantInput = {
+  added_by: Scalars['Int'];
+  conversation_id: Scalars['Int'];
+  user_id: Scalars['Int'];
+};
+
+>>>>>>> d64c06d1359cc4872602d24c5872ad3b93dd9060
 export type AdditionalIdInput = {
   number: Scalars['String'];
   type: Scalars['String'];
@@ -77,7 +86,7 @@ export type AnchorTransation = {
   /** Whether the transaction was refunded */
   refunded: Scalars['Boolean'];
   /** Transaction start timestamp */
-  started_at: Scalars['DateTime'];
+  started_at: Scalars['String'];
   /** Current status of the transaction */
   status: Scalars['String'];
   /** Estimated time for completion */
@@ -398,6 +407,8 @@ export type ExchangeOrder = {
   ad_id: Scalars['Int'];
   /** Amount */
   amount: Scalars['Float'];
+  /** Conversation UUID associated with this order */
+  conversation_uuid?: Maybe<Scalars['String']>;
   /** Order Created At */
   created_at: Scalars['DateTime'];
   /** Expected Amount */
@@ -565,6 +576,8 @@ export type MessageInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Add a participant to a conversation */
+  AddParticipant: Conversation;
   /** Confirm withdrawal */
   ConfirmWithdrawal?: Maybe<OffRamp>;
   /** Create a business profile */
@@ -573,6 +586,8 @@ export type Mutation = {
   CreateExchangeAd: ExchangeAd;
   /** Create a message */
   CreateMessage: Message;
+  /** Create a new P2P order */
+  CreateP2pOrder: ExchangeOrder;
   /** Create a new P2P payment method */
   CreateP2pPaymentMethod: P2pPaymentMethod;
   /** Create Product */
@@ -629,10 +644,20 @@ export type Mutation = {
   /** Update a user's profile with detailed information */
   UpdateProfile: Scalars['Boolean'];
   UpdateStoreLocation: StoreLocation;
+<<<<<<< HEAD
+=======
+  /** Upload any file and get the URL */
+  UploadFile: Scalars['String'];
+>>>>>>> d64c06d1359cc4872602d24c5872ad3b93dd9060
   /** Verify user identity with optional checks */
   VerifyUserIdentity: Scalars['Boolean'];
   /** Verify user OTP */
   VerifyUserOTP: Scalars['Boolean'];
+};
+
+
+export type MutationAddParticipantArgs = {
+  input: AddParticipantInput;
 };
 
 
@@ -679,6 +704,19 @@ export type MutationCreateExchangeAdArgs = {
 
 export type MutationCreateMessageArgs = {
   input: MessageInput;
+};
+
+
+export type MutationCreateP2pOrderArgs = {
+  amount: Scalars['Float'];
+  city: Scalars['String'];
+  conversation_uuid: Scalars['String'];
+  country: Scalars['String'];
+  delivery_address: Scalars['String'];
+  exchange_ad_uuid: Scalars['String'];
+  metadata?: InputMaybe<Scalars['String']>;
+  payment_type: Scalars['String'];
+  payout_option: Scalars['String'];
 };
 
 
@@ -904,6 +942,14 @@ export type MutationUpdateStoreLocationArgs = {
 };
 
 
+<<<<<<< HEAD
+=======
+export type MutationUploadFileArgs = {
+  file: Scalars['Upload'];
+};
+
+
+>>>>>>> d64c06d1359cc4872602d24c5872ad3b93dd9060
 export type MutationVerifyUserIdentityArgs = {
   additional_ids?: InputMaybe<Array<AdditionalIdInput>>;
   address?: InputMaybe<Scalars['String']>;
