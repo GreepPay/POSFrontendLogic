@@ -117,29 +117,32 @@ export default class Common {
     }
   }
 
-   public copytext = (text: string) => {
-    const el = document.createElement("textarea");
-    el.value = text;
-    el.setAttribute("readonly", "");
-    el.style.position = "absolute";
-    el.style.left = "-9999px";
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand("copy");
-    document.body.removeChild(el);
+  public copytext = (text: string) => {
+    const el = document.createElement("textarea")
+    el.value = text
+    el.setAttribute("readonly", "")
+    el.style.position = "absolute"
+    el.style.left = "-9999px"
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand("copy")
+    document.body.removeChild(el)
     this.showAlert({
       show: true,
       message: "Copied to clipboard",
       type: "success",
-    });
-  };
+    })
+  }
 
   public initiateWebSocket = () => {
+    const VITE_PUSHER_APP_KEY =
+      (import.meta as any).env.VITE_PUSHER_APP_KEY || "test"
+
     try {
       if (!this.laravelEcho) {
         this.laravelEcho = new Echo({
           broadcaster: "pusher",
-          key: (import.meta as any).env.VITE_PUSHER_APP_KEY,
+          key: VITE_PUSHER_APP_KEY,
           cluster: "mt1",
           // forceTLS: true,
           // encrypted: true,

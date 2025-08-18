@@ -60,13 +60,15 @@ export default class AuthApi extends BaseApiService {
               description
               logo
               category
-            }
+            } 
           }
           wallet {
             total_balance
             point_balance
             currency
             state
+            credited_amount
+            debited_amount
           }
         }
       }
@@ -309,7 +311,6 @@ export default class AuthApi extends BaseApiService {
 
     return response
   }
-
 
   public SignOut = () => {
     const requestData = `
