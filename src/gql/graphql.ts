@@ -767,6 +767,8 @@ export type MutationSavePushNotificationTokenArgs = {
 };
 
 
+
+
 export type MutationSendResetPasswordOtpArgs = {
   email: Scalars['String'];
 };
