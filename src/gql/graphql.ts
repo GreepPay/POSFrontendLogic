@@ -42,6 +42,17 @@ export type Account = {
   uuid: Scalars['String'];
 };
 
+export type AddParticipantInput = {
+  added_by: Scalars['Int'];
+  conversation_id: Scalars['Int'];
+  user_id: Scalars['Int'];
+};
+
+export type AdditionalIdInput = {
+  number: Scalars['String'];
+  type: Scalars['String'];
+};
+
 /** Represents an Anchor Transaction in the Stellar network */
 export type AnchorTransation = {
   __typename?: 'AnchorTransation';
@@ -52,7 +63,7 @@ export type AnchorTransation = {
   /** Amount to be received */
   amount_out?: Maybe<Scalars['Float']>;
   /** Transaction completion timestamp */
-  completed_at?: Maybe<Scalars['DateTime']>;
+  completed_at?: Maybe<Scalars['String']>;
   /** Deposit memo */
   deposit_memo?: Maybe<Scalars['String']>;
   /** Type of deposit memo */
@@ -72,7 +83,7 @@ export type AnchorTransation = {
   /** Whether the transaction was refunded */
   refunded: Scalars['Boolean'];
   /** Transaction start timestamp */
-  started_at: Scalars['DateTime'];
+  started_at: Scalars['String'];
   /** Current status of the transaction */
   status: Scalars['String'];
   /** Estimated time for completion */
@@ -393,6 +404,8 @@ export type ExchangeOrder = {
   ad_id: Scalars['Int'];
   /** Amount */
   amount: Scalars['Float'];
+  /** Conversation UUID associated with this order */
+  conversation_uuid?: Maybe<Scalars['String']>;
   /** Order Created At */
   created_at: Scalars['DateTime'];
   /** Expected Amount */
@@ -423,6 +436,15 @@ export type ExchangeOrder = {
   user_id: Scalars['Int'];
   /** Unique UUID */
   uuid: Scalars['String'];
+};
+
+/** A paginated list of ExchangeOrder items. */
+export type ExchangeOrderPaginator = {
+  __typename?: 'ExchangeOrderPaginator';
+  /** A list of ExchangeOrder items. */
+  data: Array<ExchangeOrder>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
 };
 
 export type ExchangeRate = {
@@ -551,6 +573,8 @@ export type MessageInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Add a participant to a conversation */
+  AddParticipant: Conversation;
   /** Confirm withdrawal */
   ConfirmWithdrawal?: Maybe<OffRamp>;
   /** Create a business profile */
@@ -559,6 +583,8 @@ export type Mutation = {
   CreateExchangeAd: ExchangeAd;
   /** Create a message */
   CreateMessage: Message;
+  /** Create a new P2P order */
+  CreateP2pOrder: ExchangeOrder;
   /** Create a new P2P payment method */
   CreateP2pPaymentMethod: P2pPaymentMethod;
   /** Create Product */
@@ -591,7 +617,7 @@ export type Mutation = {
   /** Save a push notification token for the authenticated user. */
   SavePushNotificationToken?: Maybe<Scalars['Boolean']>;
   /** send rest password OTP */
-  SendResetPasswordOTP: Scalars['Boolean'];
+  SendResetPasswordOTP: Scalars['String'];
   /** Sign in a user */
   SignIn: AuthResponse;
   /** Sign out a user */
@@ -615,8 +641,17 @@ export type Mutation = {
   /** Update a user's profile with detailed information */
   UpdateProfile: Scalars['Boolean'];
   UpdateStoreLocation: StoreLocation;
+  /** Upload any file and get the URL */
+  UploadFile: Scalars['String'];
+  /** Verify user identity with optional checks */
+  VerifyUserIdentity: Scalars['Boolean'];
   /** Verify user OTP */
   VerifyUserOTP: Scalars['Boolean'];
+};
+
+
+export type MutationAddParticipantArgs = {
+  input: AddParticipantInput;
 };
 
 
@@ -663,6 +698,19 @@ export type MutationCreateExchangeAdArgs = {
 
 export type MutationCreateMessageArgs = {
   input: MessageInput;
+};
+
+
+export type MutationCreateP2pOrderArgs = {
+  amount: Scalars['Float'];
+  city: Scalars['String'];
+  conversation_uuid: Scalars['String'];
+  country: Scalars['String'];
+  delivery_address: Scalars['String'];
+  exchange_ad_uuid: Scalars['String'];
+  metadata?: InputMaybe<Scalars['String']>;
+  payment_type: Scalars['String'];
+  payout_option: Scalars['String'];
 };
 
 
@@ -887,6 +935,26 @@ export type MutationUpdateStoreLocationArgs = {
   meta_data?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
   store_location_uuid: Scalars['String'];
+};
+
+
+export type MutationUploadFileArgs = {
+  file: Scalars['Upload'];
+};
+
+
+export type MutationVerifyUserIdentityArgs = {
+  additional_ids?: InputMaybe<Array<AdditionalIdInput>>;
+  address?: InputMaybe<Scalars['String']>;
+  checks: VerifyChecksInput;
+  date_of_birth?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']>;
+  full_name?: InputMaybe<Scalars['String']>;
+  id_country: Scalars['String'];
+  id_number: Scalars['String'];
+  id_type: Scalars['String'];
+  phone_number?: InputMaybe<Scalars['String']>;
+  user_uuid?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -1411,6 +1479,10 @@ export type Query = {
   GetOrder?: Maybe<Order>;
   /** Get many orders - paginated list of orders for the authenticated business */
   GetOrders: OrderPaginator;
+  /** Get a single P2P order by UUID */
+  GetP2pOrder?: Maybe<ExchangeOrder>;
+  /** Get many P2P orders - paginated list of P2P orders for the authenticated user */
+  GetP2pOrders: ExchangeOrderPaginator;
   /** Get many point transactions */
   GetPointTransactions: PointTransactionPaginator;
   /** Get a product by UUID */
@@ -1502,6 +1574,19 @@ export type QueryGetOrdersArgs = {
   orderBy?: InputMaybe<Array<QueryGetOrdersOrderByOrderByClause>>;
   page?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<QueryGetOrdersWhereWhereConditions>;
+};
+
+
+export type QueryGetP2pOrderArgs = {
+  uuid: Scalars['String'];
+};
+
+
+export type QueryGetP2pOrdersArgs = {
+  first: Scalars['Int'];
+  orderBy?: InputMaybe<Array<QueryGetP2pOrdersOrderByOrderByClause>>;
+  page?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<QueryGetP2pOrdersWhereWhereConditions>;
 };
 
 
@@ -1682,6 +1767,59 @@ export type QueryGetOrdersWhereWhereConditionsRelation = {
   amount?: InputMaybe<Scalars['Int']>;
   /** Additional condition logic. */
   condition?: InputMaybe<QueryGetOrdersWhereWhereConditions>;
+  /** The comparison operator to test against the amount. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The relation that is checked. */
+  relation: Scalars['String'];
+};
+
+/** Allowed column names for Query.GetP2pOrders.orderBy. */
+export enum QueryGetP2pOrdersOrderByColumn {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Order by clause for Query.GetP2pOrders.orderBy. */
+export type QueryGetP2pOrdersOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetP2pOrdersOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetP2pOrders.where. */
+export enum QueryGetP2pOrdersWhereColumn {
+  Amount = 'AMOUNT',
+  CreatedAt = 'CREATED_AT',
+  ExpiredAt = 'EXPIRED_AT',
+  PaymentType = 'PAYMENT_TYPE',
+  PayoutOption = 'PAYOUT_OPTION',
+  Status = 'STATUS',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Dynamic WHERE conditions for the `where` argument of the query `GetP2pOrders`. */
+export type QueryGetP2pOrdersWhereWhereConditions = {
+  /** A set of conditions that requires all conditions to match. */
+  AND?: InputMaybe<Array<QueryGetP2pOrdersWhereWhereConditions>>;
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied. */
+  HAS?: InputMaybe<QueryGetP2pOrdersWhereWhereConditionsRelation>;
+  /** A set of conditions that requires at least one condition to match. */
+  OR?: InputMaybe<Array<QueryGetP2pOrdersWhereWhereConditions>>;
+  /** The column that is used for the condition. */
+  column?: InputMaybe<QueryGetP2pOrdersWhereColumn>;
+  /** The operator that is used for the condition. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The value that is used for the condition. */
+  value?: InputMaybe<Scalars['Mixed']>;
+};
+
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `GetP2pOrders`. */
+export type QueryGetP2pOrdersWhereWhereConditionsRelation = {
+  /** The amount to test. */
+  amount?: InputMaybe<Scalars['Int']>;
+  /** Additional condition logic. */
+  condition?: InputMaybe<QueryGetP2pOrdersWhereWhereConditions>;
   /** The comparison operator to test against the amount. */
   operator?: InputMaybe<SqlOperator>;
   /** The relation that is checked. */
@@ -2302,6 +2440,12 @@ export enum VerificationStatus {
   Pending = 'Pending',
   Rejected = 'Rejected'
 }
+
+export type VerifyChecksInput = {
+  dob?: InputMaybe<Scalars['Boolean']>;
+  name?: InputMaybe<Scalars['Boolean']>;
+  phone?: InputMaybe<Scalars['Boolean']>;
+};
 
 /** A single wallet */
 export type Wallet = {
