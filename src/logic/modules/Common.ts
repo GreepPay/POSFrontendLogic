@@ -243,22 +243,18 @@ export default class Common {
     icon: "error-alert" | "error-kite" | "success-kite" | "success-thumb",
     fallbackMsg = ""
   ) => {
-    const message = error.graphQLErrors[0].message
-    // this.showLoader({
-    //   show: true,
-    //   useModal: true,
-    //   loading: false,
-    //   hasError: true,
-    //   message: message != "null" ? message : fallbackMsg,
-    //   icon,
-    //   title,
-    // });
-
-    this.showAlert({
-      show: true,
-      message: message,
-      type: "error",
+    const message = error.graphQLErrors[0]?.message
+    this.showLoader({
+      show: false,
+      useModal: true,
+      loading: false,
+      hasError: true,
+      message: message != "null" ? message : fallbackMsg,
+      icon,
+      title,
     })
+
+    this.showAlert({ show: true, message: message, type: "error" })
   }
 
   public showModal = (modalSetupData: ModalSetup) => {

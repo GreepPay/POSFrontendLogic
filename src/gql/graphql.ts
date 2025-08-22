@@ -42,15 +42,12 @@ export type Account = {
   uuid: Scalars['String'];
 };
 
-<<<<<<< HEAD
-=======
 export type AddParticipantInput = {
   added_by: Scalars['Int'];
   conversation_id: Scalars['Int'];
   user_id: Scalars['Int'];
 };
 
->>>>>>> d64c06d1359cc4872602d24c5872ad3b93dd9060
 export type AdditionalIdInput = {
   number: Scalars['String'];
   type: Scalars['String'];
@@ -344,6 +341,14 @@ export type EventDetailsInput = {
   waitlistEnabled: Scalars['Boolean'];
 };
 
+export type EventOverview = {
+  __typename?: 'EventOverview';
+  checkins: Scalars['Int'];
+  revenue: Scalars['Float'];
+  tickets_left: Scalars['Int'];
+  tickets_sold: Scalars['Int'];
+};
+
 export type EventProductInput = {
   eventDetails: EventDetailsInput;
   eventType: EventType;
@@ -597,6 +602,8 @@ export type Mutation = {
   CreateStoreLocation: StoreLocation;
   /** Delete Product */
   DeleteProduct: Scalars['Boolean'];
+  /** Delete User */
+  DeleteUser: Scalars['Boolean'];
   /** Extract Anchor Transaction */
   ExtractAnchorTransaction: AnchorTransation;
   /** Initiate Conversasion */
@@ -611,6 +618,8 @@ export type Mutation = {
   MarkNotificationsAsRead?: Maybe<Scalars['Boolean']>;
   /** Redeem GRP tokens */
   RedeemGRPToken: Scalars['Boolean'];
+  /** Release USDC for a P2P order (seller triggers fund release) */
+  ReleaseP2pFunds: Scalars['Boolean'];
   /** Remove a saved account */
   RemoveSavedAccount: Scalars['Boolean'];
   /** Resend email OTP */
@@ -619,6 +628,8 @@ export type Mutation = {
   ResetPassword: Scalars['Boolean'];
   /** Save a push notification token for the authenticated user. */
   SavePushNotificationToken?: Maybe<Scalars['Boolean']>;
+  /** Scan In A Ticket */
+  ScanInTicket: Scalars['Boolean'];
   /** send rest password OTP */
   SendResetPasswordOTP: Scalars['String'];
   /** Sign in a user */
@@ -644,11 +655,8 @@ export type Mutation = {
   /** Update a user's profile with detailed information */
   UpdateProfile: Scalars['Boolean'];
   UpdateStoreLocation: StoreLocation;
-<<<<<<< HEAD
-=======
   /** Upload any file and get the URL */
   UploadFile: Scalars['String'];
->>>>>>> d64c06d1359cc4872602d24c5872ad3b93dd9060
   /** Verify user identity with optional checks */
   VerifyUserIdentity: Scalars['Boolean'];
   /** Verify user OTP */
@@ -798,6 +806,13 @@ export type MutationRedeemGrpTokenArgs = {
 };
 
 
+export type MutationReleaseP2pFundsArgs = {
+  amount: Scalars['Float'];
+  metadata?: InputMaybe<Scalars['String']>;
+  order_uuid: Scalars['String'];
+};
+
+
 export type MutationRemoveSavedAccountArgs = {
   saved_account_uuid: Scalars['String'];
 };
@@ -818,6 +833,11 @@ export type MutationResetPasswordArgs = {
 export type MutationSavePushNotificationTokenArgs = {
   device_token: Scalars['String'];
   device_type: Scalars['String'];
+};
+
+
+export type MutationScanInTicketArgs = {
+  ticket_uuid: Scalars['String'];
 };
 
 
@@ -903,8 +923,8 @@ export type MutationUpdateP2pPaymentMethodArgs = {
 
 
 export type MutationUpdatePasswordArgs = {
+  current_password: Scalars['String'];
   new_password: Scalars['String'];
-  otp?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -942,14 +962,11 @@ export type MutationUpdateStoreLocationArgs = {
 };
 
 
-<<<<<<< HEAD
-=======
 export type MutationUploadFileArgs = {
   file: Scalars['Upload'];
 };
 
 
->>>>>>> d64c06d1359cc4872602d24c5872ad3b93dd9060
 export type MutationVerifyUserIdentityArgs = {
   additional_ids?: InputMaybe<Array<AdditionalIdInput>>;
   address?: InputMaybe<Scalars['String']>;
@@ -1341,6 +1358,8 @@ export type Product = {
   eventLocation?: Maybe<Scalars['String']>;
   /** Event Online URL */
   eventOnlineUrl?: Maybe<Scalars['String']>;
+  /** Event overviews */
+  eventOveview?: Maybe<EventOverview>;
   /** Event Registered Count */
   eventRegisteredCount: Scalars['Int'];
   /** Event Start Date */
@@ -1466,6 +1485,8 @@ export type Query = {
   GetBankAccountDetails: Scalars['String'];
   /** Get a conversation */
   GetConversation?: Maybe<Conversation>;
+  /** Get event tickets */
+  GetEventTickets: TicketPaginator;
   /** Get an exchange ads */
   GetExchangeAd?: Maybe<ExchangeAd>;
   /** Get Exchange Ads */
@@ -1476,6 +1497,8 @@ export type Query = {
   GetFinancialSummary: FinancialSummaryResponse;
   /** Get the global exchange rate between two currencies */
   GetGlobalExchangeRate: GlobalExchangeRate;
+  /** Get a paginated list of P2P payment methods for the authenticated user */
+  GetMyP2pPaymentMethods: P2pPaymentMethodPaginator;
   /** Get a paginated list of notifications for the authenticated user */
   GetNotifications: NotificationPaginator;
   /** Get the currently supported off-ramp currencies */
@@ -1490,6 +1513,8 @@ export type Query = {
   GetP2pOrder?: Maybe<ExchangeOrder>;
   /** Get many P2P orders - paginated list of P2P orders for the authenticated user */
   GetP2pOrders: ExchangeOrderPaginator;
+  /** Get a single P2P payment method by UUID */
+  GetP2pPaymentMethod?: Maybe<P2pPaymentMethod>;
   /** Get many point transactions */
   GetPointTransactions: PointTransactionPaginator;
   /** Get a product by UUID */
@@ -1514,8 +1539,6 @@ export type Query = {
   GetWithdrawInfo: WithdrawInfo;
   /** Get yellow card networks */
   GetYellowCardNetwork: Array<YellowcardNetwork>;
-  /** Get a paginated list of P2P payment methods for the authenticated user */
-  getMyP2pPaymentMethods: P2pPaymentMethodPaginator;
 };
 
 
@@ -1527,6 +1550,15 @@ export type QueryGetBankAccountDetailsArgs = {
 
 export type QueryGetConversationArgs = {
   uuid: Scalars['String'];
+};
+
+
+export type QueryGetEventTicketsArgs = {
+  first: Scalars['Int'];
+  orderBy?: InputMaybe<Array<QueryGetEventTicketsOrderByOrderByClause>>;
+  page?: InputMaybe<Scalars['Int']>;
+  productId: Scalars['Int'];
+  where?: InputMaybe<QueryGetEventTicketsWhereWhereConditions>;
 };
 
 
@@ -1557,6 +1589,12 @@ export type QueryGetFinancialSummaryArgs = {
 export type QueryGetGlobalExchangeRateArgs = {
   base: Scalars['String'];
   target: Scalars['String'];
+};
+
+
+export type QueryGetMyP2pPaymentMethodsArgs = {
+  first: Scalars['Int'];
+  page?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -1594,6 +1632,11 @@ export type QueryGetP2pOrdersArgs = {
   orderBy?: InputMaybe<Array<QueryGetP2pOrdersOrderByOrderByClause>>;
   page?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<QueryGetP2pOrdersWhereWhereConditions>;
+};
+
+
+export type QueryGetP2pPaymentMethodArgs = {
+  uuid: Scalars['String'];
 };
 
 
@@ -1671,10 +1714,54 @@ export type QueryGetYellowCardNetworkArgs = {
   country_code: Scalars['String'];
 };
 
+/** Allowed column names for Query.GetEventTickets.orderBy. */
+export enum QueryGetEventTicketsOrderByColumn {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
 
-export type QueryGetMyP2pPaymentMethodsArgs = {
-  first: Scalars['Int'];
-  page?: InputMaybe<Scalars['Int']>;
+/** Order by clause for Query.GetEventTickets.orderBy. */
+export type QueryGetEventTicketsOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetEventTicketsOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetEventTickets.where. */
+export enum QueryGetEventTicketsWhereColumn {
+  CreatedAt = 'CREATED_AT',
+  ProductId = 'PRODUCT_ID',
+  Status = 'STATUS',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Dynamic WHERE conditions for the `where` argument of the query `GetEventTickets`. */
+export type QueryGetEventTicketsWhereWhereConditions = {
+  /** A set of conditions that requires all conditions to match. */
+  AND?: InputMaybe<Array<QueryGetEventTicketsWhereWhereConditions>>;
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied. */
+  HAS?: InputMaybe<QueryGetEventTicketsWhereWhereConditionsRelation>;
+  /** A set of conditions that requires at least one condition to match. */
+  OR?: InputMaybe<Array<QueryGetEventTicketsWhereWhereConditions>>;
+  /** The column that is used for the condition. */
+  column?: InputMaybe<QueryGetEventTicketsWhereColumn>;
+  /** The operator that is used for the condition. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The value that is used for the condition. */
+  value?: InputMaybe<Scalars['Mixed']>;
+};
+
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `GetEventTickets`. */
+export type QueryGetEventTicketsWhereWhereConditionsRelation = {
+  /** The amount to test. */
+  amount?: InputMaybe<Scalars['Int']>;
+  /** Additional condition logic. */
+  condition?: InputMaybe<QueryGetEventTicketsWhereWhereConditions>;
+  /** The comparison operator to test against the amount. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The relation that is checked. */
+  relation: Scalars['String'];
 };
 
 /** Allowed column names for Query.GetExchangeAds.orderBy. */
@@ -2234,12 +2321,23 @@ export type Ticket = {
   ticketType: Scalars['String'];
   /** Ticket Updated At */
   updatedAt: Scalars['String'];
+  /** User */
+  user: User;
   /** User ID */
   userId: Scalars['Int'];
   /** UUID */
   uuid: Scalars['String'];
   /** Variant ID */
   variantId?: Maybe<Scalars['String']>;
+};
+
+/** A paginated list of Ticket items. */
+export type TicketPaginator = {
+  __typename?: 'TicketPaginator';
+  /** A list of Ticket items. */
+  data: Array<Ticket>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
 };
 
 /** A single transaction */
