@@ -2,6 +2,7 @@ import {
   MutationCreateBusinessProfileArgs,
   MutationUpdateBusinessProfileArgs,
   MutationUpdateProfileArgs,
+  MutationCreateStoreLocationArgs,
 } from "src/gql/graphql";
 import { OperationResult } from "urql";
 import { BaseApiService } from "./common/BaseService";
@@ -154,6 +155,120 @@ export default class UserApi extends BaseApiService {
         UpdateBusinessProfile: { id: string };
       }>
     > = this.mutation(requestData, data);
+
+    return response;
+  };
+
+  public CreateStoreLocation = (data: MutationCreateStoreLocationArgs) => {
+    const requestData = `
+      mutation CreateStoreLocation(
+        $business_uuid: String!
+        $name: String!
+        $address: String!
+        $city: String!
+        $country: String!
+        $latitude: Float
+        $longitude: Float
+        $meta_data: String
+      ) {
+        CreateStoreLocation(
+          business_uuid: $business_uuid
+          name: $name
+          address: $address
+          city: $city
+          country: $country
+          latitude: $latitude
+          longitude: $longitude
+          meta_data: $meta_data
+        ) {
+          uuid
+          name
+          address
+          city
+          country
+          latitude
+          longitude
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        CreateStoreLocation: {
+          uuid: string;
+          name: string;
+          address: string;
+          city: string;
+          country: string;
+          latitude?: number;
+          longitude?: number;
+        };
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  };
+
+  public GetStoreLocations = (first: number = 20, page: number = 1) => {
+    const requestData = `
+      query GetStoreLocations($first: Int!, $page: Int) {
+        GetStoreLocations(first: $first, page: $page) {
+          data {
+            uuid
+            name
+            address
+            city
+            country
+            latitude
+            longitude
+            meta_data
+            business_id
+            created_at
+            updated_at
+          }
+          paginatorInfo {
+            count
+            currentPage
+            firstItem
+            hasMorePages
+            lastItem
+            lastPage
+            perPage
+            total
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetStoreLocations: {
+          data: Array<{
+            uuid: string;
+            name: string;
+            address: string;
+            city: string;
+            country: string;
+            latitude?: number;
+            longitude?: number;
+            meta_data?: string;
+            business_id: string;
+            created_at: string;
+            updated_at: string;
+          }>;
+          paginatorInfo: {
+            count: number;
+            currentPage: number;
+            firstItem: number;
+            hasMorePages: boolean;
+            lastItem: number;
+            lastPage: number;
+            perPage: number;
+            total: number;
+          };
+        };
+      }>
+    > = this.query(requestData, { first, page });
 
     return response;
   };

@@ -9,13 +9,18 @@ import {
   GlobalExchangeRate,
   InteractiveWithdrawalResponse,
   MutationCreateExchangeAdArgs,
+  MutationCreateP2pPaymentMethodArgs,
   MutationCreateProductArgs,
   MutationCreateSavedAccountArgs,
   MutationExtractAnchorTransactionArgs,
   MutationInitiateInteractiveWithdrawalArgs,
   MutationInitiateWithdrawalArgs,
+  MutationSoftDeleteP2pPaymentMethodArgs,
   MutationUpdateExchangeAdArgs,
+  MutationUpdateP2pPaymentMethodArgs,
   OffRamp,
+  P2pPaymentMethod,
+  P2pPaymentMethodPaginator,
   PointTransaction,
   PointTransactionPaginator,
   SupportedCurrency,
@@ -186,7 +191,7 @@ export default class WalletApi extends BaseApiService {
     count: number,
     orderType = "CREATED_AT",
     order: "ASC" | "DESC",
-    whereQuery = "",
+    whereQuery = ""
   ) => {
     const requestData = `
       query GetPointTransactions(
@@ -267,7 +272,7 @@ export default class WalletApi extends BaseApiService {
     count: number,
     orderType = "CREATED_AT",
     order: "ASC" | "DESC",
-    whereQuery = "",
+    whereQuery = ""
   ) => {
     const requestData = `
       query GetTransactions(
@@ -329,7 +334,7 @@ export default class WalletApi extends BaseApiService {
     count: number,
     orderType = "CREATED_AT",
     order: "ASC" | "DESC",
-    whereQuery = "",
+    whereQuery = ""
   ) => {
     const requestData = `
       query GetExchangeAds(
@@ -393,7 +398,7 @@ export default class WalletApi extends BaseApiService {
     count: number,
     orderType = "CREATED_AT",
     order: "ASC" | "DESC",
-    whereQuery = "",
+    whereQuery = ""
   ) => {
     const requestData = `
       query GetRecommendedExchangeAds(
@@ -733,7 +738,7 @@ export default class WalletApi extends BaseApiService {
     uuid: string,
     currency: string,
     amount: number,
-    metadata = "",
+    metadata = ""
   ) => {
     const requestData = `
         mutation ConfirmWithdrawal(
@@ -954,7 +959,9 @@ export default class WalletApi extends BaseApiService {
     return response;
   };
 
-  public InitiateInteractiveWithdrawal = (data: MutationInitiateInteractiveWithdrawalArgs) => {
+  public InitiateInteractiveWithdrawal = (
+    data: MutationInitiateInteractiveWithdrawalArgs
+  ) => {
     const requestData = `
       mutation InitiateInteractiveWithdrawal($amount: Float!, $withdrawal_currency: String!) {
         InitiateInteractiveWithdrawal(amount: $amount, withdrawal_currency: $withdrawal_currency) {
@@ -972,9 +979,11 @@ export default class WalletApi extends BaseApiService {
     > = this.mutation(requestData, data);
 
     return response;
-  }
+  };
 
-  public ExtractAnchorTransaction = (data: MutationExtractAnchorTransactionArgs) => {
+  public ExtractAnchorTransaction = (
+    data: MutationExtractAnchorTransactionArgs
+  ) => {
     const requestData = `
       mutation ExtractAnchorTransaction($transaction_id: String!, $withdrawal_currency: String!) {
         ExtractAnchorTransaction(transaction_id: $transaction_id, withdrawal_currency: $withdrawal_currency) {
@@ -1005,12 +1014,12 @@ export default class WalletApi extends BaseApiService {
 
     const response: Promise<
       OperationResult<{
-        ExtractAnchorTransaction:  AnchorTransation;
+        ExtractAnchorTransaction: AnchorTransation;
       }>
     > = this.mutation(requestData, data);
 
     return response;
-  }
+  };
 
   // P2P Orders
   public GetP2pOrders = (
@@ -1018,7 +1027,7 @@ export default class WalletApi extends BaseApiService {
     count: number,
     orderType = "CREATED_AT",
     order: "ASC" | "DESC" = "DESC",
-    whereQuery = "",
+    whereQuery = ""
   ) => {
     const requestData = `
       query GetP2pOrders($first: Int!, $page: Int!) {
@@ -1221,11 +1230,223 @@ export default class WalletApi extends BaseApiService {
       }
     `;
 
+    // Ensure file is properly passed and handle potential null/undefined cases
+    if (!file) {
+      throw new Error("File is required for upload");
+    }
+
+    // Ensure the file is a valid File object
+    if (!(file instanceof File)) {
+      throw new Error("Invalid file object provided");
+    }
+
+    // Log file details for debugging
+    console.log("Uploading file:", {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    });
+
     const response: Promise<
       OperationResult<{
         UploadFile: string;
       }>
     > = this.mutation(requestData, { file });
+
+    return response;
+  };
+
+  // ✅ NEW: Release P2P Funds mutation
+  public ReleaseP2pFunds = (
+    order_uuid: string,
+    amount: number,
+    metadata?: string
+  ) => {
+    const requestData = `
+      mutation ReleaseP2pFunds($order_uuid: String!, $amount: Float!, $metadata: String) {
+        ReleaseP2pFunds(order_uuid: $order_uuid, amount: $amount, metadata: $metadata)
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        ReleaseP2pFunds: boolean;
+      }>
+    > = this.mutation(requestData, {
+      order_uuid,
+      amount,
+      metadata,
+    });
+
+    return response;
+  };
+
+  // P2P Payment Methods
+  public GetMyP2pPaymentMethods = (first: number, page: number) => {
+    const requestData = `
+      query GetMyP2pPaymentMethods($first: Int!, $page: Int) {
+        GetMyP2pPaymentMethods(first: $first, page: $page) {
+          paginatorInfo {
+            count
+            currentPage
+            firstItem
+            hasMorePages
+            lastItem
+            lastPage
+            perPage
+            total
+          }
+          data {
+            uuid
+            user_id
+            bank_name
+            account_number
+            account_name
+            currency
+            meta_data
+            created_at
+            updated_at
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetMyP2pPaymentMethods: P2pPaymentMethodPaginator;
+      }>
+    > = this.query(requestData, {
+      first,
+      page,
+    });
+
+    return response;
+  };
+
+  public GetP2pPaymentMethod = (uuid: string) => {
+    const requestData = `
+      query GetP2pPaymentMethod($uuid: String!) {
+        GetP2pPaymentMethod(uuid: $uuid) {
+          uuid
+          user_id
+          bank_name
+          account_number
+          account_name
+          currency
+          meta_data
+          created_at
+          updated_at
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetP2pPaymentMethod: P2pPaymentMethod;
+      }>
+    > = this.query(requestData, {
+      uuid,
+    });
+
+    return response;
+  };
+
+  public CreateP2pPaymentMethod = (
+    data: MutationCreateP2pPaymentMethodArgs
+  ) => {
+    const requestData = `
+      mutation CreateP2pPaymentMethod(
+        $bank_name: String!
+        $account_number: String!
+        $account_name: String!
+        $currency: String
+        $meta_data: String
+      ) {
+        CreateP2pPaymentMethod(
+          bank_name: $bank_name
+          account_number: $account_number
+          account_name: $account_name
+          currency: $currency
+          meta_data: $meta_data
+        ) {
+          uuid
+          user_id
+          bank_name
+          account_number
+          account_name
+          currency
+          meta_data
+          created_at
+          updated_at
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        CreateP2pPaymentMethod: P2pPaymentMethod;
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  };
+
+  public UpdateP2pPaymentMethod = (
+    data: MutationUpdateP2pPaymentMethodArgs
+  ) => {
+    const requestData = `
+      mutation UpdateP2pPaymentMethod(
+        $p2p_payment_method_uuid: String!
+        $bank_name: String
+        $account_number: String
+        $account_name: String
+        $currency: String
+        $meta_data: String
+      ) {
+        UpdateP2pPaymentMethod(
+          p2p_payment_method_uuid: $p2p_payment_method_uuid
+          bank_name: $bank_name
+          account_number: $account_number
+          account_name: $account_name
+          currency: $currency
+          meta_data: $meta_data
+        ) {
+          uuid
+          user_id
+          bank_name
+          account_number
+          account_name
+          currency
+          meta_data
+          created_at
+          updated_at
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        UpdateP2pPaymentMethod: P2pPaymentMethod;
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  };
+
+  public SoftDeleteP2pPaymentMethod = (
+    data: MutationSoftDeleteP2pPaymentMethodArgs
+  ) => {
+    const requestData = `
+      mutation SoftDeleteP2pPaymentMethod($p2p_payment_method_uuid: String!) {
+        SoftDeleteP2pPaymentMethod(p2p_payment_method_uuid: $p2p_payment_method_uuid)
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        SoftDeleteP2pPaymentMethod: boolean;
+      }>
+    > = this.mutation(requestData, data);
 
     return response;
   };

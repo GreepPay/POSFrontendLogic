@@ -39,6 +39,12 @@ export default class MessagingApi extends BaseApiService {
                 uuid
                 id
                 business_name
+                storeLocations {
+                name
+                address
+                city
+                country
+              }
             }
             rate
             min_amount

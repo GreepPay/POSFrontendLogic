@@ -2,6 +2,7 @@ import {
   MutationCreateBusinessProfileArgs,
   MutationUpdateBusinessProfileArgs,
   MutationUpdateProfileArgs,
+  MutationCreateStoreLocationArgs,
 } from "../../gql/graphql";
 import { $api } from "../../services";
 import { CombinedError } from "urql";
@@ -14,6 +15,7 @@ export default class User extends Common {
   }
 
   // Base Variables
+  public StoreLocations: any = null;
 
   // Mutation Variables
   public UpdateProfileForm: MutationUpdateProfileArgs | undefined;
@@ -23,6 +25,7 @@ export default class User extends Common {
   public UpdateBusinessProfileForm:
     | MutationUpdateBusinessProfileArgs
     | undefined;
+  public CreateStoreLocationForm: MutationCreateStoreLocationArgs | undefined;
 
   // Queries
 
@@ -73,5 +76,36 @@ export default class User extends Common {
           throw error;
         });
     }
+  };
+
+  public CreateStoreLocation = async () => {
+    if (this.CreateStoreLocationForm) {
+      return $api.user
+        .CreateStoreLocation(this.CreateStoreLocationForm)
+        .then((response) => {
+          if (response.data?.CreateStoreLocation) {
+            return response.data.CreateStoreLocation;
+          }
+        })
+        .catch((error: CombinedError) => {
+          Logic.Common.showError(error, "Oops!", "error-alert");
+          throw error;
+        });
+    }
+  };
+
+  public GetStoreLocations = async (first: number = 20, page: number = 1) => {
+    return $api.user
+      .GetStoreLocations(first, page)
+      .then((response) => {
+        if (response.data?.GetStoreLocations) {
+          this.StoreLocations = response.data.GetStoreLocations;
+          return response.data.GetStoreLocations;
+        }
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(error, "Oops!", "error-alert");
+        throw error;
+      });
   };
 }
