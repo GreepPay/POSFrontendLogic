@@ -42,6 +42,18 @@ export type Account = {
   uuid: Scalars['String'];
 };
 
+export type AddParticipantInput = {
+  added_by: Scalars['Int'];
+  conversation_id: Scalars['Int'];
+  user_id: Scalars['Int'];
+};
+
+export type AdditionalIdInput = {
+  image_links?: InputMaybe<ImageLinksInput>;
+  number?: InputMaybe<Scalars['String']>;
+  type: Scalars['String'];
+};
+
 /** Represents an Anchor Transaction in the Stellar network */
 export type AnchorTransation = {
   __typename?: 'AnchorTransation';
@@ -52,7 +64,7 @@ export type AnchorTransation = {
   /** Amount to be received */
   amount_out?: Maybe<Scalars['Float']>;
   /** Transaction completion timestamp */
-  completed_at?: Maybe<Scalars['DateTime']>;
+  completed_at?: Maybe<Scalars['String']>;
   /** Deposit memo */
   deposit_memo?: Maybe<Scalars['String']>;
   /** Type of deposit memo */
@@ -72,7 +84,7 @@ export type AnchorTransation = {
   /** Whether the transaction was refunded */
   refunded: Scalars['Boolean'];
   /** Transaction start timestamp */
-  started_at: Scalars['DateTime'];
+  started_at: Scalars['String'];
   /** Current status of the transaction */
   status: Scalars['String'];
   /** Estimated time for completion */
@@ -151,6 +163,8 @@ export type Business = {
   registration_number?: Maybe<Scalars['String']>;
   /** Business resident permit document URL. */
   resident_permit?: Maybe<Scalars['String']>;
+  /** Store locations for this business */
+  storeLocations: Array<StoreLocation>;
   /** When the business profile was last updated. */
   updated_at: Scalars['DateTime'];
   /** Attached user */
@@ -225,6 +239,17 @@ export type ConversationInput = {
 export type CoordinatesInput = {
   lat: Scalars['Float'];
   lng: Scalars['Float'];
+};
+
+export type CountryInformation = {
+  __typename?: 'CountryInformation';
+  countryCode: Scalars['String'];
+  idTypes?: Maybe<IdTypes>;
+  imageRequirements?: Maybe<ImageRequirements>;
+  methods?: Maybe<Array<Scalars['String']>>;
+  methodsAvailable?: Maybe<MethodsAvailable>;
+  requiredFields?: Maybe<RequiredFields>;
+  supportedMethods?: Maybe<SupportedMethods>;
 };
 
 export type CreateProductInput = {
@@ -330,6 +355,14 @@ export type EventDetailsInput = {
   waitlistEnabled: Scalars['Boolean'];
 };
 
+export type EventOverview = {
+  __typename?: 'EventOverview';
+  checkins: Scalars['Int'];
+  revenue: Scalars['Float'];
+  tickets_left: Scalars['Int'];
+  tickets_sold: Scalars['Int'];
+};
+
 export type EventProductInput = {
   eventDetails: EventDetailsInput;
   eventType: EventType;
@@ -393,6 +426,8 @@ export type ExchangeOrder = {
   ad_id: Scalars['Int'];
   /** Amount */
   amount: Scalars['Float'];
+  /** Conversation UUID associated with this order */
+  conversation_uuid?: Maybe<Scalars['String']>;
   /** Order Created At */
   created_at: Scalars['DateTime'];
   /** Expected Amount */
@@ -423,6 +458,15 @@ export type ExchangeOrder = {
   user_id: Scalars['Int'];
   /** Unique UUID */
   uuid: Scalars['String'];
+};
+
+/** A paginated list of ExchangeOrder items. */
+export type ExchangeOrderPaginator = {
+  __typename?: 'ExchangeOrderPaginator';
+  /** A list of ExchangeOrder items. */
+  data: Array<ExchangeOrder>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
 };
 
 export type ExchangeRate = {
@@ -471,9 +515,28 @@ export type GlobalExchangeRate = {
   unit: Scalars['Int'];
 };
 
+export type IdTypes = {
+  __typename?: 'IdTypes';
+  IMAGE?: Maybe<Scalars['Mixed']>;
+  NUMBER?: Maybe<Scalars['Mixed']>;
+};
+
 export type ImageInput = {
   rawValue?: InputMaybe<Scalars['Upload']>;
   url: Scalars['String'];
+};
+
+export type ImageLinksInput = {
+  id_back_image?: InputMaybe<Scalars['String']>;
+  id_front_image: Scalars['String'];
+  selfie_image: Scalars['String'];
+};
+
+export type ImageRequirements = {
+  __typename?: 'ImageRequirements';
+  id_back_image?: Maybe<Scalars['String']>;
+  id_front_image?: Maybe<Scalars['String']>;
+  selfie_image?: Maybe<Scalars['String']>;
 };
 
 export type InteractiveWithdrawalResponse = {
@@ -549,16 +612,28 @@ export type MessageInput = {
   type: Scalars['String'];
 };
 
+export type MethodsAvailable = {
+  __typename?: 'MethodsAvailable';
+  IMAGE?: Maybe<Scalars['Boolean']>;
+  NUMBER?: Maybe<Scalars['Boolean']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Add a participant to a conversation */
+  AddParticipant: Conversation;
   /** Confirm withdrawal */
   ConfirmWithdrawal?: Maybe<OffRamp>;
   /** Create a business profile */
   CreateBusinessProfile: Business;
+  /** Create Crypto Transfer */
+  CreateCrpytoTransfer: OffRamp;
   /** Create exchange ad */
   CreateExchangeAd: ExchangeAd;
   /** Create a message */
   CreateMessage: Message;
+  /** Create a new P2P order */
+  CreateP2pOrder: ExchangeOrder;
   /** Create a new P2P payment method */
   CreateP2pPaymentMethod: P2pPaymentMethod;
   /** Create Product */
@@ -568,6 +643,8 @@ export type Mutation = {
   CreateStoreLocation: StoreLocation;
   /** Delete Product */
   DeleteProduct: Scalars['Boolean'];
+  /** Delete User */
+  DeleteUser: Scalars['Boolean'];
   /** Extract Anchor Transaction */
   ExtractAnchorTransaction: AnchorTransation;
   /** Initiate Conversasion */
@@ -582,6 +659,8 @@ export type Mutation = {
   MarkNotificationsAsRead?: Maybe<Scalars['Boolean']>;
   /** Redeem GRP tokens */
   RedeemGRPToken: Scalars['Boolean'];
+  /** Release USDC for a P2P order (seller triggers fund release) */
+  ReleaseP2pFunds: Scalars['Boolean'];
   /** Remove a saved account */
   RemoveSavedAccount: Scalars['Boolean'];
   /** Resend email OTP */
@@ -590,8 +669,10 @@ export type Mutation = {
   ResetPassword: Scalars['Boolean'];
   /** Save a push notification token for the authenticated user. */
   SavePushNotificationToken?: Maybe<Scalars['Boolean']>;
+  /** Scan In A Ticket */
+  ScanInTicket: Scalars['Boolean'];
   /** send rest password OTP */
-  SendResetPasswordOTP: Scalars['Boolean'];
+  SendResetPasswordOTP: Scalars['String'];
   /** Sign in a user */
   SignIn: AuthResponse;
   /** Sign out a user */
@@ -615,8 +696,17 @@ export type Mutation = {
   /** Update a user's profile with detailed information */
   UpdateProfile: Scalars['Boolean'];
   UpdateStoreLocation: StoreLocation;
+  /** Upload any file and get the URL */
+  UploadFile: Scalars['String'];
+  /** Verify user identity with optional checks and provider selection */
+  VerifyUserIdentity: Scalars['Boolean'];
   /** Verify user OTP */
   VerifyUserOTP: Scalars['Boolean'];
+};
+
+
+export type MutationAddParticipantArgs = {
+  input: AddParticipantInput;
 };
 
 
@@ -648,6 +738,12 @@ export type MutationCreateBusinessProfileArgs = {
 };
 
 
+export type MutationCreateCrpytoTransferArgs = {
+  crypto: Scalars['String'];
+  network: Scalars['String'];
+};
+
+
 export type MutationCreateExchangeAdArgs = {
   address_details: Scalars['String'];
   business_id: Scalars['String'];
@@ -663,6 +759,19 @@ export type MutationCreateExchangeAdArgs = {
 
 export type MutationCreateMessageArgs = {
   input: MessageInput;
+};
+
+
+export type MutationCreateP2pOrderArgs = {
+  amount: Scalars['Float'];
+  city: Scalars['String'];
+  conversation_uuid: Scalars['String'];
+  country: Scalars['String'];
+  delivery_address: Scalars['String'];
+  exchange_ad_uuid: Scalars['String'];
+  metadata?: InputMaybe<Scalars['String']>;
+  payment_type: Scalars['String'];
+  payout_option: Scalars['String'];
 };
 
 
@@ -744,6 +853,13 @@ export type MutationRedeemGrpTokenArgs = {
 };
 
 
+export type MutationReleaseP2pFundsArgs = {
+  amount: Scalars['Float'];
+  metadata?: InputMaybe<Scalars['String']>;
+  order_uuid: Scalars['String'];
+};
+
+
 export type MutationRemoveSavedAccountArgs = {
   saved_account_uuid: Scalars['String'];
 };
@@ -767,6 +883,11 @@ export type MutationSavePushNotificationTokenArgs = {
 };
 
 
+export type MutationScanInTicketArgs = {
+  ticket_uuid: Scalars['String'];
+};
+
+
 export type MutationSendResetPasswordOtpArgs = {
   email: Scalars['String'];
 };
@@ -774,7 +895,8 @@ export type MutationSendResetPasswordOtpArgs = {
 
 export type MutationSignInArgs = {
   email: Scalars['String'];
-  password: Scalars['String'];
+  password?: InputMaybe<Scalars['String']>;
+  sso_id?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -791,6 +913,7 @@ export type MutationSignUpArgs = {
   last_name?: InputMaybe<Scalars['String']>;
   password: Scalars['String'];
   phone_number?: InputMaybe<Scalars['String']>;
+  sso_id?: InputMaybe<Scalars['String']>;
   state?: InputMaybe<Scalars['String']>;
 };
 
@@ -849,8 +972,8 @@ export type MutationUpdateP2pPaymentMethodArgs = {
 
 
 export type MutationUpdatePasswordArgs = {
+  current_password: Scalars['String'];
   new_password: Scalars['String'];
-  otp?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -885,6 +1008,28 @@ export type MutationUpdateStoreLocationArgs = {
   meta_data?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
   store_location_uuid: Scalars['String'];
+};
+
+
+export type MutationUploadFileArgs = {
+  file: Scalars['Upload'];
+};
+
+
+export type MutationVerifyUserIdentityArgs = {
+  additional_ids?: InputMaybe<Array<AdditionalIdInput>>;
+  address?: InputMaybe<Scalars['String']>;
+  checks: VerifyChecksInput;
+  date_of_birth: Scalars['String'];
+  email?: InputMaybe<Scalars['String']>;
+  full_name: Scalars['String'];
+  id_country: Scalars['String'];
+  id_number?: InputMaybe<Scalars['String']>;
+  id_type: Scalars['String'];
+  image_links?: InputMaybe<ImageLinksInput>;
+  phone_number?: InputMaybe<Scalars['String']>;
+  provider?: InputMaybe<Scalars['String']>;
+  user_uuid?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -1264,6 +1409,8 @@ export type Product = {
   eventLocation?: Maybe<Scalars['String']>;
   /** Event Online URL */
   eventOnlineUrl?: Maybe<Scalars['String']>;
+  /** Event overviews */
+  eventOveview?: Maybe<EventOverview>;
   /** Event Registered Count */
   eventRegisteredCount: Scalars['Int'];
   /** Event Start Date */
@@ -1383,12 +1530,18 @@ export type Profile = {
 
 export type Query = {
   __typename?: 'Query';
+  /** Get all business locations by business UUID */
+  GetAllBusinessLocations: StoreLocationPaginator;
   /** Get the authenticated user */
   GetAuthUser?: Maybe<User>;
   /** Get bank account details */
   GetBankAccountDetails: Scalars['String'];
   /** Get a conversation */
   GetConversation?: Maybe<Conversation>;
+  /** Get country information for verification */
+  GetCountryInformation: CountryInformation;
+  /** Get event tickets */
+  GetEventTickets: TicketPaginator;
   /** Get an exchange ads */
   GetExchangeAd?: Maybe<ExchangeAd>;
   /** Get Exchange Ads */
@@ -1399,6 +1552,8 @@ export type Query = {
   GetFinancialSummary: FinancialSummaryResponse;
   /** Get the global exchange rate between two currencies */
   GetGlobalExchangeRate: GlobalExchangeRate;
+  /** Get a paginated list of P2P payment methods for the authenticated user */
+  GetMyP2pPaymentMethods: P2pPaymentMethodPaginator;
   /** Get a paginated list of notifications for the authenticated user */
   GetNotifications: NotificationPaginator;
   /** Get the currently supported off-ramp currencies */
@@ -1409,6 +1564,12 @@ export type Query = {
   GetOrder?: Maybe<Order>;
   /** Get many orders - paginated list of orders for the authenticated business */
   GetOrders: OrderPaginator;
+  /** Get a single P2P order by UUID */
+  GetP2pOrder?: Maybe<ExchangeOrder>;
+  /** Get many P2P orders - paginated list of P2P orders for the authenticated user */
+  GetP2pOrders: ExchangeOrderPaginator;
+  /** Get a single P2P payment method by UUID */
+  GetP2pPaymentMethod?: Maybe<P2pPaymentMethod>;
   /** Get many point transactions */
   GetPointTransactions: PointTransactionPaginator;
   /** Get a product by UUID */
@@ -1433,8 +1594,13 @@ export type Query = {
   GetWithdrawInfo: WithdrawInfo;
   /** Get yellow card networks */
   GetYellowCardNetwork: Array<YellowcardNetwork>;
-  /** Get a paginated list of P2P payment methods for the authenticated user */
-  getMyP2pPaymentMethods: P2pPaymentMethodPaginator;
+};
+
+
+export type QueryGetAllBusinessLocationsArgs = {
+  business_uuid: Scalars['String'];
+  first: Scalars['Int'];
+  page?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -1446,6 +1612,20 @@ export type QueryGetBankAccountDetailsArgs = {
 
 export type QueryGetConversationArgs = {
   uuid: Scalars['String'];
+};
+
+
+export type QueryGetCountryInformationArgs = {
+  country_code: Scalars['String'];
+};
+
+
+export type QueryGetEventTicketsArgs = {
+  first: Scalars['Int'];
+  orderBy?: InputMaybe<Array<QueryGetEventTicketsOrderByOrderByClause>>;
+  page?: InputMaybe<Scalars['Int']>;
+  productId: Scalars['Int'];
+  where?: InputMaybe<QueryGetEventTicketsWhereWhereConditions>;
 };
 
 
@@ -1479,6 +1659,12 @@ export type QueryGetGlobalExchangeRateArgs = {
 };
 
 
+export type QueryGetMyP2pPaymentMethodsArgs = {
+  first: Scalars['Int'];
+  page?: InputMaybe<Scalars['Int']>;
+};
+
+
 export type QueryGetNotificationsArgs = {
   first: Scalars['Int'];
   page?: InputMaybe<Scalars['Int']>;
@@ -1500,6 +1686,24 @@ export type QueryGetOrdersArgs = {
   orderBy?: InputMaybe<Array<QueryGetOrdersOrderByOrderByClause>>;
   page?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<QueryGetOrdersWhereWhereConditions>;
+};
+
+
+export type QueryGetP2pOrderArgs = {
+  uuid: Scalars['String'];
+};
+
+
+export type QueryGetP2pOrdersArgs = {
+  first: Scalars['Int'];
+  orderBy?: InputMaybe<Array<QueryGetP2pOrdersOrderByOrderByClause>>;
+  page?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<QueryGetP2pOrdersWhereWhereConditions>;
+};
+
+
+export type QueryGetP2pPaymentMethodArgs = {
+  uuid: Scalars['String'];
 };
 
 
@@ -1569,6 +1773,7 @@ export type QueryGetTransactionsArgs = {
 
 export type QueryGetWithdrawInfoArgs = {
   amount: Scalars['Float'];
+  country_code?: InputMaybe<Scalars['String']>;
   currency?: InputMaybe<Scalars['String']>;
 };
 
@@ -1577,10 +1782,54 @@ export type QueryGetYellowCardNetworkArgs = {
   country_code: Scalars['String'];
 };
 
+/** Allowed column names for Query.GetEventTickets.orderBy. */
+export enum QueryGetEventTicketsOrderByColumn {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
 
-export type QueryGetMyP2pPaymentMethodsArgs = {
-  first: Scalars['Int'];
-  page?: InputMaybe<Scalars['Int']>;
+/** Order by clause for Query.GetEventTickets.orderBy. */
+export type QueryGetEventTicketsOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetEventTicketsOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetEventTickets.where. */
+export enum QueryGetEventTicketsWhereColumn {
+  CreatedAt = 'CREATED_AT',
+  ProductId = 'PRODUCT_ID',
+  Status = 'STATUS',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Dynamic WHERE conditions for the `where` argument of the query `GetEventTickets`. */
+export type QueryGetEventTicketsWhereWhereConditions = {
+  /** A set of conditions that requires all conditions to match. */
+  AND?: InputMaybe<Array<QueryGetEventTicketsWhereWhereConditions>>;
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied. */
+  HAS?: InputMaybe<QueryGetEventTicketsWhereWhereConditionsRelation>;
+  /** A set of conditions that requires at least one condition to match. */
+  OR?: InputMaybe<Array<QueryGetEventTicketsWhereWhereConditions>>;
+  /** The column that is used for the condition. */
+  column?: InputMaybe<QueryGetEventTicketsWhereColumn>;
+  /** The operator that is used for the condition. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The value that is used for the condition. */
+  value?: InputMaybe<Scalars['Mixed']>;
+};
+
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `GetEventTickets`. */
+export type QueryGetEventTicketsWhereWhereConditionsRelation = {
+  /** The amount to test. */
+  amount?: InputMaybe<Scalars['Int']>;
+  /** Additional condition logic. */
+  condition?: InputMaybe<QueryGetEventTicketsWhereWhereConditions>;
+  /** The comparison operator to test against the amount. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The relation that is checked. */
+  relation: Scalars['String'];
 };
 
 /** Allowed column names for Query.GetExchangeAds.orderBy. */
@@ -1680,6 +1929,59 @@ export type QueryGetOrdersWhereWhereConditionsRelation = {
   amount?: InputMaybe<Scalars['Int']>;
   /** Additional condition logic. */
   condition?: InputMaybe<QueryGetOrdersWhereWhereConditions>;
+  /** The comparison operator to test against the amount. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The relation that is checked. */
+  relation: Scalars['String'];
+};
+
+/** Allowed column names for Query.GetP2pOrders.orderBy. */
+export enum QueryGetP2pOrdersOrderByColumn {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Order by clause for Query.GetP2pOrders.orderBy. */
+export type QueryGetP2pOrdersOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetP2pOrdersOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetP2pOrders.where. */
+export enum QueryGetP2pOrdersWhereColumn {
+  Amount = 'AMOUNT',
+  CreatedAt = 'CREATED_AT',
+  ExpiredAt = 'EXPIRED_AT',
+  PaymentType = 'PAYMENT_TYPE',
+  PayoutOption = 'PAYOUT_OPTION',
+  Status = 'STATUS',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Dynamic WHERE conditions for the `where` argument of the query `GetP2pOrders`. */
+export type QueryGetP2pOrdersWhereWhereConditions = {
+  /** A set of conditions that requires all conditions to match. */
+  AND?: InputMaybe<Array<QueryGetP2pOrdersWhereWhereConditions>>;
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied. */
+  HAS?: InputMaybe<QueryGetP2pOrdersWhereWhereConditionsRelation>;
+  /** A set of conditions that requires at least one condition to match. */
+  OR?: InputMaybe<Array<QueryGetP2pOrdersWhereWhereConditions>>;
+  /** The column that is used for the condition. */
+  column?: InputMaybe<QueryGetP2pOrdersWhereColumn>;
+  /** The operator that is used for the condition. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The value that is used for the condition. */
+  value?: InputMaybe<Scalars['Mixed']>;
+};
+
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `GetP2pOrders`. */
+export type QueryGetP2pOrdersWhereWhereConditionsRelation = {
+  /** The amount to test. */
+  amount?: InputMaybe<Scalars['Int']>;
+  /** Additional condition logic. */
+  condition?: InputMaybe<QueryGetP2pOrdersWhereWhereConditions>;
   /** The comparison operator to test against the amount. */
   operator?: InputMaybe<SqlOperator>;
   /** The relation that is checked. */
@@ -1903,6 +2205,12 @@ export type RenewalInput = {
   price?: InputMaybe<Scalars['Float']>;
 };
 
+export type RequiredFields = {
+  __typename?: 'RequiredFields';
+  IMAGE?: Maybe<Array<Scalars['String']>>;
+  NUMBER?: Maybe<Array<Scalars['String']>>;
+};
+
 /** The available SQL operators that are used to filter query results. */
 export enum SqlOperator {
   /** Whether a value is within a range of values (`BETWEEN`) */
@@ -2064,6 +2372,12 @@ export type SupportedCurrency = {
   supported_methods: Array<Scalars['String']>;
 };
 
+export type SupportedMethods = {
+  __typename?: 'SupportedMethods';
+  IMAGE?: Maybe<Scalars['String']>;
+  NUMBER?: Maybe<Scalars['String']>;
+};
+
 /** A ticket */
 export type Ticket = {
   __typename?: 'Ticket';
@@ -2087,12 +2401,23 @@ export type Ticket = {
   ticketType: Scalars['String'];
   /** Ticket Updated At */
   updatedAt: Scalars['String'];
+  /** User */
+  user: User;
   /** User ID */
   userId: Scalars['Int'];
   /** UUID */
   uuid: Scalars['String'];
   /** Variant ID */
   variantId?: Maybe<Scalars['String']>;
+};
+
+/** A paginated list of Ticket items. */
+export type TicketPaginator = {
+  __typename?: 'TicketPaginator';
+  /** A list of Ticket items. */
+  data: Array<Ticket>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
 };
 
 /** A single transaction */
@@ -2300,6 +2625,12 @@ export enum VerificationStatus {
   Pending = 'Pending',
   Rejected = 'Rejected'
 }
+
+export type VerifyChecksInput = {
+  dob?: InputMaybe<Scalars['Boolean']>;
+  name?: InputMaybe<Scalars['Boolean']>;
+  phone?: InputMaybe<Scalars['Boolean']>;
+};
 
 /** A single wallet */
 export type Wallet = {

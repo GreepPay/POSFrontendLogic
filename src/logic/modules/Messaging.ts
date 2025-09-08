@@ -76,4 +76,26 @@ export default class Messaging extends Common {
         });
     }
   };
+
+  public AddParticipant = (conversationId: number, userId: number, addedBy: number) => {
+    return $api.messaging
+      .AddParticipant({
+        conversation_id: conversationId,
+        user_id: userId,
+        added_by: addedBy,
+      })
+      .then((response) => {
+        if (response.data?.AddParticipant) {
+          // Update the current conversation with new participant
+          this.SingleConversation = response.data.AddParticipant;
+          Logic.Common.hideLoader();
+          return response.data.AddParticipant;
+        }
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.hideLoader();
+        Logic.Common.showError(error, "Oops!", "error-alert");
+        throw error;
+      });
+  };
 }

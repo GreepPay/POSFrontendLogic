@@ -2,6 +2,7 @@ import {
   AnchorTransation,
   ExchangeAd,
   ExchangeAdPaginator,
+  ExchangeOrder,
   ExchangeRate,
   FinancialSummaryInput,
   FinancialSummaryResponse,
@@ -59,10 +60,10 @@ export default class WalletApi extends BaseApiService {
     return response;
   };
 
-  public GetWithdrawInfo = (amount: number, currency: string) => {
+  public GetWithdrawInfo = (amount: number, currency: string, country_code: string) => {
     const requestData = `
-      query GetWithdrawInfo($amount: Float!, $currency: String!) {
-        GetWithdrawInfo(amount: $amount, currency: $currency) {
+      query GetWithdrawInfo($amount: Float!, $currency: String!, $country_code: String) {
+        GetWithdrawInfo(amount: $amount, currency: $currency, country_code: $country_code) {
           currency
           methods {
             name
@@ -74,19 +75,21 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        GetWithdrawInfo: WithdrawInfo;
+        GetWithdrawInfo: WithdrawInfo
       }>
     > = this.query(requestData, {
       amount,
       currency,
-    });
+      country_code
+    })
 
-    return response;
-  };
+    return response
+  }
+
 
   public GetGlobalExchangeRate = (base: string, target: string) => {
     const requestData = `
@@ -917,6 +920,44 @@ export default class WalletApi extends BaseApiService {
     return response;
   };
 
+
+  public CreateCrpytoTransfer = (crypto: string, network: string) => {
+    const requestData = `
+        mutation CreateCrpytoTransfer($crypto: String!, $network: String!) {
+          CreateCrpytoTransfer(crypto: $crypto, network: $network) {
+            id
+            uuid
+            amount
+            payment_reference
+            state
+            payment_channel
+            description
+            status
+            currency
+            extra_data
+            senderName
+            senderCountry
+            senderPhone
+            senderAddress
+            senderBusinessName
+            created_at
+            updated_at
+          }
+        }
+      `;
+
+    const response: Promise<
+      OperationResult<{
+        CreateCrpytoTransfer: OffRamp;
+      }>
+    > = this.mutation(requestData, {
+      crypto,
+      network,
+    });
+
+    return response;
+  }
+
   public RemoveSavedAccount = (saved_account_uuid: string) => {
     const requestData = `
         mutation RemoveSavedAccount($saved_account_uuid: String!) {
@@ -1004,10 +1045,228 @@ export default class WalletApi extends BaseApiService {
 
     const response: Promise<
       OperationResult<{
-        ExtractAnchorTransaction:  AnchorTransation;
+        ExtractAnchorTransaction: AnchorTransation;
       }>
     > = this.mutation(requestData, data);
 
     return response;
   }
+
+  // P2P Orders
+  public GetP2pOrders = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC" = "DESC",
+    whereQuery = "",
+  ) => {
+    const requestData = `
+      query GetP2pOrders($first: Int!, $page: Int!) {
+        GetP2pOrders(first: $first, page: $page) {
+          data {
+            id
+            uuid
+            amount
+            expected_amount
+            status
+            payment_type
+            payout_option
+            pickup_location_address_line
+            pickup_location_city
+            pickup_location_country
+            created_at
+            updated_at
+            expired_at
+            ad {
+              uuid
+              from_currency
+              to_currency
+              rate
+              status
+              business {
+                uuid
+                business_name
+                logo
+                address
+                city
+                country
+              }
+            }
+            user {
+              id
+              uuid
+              first_name
+              last_name
+              email
+              phone
+            }
+          }
+          paginatorInfo {
+            count
+            currentPage
+            firstItem
+            hasMorePages
+            lastItem
+            lastPage
+            perPage
+            total
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetP2pOrders: {
+          data: ExchangeOrder[];
+          paginatorInfo: any;
+        };
+      }>
+    > = this.query(requestData, {
+      first: count,
+      page,
+    });
+
+    return response;
+  };
+
+  public GetP2pOrder = (uuid: string) => {
+    const requestData = `
+      query GetP2pOrder($uuid: String!) {
+        GetP2pOrder(uuid: $uuid) {
+          id
+          uuid
+          amount
+          expected_amount
+          status
+          payment_type
+          payout_option
+          pickup_location_address_line
+          pickup_location_city
+          pickup_location_country
+          conversation_uuid
+          created_at
+          updated_at
+          expired_at
+          ad {
+            uuid
+            from_currency
+            to_currency
+            rate
+            status
+            business {
+              uuid
+              business_name
+              logo
+              address
+              city
+              country
+              user {
+                id
+                uuid
+                first_name
+                last_name
+                email
+              }
+            }
+          }
+          user {
+            id
+            uuid
+            first_name
+            last_name
+            email
+            phone
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetP2pOrder: ExchangeOrder;
+      }>
+    > = this.query(requestData, {
+      uuid,
+    });
+
+    return response;
+  };
+
+  public CreateP2pOrder = (orderData: {
+    exchange_ad_uuid: string;
+    amount: number;
+    delivery_address: string;
+    city: string;
+    country: string;
+    payment_type: string;
+    payout_option: string;
+    conversation_uuid: string;
+    metadata?: string;
+  }) => {
+    const requestData = `
+      mutation CreateP2pOrder(
+        $exchange_ad_uuid: String!
+        $amount: Float!
+        $delivery_address: String!
+        $city: String!
+        $country: String!
+        $payment_type: String!
+        $payout_option: String!
+        $conversation_uuid: String!
+        $metadata: String
+      ) {
+        CreateP2pOrder(
+          exchange_ad_uuid: $exchange_ad_uuid
+          amount: $amount
+          delivery_address: $delivery_address
+          city: $city
+          country: $country
+          payment_type: $payment_type
+          payout_option: $payout_option
+          conversation_uuid: $conversation_uuid
+          metadata: $metadata
+        ) {
+          id
+          uuid
+          amount
+          expected_amount
+          status
+          payment_type
+          payout_option
+          pickup_location_address_line
+          pickup_location_city
+          pickup_location_country
+          conversation_uuid
+          created_at
+          updated_at
+          expired_at
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        CreateP2pOrder: ExchangeOrder;
+      }>
+    > = this.mutation(requestData, orderData);
+
+    return response;
+  };
+
+  public UploadFile = (file: File) => {
+    const requestData = `
+      mutation UploadFile($file: Upload!) {
+        UploadFile(file: $file)
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        UploadFile: string;
+      }>
+    > = this.mutation(requestData, { file });
+
+    return response;
+  };
 }

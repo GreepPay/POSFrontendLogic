@@ -5,9 +5,10 @@ import {
   OrderPaginator,
   Product,
   ProductPaginator,
-} from "../gql/graphql";
-import { OperationResult } from "urql";
-import { BaseApiService } from "./common/BaseService";
+  TicketPaginator,
+} from "../gql/graphql"
+import { OperationResult } from "urql"
+import { BaseApiService } from "./common/BaseService"
 
 export default class CommerceApi extends BaseApiService {
   // Query
@@ -24,7 +25,7 @@ export default class CommerceApi extends BaseApiService {
       orderType,
       order,
       whereQuery,
-    });
+    })
     const requestData = `
       query GetProducts(
         $page: Int!,
@@ -98,18 +99,109 @@ export default class CommerceApi extends BaseApiService {
           }
         }
       }
-    `;
+    `
     const response: Promise<
       OperationResult<{
-        GetProducts: ProductPaginator;
+        GetProducts: ProductPaginator
       }>
     > = this.query(requestData, {
       page,
       count,
-    });
+    })
 
-    return response;
-  };
+    return response
+  }
+
+  public GetEventTickets = (productId: number, first: number, page: number) => {
+    const requestData = `
+      query GetEventTickets(
+        $productId: Int!
+        $first: Int!
+        $page: Int
+      ) {
+        GetEventTickets(
+          productId: $productId
+          first: $first
+          page: $page  
+        ) {
+         paginatorInfo {
+             total
+            perPage
+            lastPage
+            lastItem
+            hasMorePages
+            firstItem
+            currentPage
+            count
+          }
+          data {
+            id
+            uuid 
+            variantId
+            saleId
+            sale {
+              id
+              uuid
+              transactionId
+              customerId
+              subtotalAmount
+              taxAmount
+              discountAmount
+              totalAmount
+              currency
+              status
+              items
+              appliedDiscounts
+              taxDetails
+              paymentDetails
+              refundDetails
+              metadata
+              createdAt
+              updatedAt
+            }
+            user {
+              id
+              uuid
+              first_name
+              last_name
+              username
+              email
+              phone
+              email_verified_at
+              phone_verified_at
+              status
+              profile { 
+                user_type
+                profile_picture
+                verification_status 
+                updated_at
+                default_currency
+                created_at
+              } 
+            }
+            userId
+            ticketType
+            price
+            qrCode
+            status
+            createdAt
+            updatedAt
+          } 
+        }
+      }
+    `
+    const response: Promise<
+      OperationResult<{
+        GetEventTickets: TicketPaginator
+      }>
+    > = this.query(requestData, {
+      productId,
+      first,
+      page,
+    })
+
+    return response
+  }
 
   public GetProduct = (uuid: string) => {
     const requestData = `
@@ -160,19 +252,25 @@ export default class CommerceApi extends BaseApiService {
         images
         createdAt
         updatedAt
+          eventOveview {
+          revenue
+          tickets_sold
+          tickets_left
+          checkins
+        }
         }
       }
-    `;
+    `
     const response: Promise<
       OperationResult<{
-        GetProduct: Product;
+        GetProduct: Product
       }>
     > = this.query(requestData, {
       uuid,
-    });
+    })
 
-    return response;
-  };
+    return response
+  }
 
   public GetOrders = (
     page: number,
@@ -239,18 +337,18 @@ export default class CommerceApi extends BaseApiService {
           }
         }
       }
-    `;
+    `
     const response: Promise<
       OperationResult<{
-        GetOrders: OrderPaginator;
+        GetOrders: OrderPaginator
       }>
     > = this.query(requestData, {
       page,
       count,
-    });
+    })
 
-    return response;
-  };
+    return response
+  }
 
   public GetOrder = (uuid: string) => {
     const requestData = `
@@ -288,17 +386,17 @@ export default class CommerceApi extends BaseApiService {
         updatedAt
         }
       }
-    `;
+    `
     const response: Promise<
       OperationResult<{
-        GetOrder: Order;
+        GetOrder: Order
       }>
     > = this.query(requestData, {
       uuid,
-    });
+    })
 
-    return response;
-  };
+    return response
+  }
 
   // Mutations
   public CreateProduct = (data: MutationCreateProductArgs) => {
@@ -352,16 +450,16 @@ export default class CommerceApi extends BaseApiService {
           updatedAt
           }
         }
-      `;
+      `
 
     const response: Promise<
       OperationResult<{
-        CreateProduct: Product;
+        CreateProduct: Product
       }>
-    > = this.mutation(requestData, data);
+    > = this.mutation(requestData, data)
 
-    return response;
-  };
+    return response
+  }
 
   public UpdateProduct = (data: MutationUpdateProductArgs) => {
     const requestData = `
@@ -414,30 +512,30 @@ export default class CommerceApi extends BaseApiService {
           updatedAt
           }
         }
-      `;
+      `
 
     const response: Promise<
       OperationResult<{
-        UpdateProduct: Product;
+        UpdateProduct: Product
       }>
-    > = this.mutation(requestData, data);
+    > = this.mutation(requestData, data)
 
-    return response;
-  };
+    return response
+  }
 
   public DeleteProduct = (product_id: number) => {
     const requestData = `
         mutation DeleteProduct($product_id: Int!) {
           DeleteProduct(product_id: $product_id)
         }
-      `;
+      `
 
     const response: Promise<
       OperationResult<{
-        DeleteProduct: Boolean;
+        DeleteProduct: Boolean
       }>
-    > = this.mutation(requestData, { product_id });
+    > = this.mutation(requestData, { product_id })
 
-    return response;
-  };
+    return response
+  }
 }
