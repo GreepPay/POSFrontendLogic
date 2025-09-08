@@ -3,11 +3,13 @@ import { CombinedError } from "urql"
 import Common from "./Common"
 import { Logic } from ".."
 import {
+  
   MutationResetPasswordArgs,
   MutationSignInArgs,
   MutationSignUpArgs,
   MutationUpdatePasswordArgs,
   MutationVerifyUserOtpArgs,
+  MutationSendResetPasswordOtpArgs,
   User,
   MutationVerifyUserIdentityArgs,
 } from "src/gql/graphql"
@@ -62,8 +64,6 @@ export default class Auth extends Common {
       .then((response) => {
         this.AuthUser = response.data?.GetAuthUser
         localStorage.setItem("auth_user", JSON.stringify(this.AuthUser))
-
-        Logic.Common.initiateWebSocket()
         return this.AuthUser
       })
       .catch((error: CombinedError) => {
@@ -135,7 +135,7 @@ export default class Auth extends Common {
 
   public ResendEmailOTP = async (email: string) => {
     return $api.auth
-      .ResendEmailOTP(email)
+      .ResendEmailOTP({ email })
       .then((response) => {
         if (response.data?.ResendEmailOTP) {
           return response.data.ResendEmailOTP
@@ -147,25 +147,24 @@ export default class Auth extends Common {
       })
   }
 
-  public ResetPassword = async () => {
-    if (this.ResetPasswordForm) {
-      return $api.auth
-        .ResetPassword(this.ResetPasswordForm)
-        .then((response) => {
-          if (response.data?.ResetPassword) {
-            return response.data.ResetPassword
-          }
-        })
-        .catch((error: CombinedError) => {
-          Logic.Common.showError(error, "Oops!", "error-alert")
-          throw new Error(error.message)
-        })
-    }
+  public ResetPassword = async (data: MutationResetPasswordArgs) => {
+    return $api.auth
+      .ResetPassword(data)
+      .then((response) => {
+        if (response.data?.ResetPassword) {
+          return response.data.ResetPassword;
+        }
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(error, "Oops!", "error-alert")
+        throw new Error(error.message)
+      })
   }
+
 
   public SendResetPasswordOTP = async (email: string) => {
     return $api.auth
-      .SendResetPasswordOTP(email)
+      .SendResetPasswordOTP({ email })
       .then((response) => {
         if (response.data?.SendResetPasswordOTP) {
           localStorage.setItem("reset_password_uuid", response.data.SendResetPasswordOTP || "");  

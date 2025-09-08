@@ -1,6 +1,8 @@
 import { BaseApiService } from "./common/BaseService"
 import { OperationResult } from "urql"
 import {
+  MutationSendResetPasswordOtpArgs,
+  MutationResendEmailOtpArgs,
   AuthResponse,
   MutationResetPasswordArgs,
   MutationSignInArgs,
@@ -167,6 +169,19 @@ export default class AuthApi extends BaseApiService {
       }>
     > = this.mutationWithProgress(requestData, data, progressCallback)
 
+    return response;
+  };
+  
+  public SendResetPasswordOTP = (data: MutationSendResetPasswordOtpArgs) => {
+    const requestData = `
+      mutation SendResetPasswordOTP($email: String!) {
+        SendResetPasswordOTP(email: $email)
+      }
+    `
+
+    const response: Promise<
+      OperationResult<{ SendResetPasswordOTP: string }>
+    > = this.mutation(requestData, data)
     return response
   }
 
@@ -196,19 +211,20 @@ export default class AuthApi extends BaseApiService {
     return response
   }
 
-  public ResendEmailOTP = (email: string) => {
+  /**
+   * @description Resends the email OTP to verify a user's email
+   * @params email - The user's email address
+   * @response Boolean - Returns true if the OTP was successfully resent, false otherwise
+   */
+  public ResendEmailOTP = (data: MutationResendEmailOtpArgs) => {
     const requestData = `
-      mutation ResendEmailOTP($email: String!) {
-        ResendEmailOTP(email: $email)
-      }
+    mutation ResendEmailOTP($email: String!) {
+      ResendEmailOTP(email: $email)
+    }
+  `;
 
-		`
-
-    const response: Promise<
-      OperationResult<{
-        ResendEmailOTP: Boolean
-      }>
-    > = this.mutation(requestData, { email })
+    const response: Promise<OperationResult<{ ResendEmailOTP: boolean }>> =
+      this.mutation(requestData, data);
 
     return response
   }
@@ -234,25 +250,10 @@ export default class AuthApi extends BaseApiService {
       }>
     > = this.mutation(requestData, data)
 
-    return response
-  }
-
-  public SendResetPasswordOTP = (email: string) => {
-    const requestData = `
-      mutation SendResetPasswordOTP($email: String!) {
-        SendResetPasswordOTP(email: $email)
-      }
-
-		`
-
-    const response: Promise<
-      OperationResult<{
-        SendResetPasswordOTP: string
-      }>
-    > = this.mutation(requestData, { email })
-
-    return response
-  }
+    return response;
+  };
+  
+  
 
   public UpdatePassword = (data: MutationUpdatePasswordArgs) => {
     const request_data = `

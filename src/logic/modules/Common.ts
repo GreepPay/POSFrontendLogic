@@ -19,6 +19,14 @@ import Pusher from "pusher-js"
 // @ts-ignore
 window.Pusher = Pusher
 
+export interface WebSocketConfig {
+  pusherKey: string;
+  pusherHost: string;
+  pusherPort: string;
+  pusherCluster: string;
+  socketAuthUrl: string;
+}
+
 export default class Common {
   public router: Router | undefined = undefined
 
@@ -134,31 +142,25 @@ export default class Common {
     })
   }
 
-  public initiateWebSocket = () => {
-    const VITE_PUSHER_APP_KEY =
-      (import.meta as any).env.VITE_PUSHER_APP_KEY || "test"
-
+  public initiateWebSocket = (config: WebSocketConfig) => {
     try {
       if (!this.laravelEcho) {
         this.laravelEcho = new Echo({
           broadcaster: "pusher",
-          key: VITE_PUSHER_APP_KEY,
-          cluster: "mt1",
-          // forceTLS: true,
-          // encrypted: true,
+          key: config.pusherKey,
+          cluster: config.pusherCluster || "mt1",
+          encrypted: true,
           forceTLS: true,
           disableStats: true,
-          wsPort: (import.meta as any).env.VITE_PUSHER_PORT,
-          wsHost: (import.meta as any).env.VITE_PUSHER_HOST,
+          wsPort: config.pusherPort || "6001",
+          wsHost: config.pusherHost,
           auth: {
             headers: {
               authorization: `Bearer ${Logic.Auth.AccessToken}`,
             },
           },
-          authEndpoint: `${
-            (import.meta as any).env.VITE_SOCKET_AUTH_URL
-          }/broadcasting/auth`,
-        })
+          authEndpoint: `${config.socketAuthUrl}/broadcasting/auth`,
+        });
       }
     } catch (error) {
       console.error(error)

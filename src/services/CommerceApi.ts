@@ -19,13 +19,13 @@ export default class CommerceApi extends BaseApiService {
     order: "ASC" | "DESC",
     whereQuery = ""
   ) => {
-    console.log("GetProducts called with:", {
-      page,
-      count,
-      orderType,
-      order,
-      whereQuery,
-    })
+    // console.log("GetProducts called with:", {
+    //   page,
+    //   count,
+    //   orderType,
+    //   order,
+    //   whereQuery,
+    // })
     const requestData = `
       query GetProducts(
         $page: Int!,
