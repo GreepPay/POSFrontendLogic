@@ -3,7 +3,6 @@ import { CombinedError } from "urql"
 import Common from "./Common"
 import { Logic } from ".."
 import {
-  
   MutationResetPasswordArgs,
   MutationSignInArgs,
   MutationSignUpArgs,
@@ -19,6 +18,7 @@ export default class Auth extends Common {
   public AccessToken: string | null = null
   public AuthUser: User | undefined = undefined
   public RequestUuid: string | null = null
+  public hasConnection: boolean = false
 
   // Mutation Variables
   public SignUpForm: MutationSignUpArgs | undefined
@@ -35,6 +35,7 @@ export default class Auth extends Common {
     this.defineReactiveProperty("AccessToken", null)
     this.defineReactiveProperty("AuthUser", undefined)
     this.defineReactiveProperty("RequestUuid", null)
+    this.defineReactiveProperty("hasConnection", false)
     this.defineReactiveProperty("CurrentAppVersion", null)
 
     this.AccessToken = localStorage.getItem("access_token")
@@ -64,6 +65,9 @@ export default class Auth extends Common {
       .then((response) => {
         this.AuthUser = response.data?.GetAuthUser
         localStorage.setItem("auth_user", JSON.stringify(this.AuthUser))
+
+        this.connectSocketChannels()
+
         return this.AuthUser
       })
       .catch((error: CombinedError) => {
@@ -71,6 +75,33 @@ export default class Auth extends Common {
         Logic.Auth.SignOut()
         throw error
       })
+  }
+
+  private connectSocketChannels = () => {
+    if (!Logic.Common.laravelEcho) {
+      Logic.Common.initiateWebSocket({
+        pusherKey: import.meta.env.VITE_PUSHER_APP_KEY,
+        pusherHost: import.meta.env.VITE_PUSHER_HOST,
+        pusherPort: import.meta.env.VITE_PUSHER_PORT,
+        pusherCluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        socketAuthUrl: import.meta.env.VITE_SOCKET_AUTH_URL,
+      })
+    }
+
+    if (Logic.Common.laravelEcho && !this.hasConnection) {
+      Logic.Common.laravelEcho
+        .private(`user.${Logic.Auth.AuthUser?.id}`)
+        .subscribed(() => (this.hasConnection = true))
+        .listen(
+          ".transaction.created",
+          (data: { status: string } & { [key: string]: any }) => {
+            if (data.status === "success") {
+              Logic.Auth.GetAuthUser()
+              Logic.Wallet.GetGlobalExchangeRate()
+            }
+          }
+        )
+    }
   }
 
   public GetCurrentAppVersion = async (): Promise<string | null> => {
@@ -152,7 +183,7 @@ export default class Auth extends Common {
       .ResetPassword(data)
       .then((response) => {
         if (response.data?.ResetPassword) {
-          return response.data.ResetPassword;
+          return response.data.ResetPassword
         }
       })
       .catch((error: CombinedError) => {
@@ -161,13 +192,15 @@ export default class Auth extends Common {
       })
   }
 
-
   public SendResetPasswordOTP = async (email: string) => {
     return $api.auth
       .SendResetPasswordOTP({ email })
       .then((response) => {
         if (response.data?.SendResetPasswordOTP) {
-          localStorage.setItem("reset_password_uuid", response.data.SendResetPasswordOTP || "");  
+          localStorage.setItem(
+            "reset_password_uuid",
+            response.data.SendResetPasswordOTP || ""
+          )
           return response.data.SendResetPasswordOTP
         }
       })
@@ -231,7 +264,7 @@ export default class Auth extends Common {
       .DeleteUser()
       .then((response) => {
         Logic.Common.hideLoader()
-        Logic.Common.GoToRoute("/start", true);
+        Logic.Common.GoToRoute("/start", true)
         return response.data?.DeleteUser
       })
       .catch((error: CombinedError) => {
