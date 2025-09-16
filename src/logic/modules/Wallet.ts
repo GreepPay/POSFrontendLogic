@@ -77,11 +77,16 @@ export default class Wallet extends Common {
     | MutationExtractAnchorTransactionArgs
     | undefined
 
-
   // Mutation Variables
-  public CreateP2pPaymentMethodForm: MutationCreateP2pPaymentMethodArgs | undefined;
-  public UpdateP2pPaymentMethodForm: MutationUpdateP2pPaymentMethodArgs | undefined;
-  public SoftDeleteP2pPaymentMethodForm: MutationSoftDeleteP2pPaymentMethodArgs | undefined;
+  public CreateP2pPaymentMethodForm:
+    | MutationCreateP2pPaymentMethodArgs
+    | undefined
+  public UpdateP2pPaymentMethodForm:
+    | MutationUpdateP2pPaymentMethodArgs
+    | undefined
+  public SoftDeleteP2pPaymentMethodForm:
+    | MutationSoftDeleteP2pPaymentMethodArgs
+    | undefined
 
   constructor() {
     super()
@@ -129,12 +134,14 @@ export default class Wallet extends Common {
   public GetWithdrawInfo = async (
     amount: number,
     currency: string,
-    country_code = ""
+    country_code = "NG"
   ): Promise<WithdrawInfo | undefined> => {
-    return $api.wallet.GetWithdrawInfo(amount, currency, country_code).then((response) => {
-      this.CurrentWithdrawalInfo = response.data?.GetWithdrawInfo
-      return this.CurrentWithdrawalInfo
-    })
+    return $api.wallet
+      .GetWithdrawInfo(amount, currency, country_code)
+      .then((response) => {
+        this.CurrentWithdrawalInfo = response.data?.GetWithdrawInfo
+        return this.CurrentWithdrawalInfo
+      })
   }
 
   public GetBanksByCountry = async (
@@ -374,10 +381,7 @@ export default class Wallet extends Common {
     }
   }
 
-  public CreateCrpytoTransfer = async (
-    crypto: string,
-    network: string
-  ) => {
+  public CreateCrpytoTransfer = async (crypto: string, network: string) => {
     if (crypto && network) {
       return $api.wallet
         .CreateCrpytoTransfer(crypto, network)
@@ -621,47 +625,51 @@ export default class Wallet extends Common {
         }
       })
       .catch((error: CombinedError) => {
-        Logic.Common.hideLoader();
-        Logic.Common.showError(error, "Oops!", "error-alert");
-        throw error;
-      });
-  };
+        Logic.Common.hideLoader()
+        Logic.Common.showError(error, "Oops!", "error-alert")
+        throw error
+      })
+  }
 
   // ✅ NEW: Release P2P Funds
-  public ReleaseP2pFunds = (order_uuid: string, amount: number, metadata?: string) => {
+  public ReleaseP2pFunds = (
+    order_uuid: string,
+    amount: number,
+    metadata?: string
+  ) => {
     Logic.Common.showLoader({
       show: true,
       loading: true,
-    });
+    })
     return $api.wallet
       .ReleaseP2pFunds(order_uuid, amount, metadata)
       .then((response) => {
         if (response.data?.ReleaseP2pFunds) {
-          Logic.Common.hideLoader();
-          return response.data.ReleaseP2pFunds;
+          Logic.Common.hideLoader()
+          return response.data.ReleaseP2pFunds
         }
       })
       .catch((error: CombinedError) => {
-        Logic.Common.hideLoader();
-        Logic.Common.showError(error, "Oops!", "error-alert");
-        throw error;
-      });
-  };
+        Logic.Common.hideLoader()
+        Logic.Common.showError(error, "Oops!", "error-alert")
+        throw error
+      })
+  }
 
   // P2P Payment Methods
   public GetMyP2pPaymentMethods = async (first: number, page: number) => {
     return $api.wallet.GetMyP2pPaymentMethods(first, page).then((response) => {
-      this.ManyP2pPaymentMethods = response.data?.GetMyP2pPaymentMethods;
-      return this.ManyP2pPaymentMethods;
-    });
-  };
+      this.ManyP2pPaymentMethods = response.data?.GetMyP2pPaymentMethods
+      return this.ManyP2pPaymentMethods
+    })
+  }
 
   public GetP2pPaymentMethod = async (uuid: string) => {
     return $api.wallet.GetP2pPaymentMethod(uuid).then((response) => {
-      this.SingleP2pPaymentMethod = response.data?.GetP2pPaymentMethod;
-      return this.SingleP2pPaymentMethod;
-    });
-  };
+      this.SingleP2pPaymentMethod = response.data?.GetP2pPaymentMethod
+      return this.SingleP2pPaymentMethod
+    })
+  }
 
   public CreateP2pPaymentMethod = async () => {
     if (this.CreateP2pPaymentMethodForm) {
@@ -669,16 +677,16 @@ export default class Wallet extends Common {
         .CreateP2pPaymentMethod(this.CreateP2pPaymentMethodForm)
         .then((response) => {
           if (response.data?.CreateP2pPaymentMethod) {
-            this.SingleP2pPaymentMethod = response.data.CreateP2pPaymentMethod;
-            return response.data.CreateP2pPaymentMethod;
+            this.SingleP2pPaymentMethod = response.data.CreateP2pPaymentMethod
+            return response.data.CreateP2pPaymentMethod
           }
         })
         .catch((error: CombinedError) => {
-          Logic.Common.showError(error, "Oops!", "error-alert");
-          throw error;
-        });
+          Logic.Common.showError(error, "Oops!", "error-alert")
+          throw error
+        })
     }
-  };
+  }
 
   public UpdateP2pPaymentMethod = async () => {
     if (this.UpdateP2pPaymentMethodForm) {
@@ -686,16 +694,16 @@ export default class Wallet extends Common {
         .UpdateP2pPaymentMethod(this.UpdateP2pPaymentMethodForm)
         .then((response) => {
           if (response.data?.UpdateP2pPaymentMethod) {
-            this.SingleP2pPaymentMethod = response.data.UpdateP2pPaymentMethod;
-            return response.data.UpdateP2pPaymentMethod;
+            this.SingleP2pPaymentMethod = response.data.UpdateP2pPaymentMethod
+            return response.data.UpdateP2pPaymentMethod
           }
         })
         .catch((error: CombinedError) => {
-          Logic.Common.showError(error, "Oops!", "error-alert");
-          throw error;
-        });
+          Logic.Common.showError(error, "Oops!", "error-alert")
+          throw error
+        })
     }
-  };
+  }
 
   public SoftDeleteP2pPaymentMethod = async () => {
     if (this.SoftDeleteP2pPaymentMethodForm) {
@@ -703,58 +711,58 @@ export default class Wallet extends Common {
         .SoftDeleteP2pPaymentMethod(this.SoftDeleteP2pPaymentMethodForm)
         .then((response) => {
           if (response.data?.SoftDeleteP2pPaymentMethod) {
-            return response.data.SoftDeleteP2pPaymentMethod;
+            return response.data.SoftDeleteP2pPaymentMethod
           }
         })
         .catch((error: CombinedError) => {
-          Logic.Common.showError(error, "Oops!", "error-alert");
-          throw error;
-        });
+          Logic.Common.showError(error, "Oops!", "error-alert")
+          throw error
+        })
     }
-  };
+  }
 
   // Helper methods for direct P2P Payment Method operations
   public CreateP2pPaymentMethodDirect = async (data: {
-    bank_name: string;
-    account_number: string;
-    account_name: string;
-    currency?: string;
-    meta_data?: string;
+    bank_name: string
+    account_number: string
+    account_name: string
+    currency?: string
+    meta_data?: string
   }) => {
     Logic.Common.showLoader({
       loading: true,
       show: true,
-    });
+    })
     return $api.wallet
       .CreateP2pPaymentMethod(data)
       .then((response) => {
         if (response.data?.CreateP2pPaymentMethod) {
-          Logic.Common.hideLoader();
-          this.SingleP2pPaymentMethod = response.data.CreateP2pPaymentMethod;
-          return response.data.CreateP2pPaymentMethod;
+          Logic.Common.hideLoader()
+          this.SingleP2pPaymentMethod = response.data.CreateP2pPaymentMethod
+          return response.data.CreateP2pPaymentMethod
         }
       })
       .catch((error: CombinedError) => {
-        Logic.Common.hideLoader();
-        Logic.Common.showError(error, "Oops!", "error-alert");
-        throw error;
-      });
-  };
+        Logic.Common.hideLoader()
+        Logic.Common.showError(error, "Oops!", "error-alert")
+        throw error
+      })
+  }
 
   public UpdateP2pPaymentMethodDirect = async (
     p2p_payment_method_uuid: string,
     data: {
-      bank_name?: string;
-      account_number?: string;
-      account_name?: string;
-      currency?: string;
-      meta_data?: string;
+      bank_name?: string
+      account_number?: string
+      account_name?: string
+      currency?: string
+      meta_data?: string
     }
   ) => {
     Logic.Common.showLoader({
       show: true,
       loading: true,
-    });
+    })
     return $api.wallet
       .UpdateP2pPaymentMethod({
         p2p_payment_method_uuid,
@@ -762,35 +770,37 @@ export default class Wallet extends Common {
       })
       .then((response) => {
         if (response.data?.UpdateP2pPaymentMethod) {
-          Logic.Common.hideLoader();
-          this.SingleP2pPaymentMethod = response.data.UpdateP2pPaymentMethod;
-          return response.data.UpdateP2pPaymentMethod;
+          Logic.Common.hideLoader()
+          this.SingleP2pPaymentMethod = response.data.UpdateP2pPaymentMethod
+          return response.data.UpdateP2pPaymentMethod
         }
       })
       .catch((error: CombinedError) => {
-        Logic.Common.hideLoader();
-        Logic.Common.showError(error, "Oops!", "error-alert");
-        throw error;
-      });
-  };
+        Logic.Common.hideLoader()
+        Logic.Common.showError(error, "Oops!", "error-alert")
+        throw error
+      })
+  }
 
-  public SoftDeleteP2pPaymentMethodDirect = async (p2p_payment_method_uuid: string) => {
+  public SoftDeleteP2pPaymentMethodDirect = async (
+    p2p_payment_method_uuid: string
+  ) => {
     Logic.Common.showLoader({
       show: true,
       loading: true,
-    });
+    })
     return $api.wallet
       .SoftDeleteP2pPaymentMethod({ p2p_payment_method_uuid })
       .then((response) => {
         if (response.data?.SoftDeleteP2pPaymentMethod) {
-          Logic.Common.hideLoader();
-          return response.data.SoftDeleteP2pPaymentMethod;
+          Logic.Common.hideLoader()
+          return response.data.SoftDeleteP2pPaymentMethod
         }
       })
       .catch((error: CombinedError) => {
-        Logic.Common.hideLoader();
-        Logic.Common.showError(error, "Oops!", "error-alert");
-        throw error;
-      });
-  };
+        Logic.Common.hideLoader()
+        Logic.Common.showError(error, "Oops!", "error-alert")
+        throw error
+      })
+  }
 }
