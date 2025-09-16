@@ -112,6 +112,12 @@ export type AuthResponse = {
   user: User;
 };
 
+export type BankAccountNameResponse = {
+  __typename?: 'BankAccountNameResponse';
+  account_name: Scalars['String'];
+  account_number: Scalars['String'];
+};
+
 export type BillingInput = {
   gracePeriod: Scalars['Int'];
   interval: BillingInterval;
@@ -501,6 +507,24 @@ export type FinancialSummaryResponse = {
   debit: Scalars['Float'];
 };
 
+export type FlutterwaveBank = {
+  __typename?: 'FlutterwaveBank';
+  code: Scalars['String'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  provider_type?: Maybe<Scalars['String']>;
+};
+
+export type FlutterwaveBankBranch = {
+  __typename?: 'FlutterwaveBankBranch';
+  bank_id: Scalars['Int'];
+  bic: Scalars['String'];
+  branch_code: Scalars['String'];
+  branch_name: Scalars['String'];
+  id: Scalars['Int'];
+  swift_code: Scalars['String'];
+};
+
 export type GlobalExchangeRate = {
   __typename?: 'GlobalExchangeRate';
   /** Base Currency */
@@ -712,6 +736,7 @@ export type MutationAddParticipantArgs = {
 
 export type MutationConfirmWithdrawalArgs = {
   amount: Scalars['Float'];
+  country_code: Scalars['String'];
   currency: Scalars['String'];
   metadata?: InputMaybe<Scalars['String']>;
   uuid: Scalars['String'];
@@ -911,7 +936,7 @@ export type MutationSignUpArgs = {
   email: Scalars['String'];
   first_name?: InputMaybe<Scalars['String']>;
   last_name?: InputMaybe<Scalars['String']>;
-  password: Scalars['String'];
+  password?: InputMaybe<Scalars['String']>;
   phone_number?: InputMaybe<Scalars['String']>;
   sso_id?: InputMaybe<Scalars['String']>;
   state?: InputMaybe<Scalars['String']>;
@@ -1530,12 +1555,18 @@ export type Profile = {
 
 export type Query = {
   __typename?: 'Query';
+  /** Get the current application version */
+  CurrentAppVersion: Scalars['String'];
   /** Get all business locations by business UUID */
   GetAllBusinessLocations: StoreLocationPaginator;
   /** Get the authenticated user */
   GetAuthUser?: Maybe<User>;
   /** Get bank account details */
   GetBankAccountDetails: Scalars['String'];
+  /** Get back branches by bank ID */
+  GetBankBranchesByBankId?: Maybe<Array<FlutterwaveBankBranch>>;
+  /** Get banks by country */
+  GetBanksByCountry: Array<FlutterwaveBank>;
   /** Get a conversation */
   GetConversation?: Maybe<Conversation>;
   /** Get country information for verification */
@@ -1590,10 +1621,14 @@ export type Query = {
   GetStoreLocations: StoreLocationPaginator;
   /** Get many transactions - paginated list of transactions for the authenticated user */
   GetTransactions: TransactionPaginator;
+  /** Get transfer fees */
+  GetTransferFees: Scalars['Float'];
   /** Get withdrawal info */
   GetWithdrawInfo: WithdrawInfo;
   /** Get yellow card networks */
   GetYellowCardNetwork: Array<YellowcardNetwork>;
+  /** Resolve bank account name */
+  ResolveBankAccountName?: Maybe<BankAccountNameResponse>;
 };
 
 
@@ -1607,6 +1642,16 @@ export type QueryGetAllBusinessLocationsArgs = {
 export type QueryGetBankAccountDetailsArgs = {
   accountNumber: Scalars['String'];
   networkId: Scalars['String'];
+};
+
+
+export type QueryGetBankBranchesByBankIdArgs = {
+  bank_id: Scalars['Int'];
+};
+
+
+export type QueryGetBanksByCountryArgs = {
+  country: Scalars['String'];
 };
 
 
@@ -1771,6 +1816,13 @@ export type QueryGetTransactionsArgs = {
 };
 
 
+export type QueryGetTransferFeesArgs = {
+  amount: Scalars['Float'];
+  currency: Scalars['String'];
+  type: Scalars['String'];
+};
+
+
 export type QueryGetWithdrawInfoArgs = {
   amount: Scalars['Float'];
   country_code?: InputMaybe<Scalars['String']>;
@@ -1780,6 +1832,12 @@ export type QueryGetWithdrawInfoArgs = {
 
 export type QueryGetYellowCardNetworkArgs = {
   country_code: Scalars['String'];
+};
+
+
+export type QueryResolveBankAccountNameArgs = {
+  account_number: Scalars['String'];
+  bank_code: Scalars['String'];
 };
 
 /** Allowed column names for Query.GetEventTickets.orderBy. */
