@@ -1,15 +1,15 @@
 import {
   MutationSavePushNotificationTokenArgs,
   NotificationPaginator,
-} from "src/gql/graphql";
-import { OperationResult } from "urql";
-import { BaseApiService } from "./common/BaseService";
+} from "src/gql/graphql"
+import { OperationResult } from "urql"
+import { BaseApiService } from "./common/BaseService"
 
 export default class NotificationApi extends BaseApiService {
   // Query
-  public GetNotifications = (first: number, page: number) => {
+  public GetNotifications = (type: string, first: number, page: number) => {
     const requestData = `
-      query GetNotifications($first: Int!, $page: Int) {
+      query GetNotifications($type: String!, $first: Int!, $page: Int ) {
         GetNotifications(first: $first, page: $page) {
           paginatorInfo {
             count
@@ -33,19 +33,16 @@ export default class NotificationApi extends BaseApiService {
           }
         }
       }
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        GetNotifications: NotificationPaginator;
+        GetNotifications: NotificationPaginator
       }>
-    > = this.query(requestData, {
-      first,
-      page,
-    });
+    > = this.query(requestData, { type, first, page })
 
-    return response;
-  };
+    return response
+  }
 
   // Mutations
   public MarkNotificationsAsRead = (notificationIds: number[]) => {
@@ -53,21 +50,21 @@ export default class NotificationApi extends BaseApiService {
       mutation MarkNotificationsAsRead($notificationIds: [Int!]!) {
         MarkNotificationsAsRead(notification_ids: $notificationIds)
       }
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        MarkNotificationsAsRead: Boolean;
+        MarkNotificationsAsRead: Boolean
       }>
     > = this.mutation(requestData, {
       notificationIds,
-    });
+    })
 
-    return response;
-  };
+    return response
+  }
 
   public SavePushNotificationToken = (
-    data: MutationSavePushNotificationTokenArgs,
+    data: MutationSavePushNotificationTokenArgs
   ) => {
     const requestData = `
       mutation SavePushNotificationToken(
@@ -79,14 +76,14 @@ export default class NotificationApi extends BaseApiService {
           device_type: $deviceType
         )
       }
-		`;
+		`
 
     const response: Promise<
       OperationResult<{
-        SavePushNotificationToken: Boolean;
+        SavePushNotificationToken: Boolean
       }>
-    > = this.mutation(requestData, data);
+    > = this.mutation(requestData, data)
 
-    return response;
-  };
+    return response
+  }
 }
