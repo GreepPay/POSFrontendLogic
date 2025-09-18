@@ -112,6 +112,12 @@ export type AuthResponse = {
   user: User;
 };
 
+export type BankAccountNameResponse = {
+  __typename?: 'BankAccountNameResponse';
+  account_name: Scalars['String'];
+  account_number: Scalars['String'];
+};
+
 export type BillingInput = {
   gracePeriod: Scalars['Int'];
   interval: BillingInterval;
@@ -501,6 +507,24 @@ export type FinancialSummaryResponse = {
   debit: Scalars['Float'];
 };
 
+export type FlutterwaveBank = {
+  __typename?: 'FlutterwaveBank';
+  code: Scalars['String'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  provider_type?: Maybe<Scalars['String']>;
+};
+
+export type FlutterwaveBankBranch = {
+  __typename?: 'FlutterwaveBankBranch';
+  bank_id: Scalars['Int'];
+  bic?: Maybe<Scalars['String']>;
+  branch_code?: Maybe<Scalars['String']>;
+  branch_name?: Maybe<Scalars['String']>;
+  id: Scalars['Int'];
+  swift_code?: Maybe<Scalars['String']>;
+};
+
 export type GlobalExchangeRate = {
   __typename?: 'GlobalExchangeRate';
   /** Base Currency */
@@ -712,6 +736,7 @@ export type MutationAddParticipantArgs = {
 
 export type MutationConfirmWithdrawalArgs = {
   amount: Scalars['Float'];
+  country_code: Scalars['String'];
   currency: Scalars['String'];
   metadata?: InputMaybe<Scalars['String']>;
   uuid: Scalars['String'];
@@ -911,7 +936,7 @@ export type MutationSignUpArgs = {
   email: Scalars['String'];
   first_name?: InputMaybe<Scalars['String']>;
   last_name?: InputMaybe<Scalars['String']>;
-  password: Scalars['String'];
+  password?: InputMaybe<Scalars['String']>;
   phone_number?: InputMaybe<Scalars['String']>;
   sso_id?: InputMaybe<Scalars['String']>;
   state?: InputMaybe<Scalars['String']>;
@@ -1043,6 +1068,7 @@ export type Notification = {
   __typename?: 'Notification';
   /** User UUID to whom the notification belongs */
   auth_user_id: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
   /** Notification Content */
   content: Scalars['String'];
   /** Notification Created At */
@@ -1530,12 +1556,18 @@ export type Profile = {
 
 export type Query = {
   __typename?: 'Query';
+  /** Get the current application version */
+  CurrentAppVersion: Scalars['String'];
   /** Get all business locations by business UUID */
   GetAllBusinessLocations: StoreLocationPaginator;
   /** Get the authenticated user */
   GetAuthUser?: Maybe<User>;
   /** Get bank account details */
   GetBankAccountDetails: Scalars['String'];
+  /** Get back branches by bank ID */
+  GetBankBranchesByBankId?: Maybe<Array<FlutterwaveBankBranch>>;
+  /** Get banks by country */
+  GetBanksByCountry: Array<FlutterwaveBank>;
   /** Get a conversation */
   GetConversation?: Maybe<Conversation>;
   /** Get country information for verification */
@@ -1590,10 +1622,14 @@ export type Query = {
   GetStoreLocations: StoreLocationPaginator;
   /** Get many transactions - paginated list of transactions for the authenticated user */
   GetTransactions: TransactionPaginator;
+  /** Get transfer fees */
+  GetTransferFees: Scalars['Float'];
   /** Get withdrawal info */
   GetWithdrawInfo: WithdrawInfo;
   /** Get yellow card networks */
   GetYellowCardNetwork: Array<YellowcardNetwork>;
+  /** Resolve bank account name */
+  ResolveBankAccountName?: Maybe<BankAccountNameResponse>;
 };
 
 
@@ -1607,6 +1643,16 @@ export type QueryGetAllBusinessLocationsArgs = {
 export type QueryGetBankAccountDetailsArgs = {
   accountNumber: Scalars['String'];
   networkId: Scalars['String'];
+};
+
+
+export type QueryGetBankBranchesByBankIdArgs = {
+  bank_id: Scalars['Int'];
+};
+
+
+export type QueryGetBanksByCountryArgs = {
+  country: Scalars['String'];
 };
 
 
@@ -1667,7 +1713,9 @@ export type QueryGetMyP2pPaymentMethodsArgs = {
 
 export type QueryGetNotificationsArgs = {
   first: Scalars['Int'];
+  orderBy?: InputMaybe<Array<QueryGetNotificationsOrderByOrderByClause>>;
   page?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<QueryGetNotificationsWhereWhereConditions>;
 };
 
 
@@ -1771,6 +1819,13 @@ export type QueryGetTransactionsArgs = {
 };
 
 
+export type QueryGetTransferFeesArgs = {
+  amount: Scalars['Float'];
+  currency: Scalars['String'];
+  type: Scalars['String'];
+};
+
+
 export type QueryGetWithdrawInfoArgs = {
   amount: Scalars['Float'];
   country_code?: InputMaybe<Scalars['String']>;
@@ -1780,6 +1835,12 @@ export type QueryGetWithdrawInfoArgs = {
 
 export type QueryGetYellowCardNetworkArgs = {
   country_code: Scalars['String'];
+};
+
+
+export type QueryResolveBankAccountNameArgs = {
+  account_number: Scalars['String'];
+  bank_code: Scalars['String'];
 };
 
 /** Allowed column names for Query.GetEventTickets.orderBy. */
@@ -1877,6 +1938,58 @@ export type QueryGetExchangeAdsWhereWhereConditionsRelation = {
   amount?: InputMaybe<Scalars['Int']>;
   /** Additional condition logic. */
   condition?: InputMaybe<QueryGetExchangeAdsWhereWhereConditions>;
+  /** The comparison operator to test against the amount. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The relation that is checked. */
+  relation: Scalars['String'];
+};
+
+/** Allowed column names for Query.GetNotifications.orderBy. */
+export enum QueryGetNotificationsOrderByColumn {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Order by clause for Query.GetNotifications.orderBy. */
+export type QueryGetNotificationsOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetNotificationsOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetNotifications.where. */
+export enum QueryGetNotificationsWhereColumn {
+  Category = 'CATEGORY',
+  CreatedAt = 'CREATED_AT',
+  DeliveryStatus = 'DELIVERY_STATUS',
+  IsRead = 'IS_READ',
+  Type = 'TYPE',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Dynamic WHERE conditions for the `where` argument of the query `GetNotifications`. */
+export type QueryGetNotificationsWhereWhereConditions = {
+  /** A set of conditions that requires all conditions to match. */
+  AND?: InputMaybe<Array<QueryGetNotificationsWhereWhereConditions>>;
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied. */
+  HAS?: InputMaybe<QueryGetNotificationsWhereWhereConditionsRelation>;
+  /** A set of conditions that requires at least one condition to match. */
+  OR?: InputMaybe<Array<QueryGetNotificationsWhereWhereConditions>>;
+  /** The column that is used for the condition. */
+  column?: InputMaybe<QueryGetNotificationsWhereColumn>;
+  /** The operator that is used for the condition. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The value that is used for the condition. */
+  value?: InputMaybe<Scalars['Mixed']>;
+};
+
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `GetNotifications`. */
+export type QueryGetNotificationsWhereWhereConditionsRelation = {
+  /** The amount to test. */
+  amount?: InputMaybe<Scalars['Int']>;
+  /** Additional condition logic. */
+  condition?: InputMaybe<QueryGetNotificationsWhereWhereConditions>;
   /** The comparison operator to test against the amount. */
   operator?: InputMaybe<SqlOperator>;
   /** The relation that is checked. */
@@ -2439,6 +2552,8 @@ export type Transaction = {
   description: Scalars['String'];
   /** Credit or Debit: 'credit' or 'debit' */
   dr_or_cr: Scalars['String'];
+  /** Extra Data (JSON string) */
+  extra_data?: Maybe<Scalars['String']>;
   /** Gateway (default: 'Greep-wallet') */
   gateway: Scalars['String'];
   /** The associated point transaction */

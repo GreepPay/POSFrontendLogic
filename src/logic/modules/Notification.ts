@@ -30,12 +30,14 @@ export default class Notification extends Common {
 
   // Queries
   public GetNotifications = async (
-    type: string,
-    first: number,
-    page: number
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order = "DESC" as "DESC" | "ASC",
+    whereQuery = ""
   ) => {
     return $api.notification
-      .GetNotifications(type, first, page)
+      .GetNotifications(page, count, orderType, order, whereQuery)
       .then((response) => {
         this.ManyNotifications = response.data?.GetNotifications
         return this.ManyNotifications

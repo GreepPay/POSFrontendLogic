@@ -7,39 +7,98 @@ import { BaseApiService } from "./common/BaseService"
 
 export default class NotificationApi extends BaseApiService {
   // Query
-  public GetNotifications = (type: string, first: number, page: number) => {
+  // public GetNotifications = (type: string, first: number, page: number) => {
+  //   const requestData = `
+  //     query GetNotifications($type: String!, $first: Int!, $page: Int ) {
+  //       GetNotifications(first: $first, page: $page) {
+  //         paginatorInfo {
+  //           count
+  //           currentPage
+  //           firstItem
+  //           hasMorePages
+  //           lastItem
+  //           lastPage
+  //           perPage
+  //           total
+  //         }
+  //         data {
+  //           content
+  //           created_at
+  //           delivery_status
+  //           email
+  //           id
+  //           is_read
+  //           title
+  //           type
+  //         }
+  //       }
+  //     }
+  // 	`
+
+  //   const response: Promise<
+  //     OperationResult<{
+  //       GetNotifications: NotificationPaginator
+  //     }>
+  //   > = this.query(requestData, { type, first, page })
+
+  //   return response
+  // }
+  public GetNotifications = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC" = "DESC",
+    whereQuery = ""
+  ) => {
     const requestData = `
-      query GetNotifications($type: String!, $first: Int!, $page: Int ) {
-        GetNotifications(first: $first, page: $page) {
-          paginatorInfo {
-            count
-            currentPage
-            firstItem
-            hasMorePages
-            lastItem
-            lastPage
-            perPage
-            total
-          }
-          data {
-            content
-            created_at
-            delivery_status
-            email
-            id
-            is_read
-            title
-            type
-          }
+    query GetNotifications(
+      $page: Int!,
+      $count: Int! 
+    ) {
+      GetNotifications( 
+        first: $count,
+        page: $page,
+        orderBy: {
+          column: ${orderType ? orderType : "CREATED_AT"},
+          order: ${order}
+        }
+        ${whereQuery ? `where: ${whereQuery}` : ""}
+        ) {
+        paginatorInfo {
+          count
+          currentPage
+          firstItem
+          hasMorePages
+          lastItem
+          lastPage
+          perPage
+          total
+        }
+        data {
+          id
+          type
+          category
+          title
+          content
+          is_read
+          delivery_status
+          created_at
+          updated_at
         }
       }
-		`
+    }
+  `
 
     const response: Promise<
       OperationResult<{
         GetNotifications: NotificationPaginator
       }>
-    > = this.query(requestData, { type, first, page })
+    > = this.query(requestData, {
+      page,
+      count,
+      // where: where ?? {},
+      // orderBy: orderBy ?? [],
+    })
 
     return response
   }
