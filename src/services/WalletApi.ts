@@ -1,11 +1,14 @@
 import {
   AnchorTransation,
+  BankAccountNameResponse,
   ExchangeAd,
   ExchangeAdPaginator,
   ExchangeOrder,
   ExchangeRate,
   FinancialSummaryInput,
   FinancialSummaryResponse,
+  FlutterwaveBank,
+  FlutterwaveBankBranch,
   GlobalExchangeRate,
   InteractiveWithdrawalResponse,
   MutationCreateExchangeAdArgs,
@@ -90,6 +93,100 @@ export default class WalletApi extends BaseApiService {
       amount,
       currency,
       country_code
+    })
+
+    return response
+  }
+
+
+
+  public GetBanksByCountry = (country: string) => {
+    const requestData = `
+        query GetBanksByCountry($country: String!) {
+          GetBanksByCountry(country: $country) {
+             id
+             code
+             name
+             provider_type
+          }
+        }
+      `
+
+    const response: Promise<
+      OperationResult<{
+        GetBanksByCountry: FlutterwaveBank[]
+      }>
+    > = this.query(requestData, {
+      country
+    })
+
+    return response
+  }
+
+
+  public GetBankBranchesByBankId = (bank_id: number) => {
+    const requestData = `
+        query GetBankBranchesByBankId($bank_id: String!) {
+          GetBankBranchesByBankId(bank_id: $bank_id) {
+             id
+             branch_code
+             branch_name
+             swift_code
+             bic
+             bank_id
+          }
+        }
+      `
+
+    const response: Promise<
+      OperationResult<{
+        GetBankBranchesByBankId: FlutterwaveBankBranch[]
+      }>
+    > = this.query(requestData, {
+      bank_id
+    })
+
+    return response
+  }
+
+  public ResolveBankAccountName = (account_number: string, bank_code: string) => {
+    const requestData = `
+        query ResolveBankAccountName($account_number: String!, $bank_code: String!) {
+          ResolveBankAccountName(account_number: $account_number, bank_code: $bank_code) {
+             account_number
+             account_name
+          }
+        }
+      `
+
+    const response: Promise<
+      OperationResult<{
+        ResolveBankAccountName: BankAccountNameResponse
+      }>
+    > = this.query(requestData, {
+      account_number,
+      bank_code
+    })
+
+    return response
+  }
+
+
+  public GetTransferFees = (amount: number, currency: string, type: string) => {
+    const requestData = `
+        query GetTransferFees($amount: Float!, $currency: String!, $type: String!) {
+          GetTransferFees(amount: $amount, currency: $currency, type: $type) 
+        }
+      `;
+
+    const response: Promise<
+      OperationResult<{
+        GetTransferFees: number
+      }>
+    > = this.query(requestData, {
+      amount,
+      currency,
+      type
     })
 
     return response
@@ -740,6 +837,7 @@ export default class WalletApi extends BaseApiService {
     uuid: string,
     currency: string,
     amount: number,
+    country_code: string,
     metadata = ""
   ) => {
     const requestData = `
@@ -747,12 +845,14 @@ export default class WalletApi extends BaseApiService {
           $uuid: String!
           $currency: String!
           $amount: Float!
+          $country_code: String!
           $metadata: String
         ) {
           ConfirmWithdrawal(
             uuid: $uuid
             currency: $currency
             amount: $amount
+            country_code: $country_code
             metadata: $metadata
           ) {
              id
@@ -787,21 +887,22 @@ export default class WalletApi extends BaseApiService {
              updated_at
           }
         }
-      `;
+      `
 
     const response: Promise<
       OperationResult<{
-        ConfirmWithdrawal: OffRamp;
+        ConfirmWithdrawal: OffRamp
       }>
     > = this.mutation(requestData, {
       uuid,
       currency,
       amount,
+      country_code,
       metadata,
-    });
+    })
 
-    return response;
-  };
+    return response
+  }
 
   public CreateExchangeAd = (data: MutationCreateExchangeAdArgs) => {
     const requestData = `
