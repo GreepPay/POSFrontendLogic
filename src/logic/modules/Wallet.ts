@@ -1,10 +1,13 @@
 import {
+  BankAccountNameResponse,
   ExchangeAd,
   ExchangeAdPaginator,
   ExchangeOrder,
   ExchangeRate,
   FinancialSummaryInput,
   FinancialSummaryResponse,
+  FlutterwaveBank,
+  FlutterwaveBankBranch,
   GlobalExchangeRate,
   MutationCreateExchangeAdArgs,
   MutationCreateP2pPaymentMethodArgs,
@@ -56,8 +59,11 @@ export default class Wallet extends Common {
     | undefined
   public SingleP2pOrder: ExchangeOrder | undefined
   public CurrentCryptoTransfer: OffRamp | undefined
-  public ManyP2pPaymentMethods: P2pPaymentMethodPaginator | undefined
-  public SingleP2pPaymentMethod: P2pPaymentMethod | undefined
+  public ManyP2pPaymentMethods: P2pPaymentMethodPaginator | undefined;
+  public SingleP2pPaymentMethod: P2pPaymentMethod | undefined;
+  public ManyBanksByCountry: FlutterwaveBank[] | undefined
+  public ManyBankBranches: FlutterwaveBankBranch[] | undefined
+  public ResolvedBankAccountName: BankAccountNameResponse | undefined
 
   // Mutation Variables
   public CreateSavedAccountForm: MutationCreateSavedAccountArgs | undefined
@@ -105,8 +111,11 @@ export default class Wallet extends Common {
     this.defineReactiveProperty("ManyP2pOrders", undefined)
     this.defineReactiveProperty("SingleP2pOrder", undefined)
     this.defineReactiveProperty("CurrentCryptoTransfer", undefined)
-    this.defineReactiveProperty("ManyP2pPaymentMethods", undefined)
-    this.defineReactiveProperty("SingleP2pPaymentMethod", undefined)
+    this.defineReactiveProperty("ManyP2pPaymentMethods", undefined);
+    this.defineReactiveProperty("SingleP2pPaymentMethod", undefined);
+    this.defineReactiveProperty("ManyBanksByCountry", undefined)
+    this.defineReactiveProperty("ManyBankBranches", undefined)
+    this.defineReactiveProperty("ResolvedBankAccountName", undefined)
   }
 
   // Queries
@@ -132,6 +141,48 @@ export default class Wallet extends Common {
       .then((response) => {
         this.CurrentWithdrawalInfo = response.data?.GetWithdrawInfo
         return this.CurrentWithdrawalInfo
+      })
+  }
+
+  public GetBanksByCountry = async (
+    country: string
+  ): Promise<FlutterwaveBank[] | undefined> => {
+    return $api.wallet.GetBanksByCountry(country).then((response) => {
+      this.ManyBanksByCountry = response.data?.GetBanksByCountry
+      return this.ManyBanksByCountry
+    })
+  }
+
+  public GetBankBranchesByBankId = async (
+    bank_id: number
+  ): Promise<FlutterwaveBankBranch[] | undefined> => {
+    return $api.wallet.GetBankBranchesByBankId(bank_id).then((response) => {
+      this.ManyBankBranches = response.data?.GetBankBranchesByBankId
+      return this.ManyBankBranches
+    })
+  }
+
+  public ResolveBankAccountName = async (
+    account_number: string,
+    bank_code: string
+  ): Promise<BankAccountNameResponse | undefined> => {
+    return $api.wallet
+      .ResolveBankAccountName(account_number, bank_code)
+      .then((response) => {
+        this.ResolvedBankAccountName = response.data?.ResolveBankAccountName
+        return this.ResolvedBankAccountName
+      })
+  }
+
+  public GetTransferFees = async (
+    amount: number,
+    currency: string,
+    type: string
+  ): Promise<number | undefined> => {
+    return $api.wallet
+      .GetTransferFees(amount, currency, type)
+      .then((response) => {
+        return response.data?.GetTransferFees
       })
   }
 
@@ -434,11 +485,12 @@ export default class Wallet extends Common {
     uuid: string,
     currency: string,
     amount: number,
+    country_code = "",
     metadata = ""
   ) => {
     if (uuid) {
       return $api.wallet
-        .ConfirmWithdrawal(uuid, currency, amount, metadata)
+        .ConfirmWithdrawal(uuid, currency, amount, country_code, metadata)
         .then((response) => {
           if (response.data?.ConfirmWithdrawal) {
             this.CurrentOfframp = response.data.ConfirmWithdrawal
