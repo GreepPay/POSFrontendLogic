@@ -10,7 +10,7 @@ import { getPlatforms } from "@ionic/vue"
 export default class Notification extends Common {
   // Base Variables
   public UnreadNotification = 0
-  public ManyNotifications: NotificationPaginator | undefined
+  public Notifications: NotificationPaginator | undefined
 
   // Mutation Variables
 
@@ -19,13 +19,13 @@ export default class Notification extends Common {
     | undefined
 
   public reset = () => {
-    this.ManyNotifications = undefined
+    this.Notifications = undefined
   }
 
   constructor() {
     super()
     this.defineReactiveProperty("UnreadNotification", 0)
-    this.defineReactiveProperty("ManyNotifications", undefined)
+    this.defineReactiveProperty("Notifications", undefined)
   }
 
   // Queries
@@ -39,8 +39,8 @@ export default class Notification extends Common {
     return $api.notification
       .GetNotifications(page, count, orderType, order, whereQuery)
       .then((response) => {
-        this.ManyNotifications = response.data?.GetNotifications
-        return this.ManyNotifications
+        this.Notifications = response.data?.GetNotifications
+        return this.Notifications
       })
   }
 
@@ -60,7 +60,7 @@ export default class Notification extends Common {
     return $api.notification
       .MarkNotificationsAsRead(notificationIds)
       .then(() => {
-        this.GetNotifications("email", 1, 50)
+        this.GetNotifications(1, 10)
       })
   }
 
