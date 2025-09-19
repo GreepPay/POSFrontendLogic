@@ -7,42 +7,6 @@ import { BaseApiService } from "./common/BaseService"
 
 export default class NotificationApi extends BaseApiService {
   // Query
-  // public GetNotifications = (type: string, first: number, page: number) => {
-  //   const requestData = `
-  //     query GetNotifications($type: String!, $first: Int!, $page: Int ) {
-  //       GetNotifications(first: $first, page: $page) {
-  //         paginatorInfo {
-  //           count
-  //           currentPage
-  //           firstItem
-  //           hasMorePages
-  //           lastItem
-  //           lastPage
-  //           perPage
-  //           total
-  //         }
-  //         data {
-  //           content
-  //           created_at
-  //           delivery_status
-  //           email
-  //           id
-  //           is_read
-  //           title
-  //           type
-  //         }
-  //       }
-  //     }
-  // 	`
-
-  //   const response: Promise<
-  //     OperationResult<{
-  //       GetNotifications: NotificationPaginator
-  //     }>
-  //   > = this.query(requestData, { type, first, page })
-
-  //   return response
-  // }
   public GetNotifications = (
     page: number,
     count: number,
