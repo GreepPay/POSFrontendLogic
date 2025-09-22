@@ -59,9 +59,7 @@ export default class NotificationApi extends BaseApiService {
       }>
     > = this.query(requestData, {
       page,
-      count,
-      // where: where ?? {},
-      // orderBy: orderBy ?? [],
+      count,  
     })
 
     return response
