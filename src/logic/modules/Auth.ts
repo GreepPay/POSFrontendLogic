@@ -92,7 +92,6 @@ export default class Auth extends Common {
       Logic.Common.laravelEcho
         .private(`user.${Logic.Auth.AuthUser?.id}`)
         .subscribed(() => (this.hasConnection = true))
-        .cancelled(() => (this.hasConnection = false))
         .listen(
           ".transaction.created",
           (data: { status: string } & { [key: string]: any }) => {
