@@ -6,9 +6,26 @@ import {
   Product,
   ProductPaginator,
   TicketPaginator,
-} from "../gql/graphql"
-import { OperationResult } from "urql"
-import { BaseApiService } from "./common/BaseService"
+  Delivery,
+} from "../gql/graphql";
+import { OperationResult } from "urql";
+import { BaseApiService } from "./common/BaseService";
+
+// Temporary type definition for DeliveryPaginator
+type DeliveryPaginator = {
+  __typename?: "DeliveryPaginator";
+  data: Array<Delivery>;
+  paginatorInfo: {
+    total: number;
+    perPage: number;
+    lastPage: number;
+    lastItem?: number;
+    hasMorePages: boolean;
+    firstItem?: number;
+    currentPage: number;
+    count: number;
+  };
+};
 
 export default class CommerceApi extends BaseApiService {
   // Query
@@ -99,18 +116,18 @@ export default class CommerceApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetProducts: ProductPaginator
+        GetProducts: ProductPaginator;
       }>
     > = this.query(requestData, {
       page,
       count,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetEventTickets = (productId: number, first: number, page: number) => {
     const requestData = `
@@ -189,19 +206,19 @@ export default class CommerceApi extends BaseApiService {
           } 
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetEventTickets: TicketPaginator
+        GetEventTickets: TicketPaginator;
       }>
     > = this.query(requestData, {
       productId,
       first,
       page,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetProduct = (uuid: string) => {
     const requestData = `
@@ -260,17 +277,17 @@ export default class CommerceApi extends BaseApiService {
         }
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetProduct: Product
+        GetProduct: Product;
       }>
     > = this.query(requestData, {
       uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetOrders = (
     page: number,
@@ -337,18 +354,18 @@ export default class CommerceApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetOrders: OrderPaginator
+        GetOrders: OrderPaginator;
       }>
     > = this.query(requestData, {
       page,
       count,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetOrder = (uuid: string) => {
     const requestData = `
@@ -386,17 +403,311 @@ export default class CommerceApi extends BaseApiService {
         updatedAt
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetOrder: Order
+        GetOrder: Order;
       }>
     > = this.query(requestData, {
       uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
+
+  public GetDeliveries = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC",
+    whereQuery = ""
+  ) => {
+    const requestData = `
+      query GetDeliveries(
+        $page: Int!,
+        $count: Int!
+      ){
+        GetDeliveries(
+          first: $count,
+          page: $page,
+          orderBy: {
+            column: ${orderType ? orderType : "CREATED_AT"},
+            order: ${order}
+          }
+          ${whereQuery ? `where: ${whereQuery}` : ""}
+        ) {
+          paginatorInfo {
+            total
+            perPage
+            lastPage
+            lastItem
+            hasMorePages
+            firstItem
+            currentPage
+            count
+          }
+          data {
+            id
+            uuid
+            type
+            status
+            deliveryAddress
+            metadata
+            trackingNumber
+            estimatedDeliveryDate
+            actualDeliveryDate
+            trackingUpdates
+            deliveryAttempts
+            order {
+              id
+              uuid
+              orderNumber
+              customerId
+              user {
+                id
+                uuid
+                first_name
+                last_name
+                email
+                phone
+              }
+              totalAmount
+              currency
+              status
+            }
+            createdAt
+            updatedAt
+          }
+        }
+      }
+    `;
+    const response: Promise<
+      OperationResult<{
+        GetDeliveries: DeliveryPaginator;
+      }>
+    > = this.query(requestData, {
+      page,
+      count,
+    });
+
+    return response;
+  };
+
+  public GetCustomDeliveryRequests = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC"
+  ) => {
+    const whereQuery = `{
+      AND: [
+        {
+          column: TYPE
+          operator: EQ
+          value: "custom"
+        }
+        {
+          column: STATUS
+          operator: EQ
+          value: "pending"
+        }
+      ]
+    }`;
+
+    return this.GetDeliveries(page, count, orderType, order, whereQuery);
+  };
+
+  public GetBusinessDeliveries = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC",
+    whereQuery = ""
+  ) => {
+    const requestData = `
+      query GetBusinessDeliveries(
+        $page: Int!,
+        $count: Int!
+      ){
+        GetBusinessDeliveries(
+          first: $count,
+          page: $page,
+          orderBy: {
+            column: ${orderType ? orderType : "CREATED_AT"},
+            order: ${order}
+          }
+          ${whereQuery ? `where: ${whereQuery}` : ""}
+        ) {
+          paginatorInfo {
+            total
+            perPage
+            lastPage
+            lastItem
+            hasMorePages
+            firstItem
+            currentPage
+            count
+          }
+          data {
+            id
+            uuid
+            trackingNumber
+            status
+            estimatedDeliveryDate
+            actualDeliveryDate
+            deliveryAddress
+            metadata
+            trackingUpdates
+            deliveryAttempts
+            order {
+              id
+              uuid
+              orderNumber
+              customerId
+              user {
+                id
+                uuid
+                first_name
+                last_name
+                email
+                phone
+              }
+              totalAmount
+              currency
+              status
+            }
+            createdAt
+            updatedAt
+          }
+        }
+      }
+    `;
+    const response: Promise<
+      OperationResult<{
+        GetBusinessDeliveries: DeliveryPaginator;
+      }>
+    > = this.query(requestData, {
+      page,
+      count,
+    });
+
+    return response;
+  };
+
+  public GetDelivery = (id: number) => {
+    const requestData = `
+      query GetDelivery($id: Int!) {
+        GetDelivery(id: $id) {
+          id
+          uuid
+          trackingNumber
+          status
+          type
+          estimatedDeliveryDate
+          actualDeliveryDate
+          deliveryAddress
+          metadata
+          trackingUpdates
+          deliveryAttempts
+          order {
+            id
+            uuid
+            orderNumber
+            customerId
+            user {
+              id
+              uuid
+              first_name
+              last_name
+              email
+              phone
+            }
+            totalAmount
+            currency
+            status
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    `;
+    const response: Promise<
+      OperationResult<{
+        GetDelivery: Delivery;
+      }>
+    > = this.query(requestData, {
+      id,
+    });
+
+    return response;
+  };
+
+  public GetDeliveryByUuid = (uuid: string) => {
+    const requestData = `
+      query GetDeliveryByUuid($uuid: String!) {
+        GetDeliveryByUuid(uuid: $uuid) {
+          id
+          uuid
+          trackingNumber
+          status
+          type
+          estimatedDeliveryDate
+          actualDeliveryDate
+          deliveryAddress
+          pickupAddress
+          metadata
+          trackingUpdates
+          deliveryAttempts
+          weight
+          scheduledTime
+          scheduledDate
+          user {
+            id
+            uuid
+            first_name
+            last_name
+            email
+            phone
+            profile {
+              profile_picture
+            }
+          }
+          order {
+            id
+            uuid
+            orderNumber
+            customerId
+            user {
+              id
+              uuid
+              first_name
+              last_name
+              email
+              phone
+              profile {
+                profile_picture
+              }
+            }
+            totalAmount
+            currency
+            status
+            items
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    `;
+    const response: Promise<
+      OperationResult<{
+        GetDeliveryByUuid: Delivery;
+      }>
+    > = this.query(requestData, {
+      uuid,
+    });
+
+    return response;
+  };
 
   // Mutations
   public CreateProduct = (data: MutationCreateProductArgs) => {
@@ -450,16 +761,16 @@ export default class CommerceApi extends BaseApiService {
           updatedAt
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        CreateProduct: Product
+        CreateProduct: Product;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public UpdateProduct = (data: MutationUpdateProductArgs) => {
     const requestData = `
@@ -512,30 +823,46 @@ export default class CommerceApi extends BaseApiService {
           updatedAt
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        UpdateProduct: Product
+        UpdateProduct: Product;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public DeleteProduct = (product_id: number) => {
     const requestData = `
         mutation DeleteProduct($product_id: Int!) {
           DeleteProduct(product_id: $product_id)
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        DeleteProduct: Boolean
+        DeleteProduct: Boolean;
       }>
-    > = this.mutation(requestData, { product_id })
+    > = this.mutation(requestData, { product_id });
 
-    return response
-  }
+    return response;
+  };
+
+  public AcceptDelivery = (deliveryId: number) => {
+    const requestData = `
+      mutation AcceptDelivery($deliveryId: Int!) {
+        AcceptDelivery(deliveryId: $deliveryId)
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        AcceptDelivery: boolean;
+      }>
+    > = this.mutation(requestData, { deliveryId });
+
+    return response;
+  };
 }
