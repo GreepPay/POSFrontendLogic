@@ -684,7 +684,7 @@ export type MethodsAvailable = {
 export type Mutation = {
   __typename?: 'Mutation';
   /** Accept a custom delivery by business */
-  AcceptDelivery: Delivery;
+  AcceptDelivery: Scalars['Boolean'];
   /** Add a participant to a conversation */
   AddParticipant: Conversation;
   /** Confirm withdrawal */
