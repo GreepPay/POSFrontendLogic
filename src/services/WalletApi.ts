@@ -476,6 +476,7 @@ export default class WalletApi extends BaseApiService {
           payout_banks
           business_id
           status
+          ad_type
           created_at
           updated_at
           }
@@ -543,6 +544,7 @@ export default class WalletApi extends BaseApiService {
           payout_banks
           business_id
           status
+          ad_type
           created_at
           updated_at
           }
@@ -579,6 +581,7 @@ export default class WalletApi extends BaseApiService {
           payout_banks
           business_id
           status
+          ad_type
           created_at
           updated_at
         }
@@ -918,6 +921,7 @@ export default class WalletApi extends BaseApiService {
             $address_details: String!
             $business_id: String!
             $payout_banks: String
+            $ad_type: String!
           ) {
             CreateExchangeAd(
               from_currency: $from_currency
@@ -929,6 +933,7 @@ export default class WalletApi extends BaseApiService {
               address_details: $address_details
               business_id: $business_id
               payout_banks: $payout_banks
+              ad_type: $ad_type
             ) {
               uuid
               business {
@@ -943,6 +948,7 @@ export default class WalletApi extends BaseApiService {
               address_details
               payout_banks
               business_id
+              ad_type
               status
               created_at
               updated_at
@@ -970,6 +976,7 @@ export default class WalletApi extends BaseApiService {
             $address_details: String
             $payout_banks: String
             $status: String
+            $ad_type: String
           ) {
             UpdateExchangeAd(
               exchange_ad_uuid: $exchange_ad_uuid
@@ -980,6 +987,7 @@ export default class WalletApi extends BaseApiService {
               address_details: $address_details
               payout_banks: $payout_banks
               status: $status
+              ad_type: $ad_type
             ) {
               uuid
               business {
@@ -993,6 +1001,7 @@ export default class WalletApi extends BaseApiService {
               payout_address
               address_details
               payout_banks
+              ad_type
               business_id
               status
               created_at

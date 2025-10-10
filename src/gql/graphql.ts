@@ -423,6 +423,8 @@ export enum EventType {
 /** A single Ad */
 export type ExchangeAd = {
   __typename?: 'ExchangeAd';
+  /** Ad Type ('buy' or 'sell') */
+  ad_type: Scalars['String'];
   /** Address Details */
   address_details?: Maybe<Scalars['String']>;
   /** Business */
@@ -816,6 +818,7 @@ export type MutationCreateCrpytoTransferArgs = {
 
 
 export type MutationCreateExchangeAdArgs = {
+  ad_type: Scalars['String'];
   address_details: Scalars['String'];
   business_id: Scalars['String'];
   from_currency: Scalars['String'];
@@ -1021,6 +1024,7 @@ export type MutationUpdateBusinessProfileArgs = {
 
 
 export type MutationUpdateExchangeAdArgs = {
+  ad_type?: InputMaybe<Scalars['String']>;
   address_details?: InputMaybe<Scalars['String']>;
   exchange_ad_uuid: Scalars['String'];
   max_amount?: InputMaybe<Scalars['Float']>;
