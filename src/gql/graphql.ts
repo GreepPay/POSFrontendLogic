@@ -2314,7 +2314,8 @@ export enum QueryGetPointTransactionsWhereColumn {
   DrOrCr = 'DR_OR_CR',
   Reference = 'REFERENCE',
   Status = 'STATUS',
-  UpdatedAt = 'UPDATED_AT'
+  UpdatedAt = 'UPDATED_AT',
+  WalletId = 'WALLET_ID'
 }
 
 /** Dynamic WHERE conditions for the `where` argument of the query `GetPointTransactions`. */
@@ -2416,6 +2417,7 @@ export type QueryGetRecommendedExchangeAdsOrderByOrderByClause = {
 
 /** Allowed column names for Query.GetRecommendedExchangeAds.where. */
 export enum QueryGetRecommendedExchangeAdsWhereColumn {
+  AdType = 'AD_TYPE',
   CreatedAt = 'CREATED_AT',
   FromCurrency = 'FROM_CURRENCY',
   Status = 'STATUS',
@@ -2473,7 +2475,8 @@ export enum QueryGetTransactionsWhereColumn {
   DrOrCr = 'DR_OR_CR',
   Reference = 'REFERENCE',
   Status = 'STATUS',
-  UpdatedAt = 'UPDATED_AT'
+  UpdatedAt = 'UPDATED_AT',
+  WalletId = 'WALLET_ID'
 }
 
 /** Dynamic WHERE conditions for the `where` argument of the query `GetTransactions`. */
@@ -2957,6 +2960,8 @@ export type Wallet = {
   debited_amount: Scalars['Float'];
   /** Debited Point Amount */
   debited_point_amount: Scalars['Float'];
+  /** ID */
+  id: Scalars['Int'];
   /** Locked Balance */
   locked_balance: Scalars['Float'];
   /** Point Balance */

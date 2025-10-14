@@ -225,6 +225,14 @@ export default class Wallet extends Common {
     whereQuery = "",
     isSearch = false
   ) => {
+
+     if(!whereQuery) {
+        whereQuery = `{
+            column: WALLET_ID
+            operator: EQ
+            value: ${Logic.Auth.GetDefaultBusiness()?.wallet?.id || 0}
+          }`
+    }
     return $api.wallet
       .GetPointTransactions(page, count, orderType, order, whereQuery)
       .then((response) => {
@@ -315,6 +323,13 @@ export default class Wallet extends Common {
     whereQuery = "",
     isSearch = false
   ) => {
+    if(!whereQuery) {
+        whereQuery = `{
+            column: WALLET_ID
+            operator: EQ
+            value: ${Logic.Auth.GetDefaultBusiness()?.wallet?.id || 0}
+          }`
+    }
     return $api.wallet
       .GetTransactions(page, count, orderType, order, whereQuery)
       .then((response) => {

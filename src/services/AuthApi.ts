@@ -44,6 +44,7 @@ export default class AuthApi extends BaseApiService {
             address
             default_currency
             wallet {
+              id
               total_balance
               point_balance
               currency
@@ -65,6 +66,7 @@ export default class AuthApi extends BaseApiService {
             } 
           }
           wallet {
+            id
             total_balance
             point_balance
             currency
