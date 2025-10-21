@@ -33,9 +33,9 @@ import {
   UserBankPaginator,
   WithdrawInfo,
   YellowcardNetwork,
-} from "../gql/graphql"
-import { OperationResult } from "urql"
-import { BaseApiService } from "./common/BaseService"
+} from "../gql/graphql";
+import { OperationResult } from "urql";
+import { BaseApiService } from "./common/BaseService";
 
 export default class WalletApi extends BaseApiService {
   // Query
@@ -54,19 +54,19 @@ export default class WalletApi extends BaseApiService {
         }
       }
 
-		`
+		`;
 
     const response: Promise<
       OperationResult<{
-        GetExchangeRate: ExchangeRate
+        GetExchangeRate: ExchangeRate;
       }>
     > = this.query(requestData, {
       from_currency,
       to_currency,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetWithdrawInfo = (
     amount: number,
@@ -87,20 +87,20 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-		`
+		`;
 
     const response: Promise<
       OperationResult<{
-        GetWithdrawInfo: WithdrawInfo
+        GetWithdrawInfo: WithdrawInfo;
       }>
     > = this.query(requestData, {
       amount,
       currency,
       country_code,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetBanksByCountry = (country: string) => {
     const requestData = `
@@ -112,18 +112,18 @@ export default class WalletApi extends BaseApiService {
              provider_type
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        GetBanksByCountry: FlutterwaveBank[]
+        GetBanksByCountry: FlutterwaveBank[];
       }>
     > = this.query(requestData, {
       country,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetBankBranchesByBankId = (bank_id: number) => {
     const requestData = `
@@ -137,18 +137,18 @@ export default class WalletApi extends BaseApiService {
              bank_id
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        GetBankBranchesByBankId: FlutterwaveBankBranch[]
+        GetBankBranchesByBankId: FlutterwaveBankBranch[];
       }>
     > = this.query(requestData, {
       bank_id,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public ResolveBankAccountName = (
     account_number: string,
@@ -161,39 +161,39 @@ export default class WalletApi extends BaseApiService {
              account_name
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        ResolveBankAccountName: BankAccountNameResponse
+        ResolveBankAccountName: BankAccountNameResponse;
       }>
     > = this.query(requestData, {
       account_number,
       bank_code,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetTransferFees = (amount: number, currency: string, type: string) => {
     const requestData = `
         query GetTransferFees($amount: Float!, $currency: String!, $type: String!) {
           GetTransferFees(amount: $amount, currency: $currency, type: $type) 
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        GetTransferFees: number
+        GetTransferFees: number;
       }>
     > = this.query(requestData, {
       amount,
       currency,
       type,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetGlobalExchangeRate = (base: string, target: string) => {
     const requestData = `
@@ -205,19 +205,19 @@ export default class WalletApi extends BaseApiService {
           unit
         }
       }
-		`
+		`;
 
     const response: Promise<
       OperationResult<{
-        GetGlobalExchangeRate: GlobalExchangeRate
+        GetGlobalExchangeRate: GlobalExchangeRate;
       }>
     > = this.query(requestData, {
       base,
       target,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetOffRampCurrencies = () => {
     const requestData = `
@@ -229,16 +229,16 @@ export default class WalletApi extends BaseApiService {
             supported_methods
           }
         }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        GetOffRampCurrencies: SupportedCurrency[]
+        GetOffRampCurrencies: SupportedCurrency[];
       }>
-    > = this.query(requestData, {})
+    > = this.query(requestData, {});
 
-    return response
-  }
+    return response;
+  };
 
   public GetYellowCardNetwork = (country_code: string) => {
     const requestData = `
@@ -255,37 +255,37 @@ export default class WalletApi extends BaseApiService {
             channelIds
           }
         }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        GetYellowCardNetwork: YellowcardNetwork[]
+        GetYellowCardNetwork: YellowcardNetwork[];
       }>
     > = this.query(requestData, {
       country_code,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetBankAccountDetails = (accountNumber: string, networkId: string) => {
     const requestData = `
         query GetBankAccountDetails($accountNumber: String!, $networkId: String!) {
           GetBankAccountDetails(accountNumber: $accountNumber, networkId: $networkId)
         }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        GetBankAccountDetails: string
+        GetBankAccountDetails: string;
       }>
     > = this.query(requestData, {
       accountNumber,
       networkId,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetPointTransactions = (
     page: number,
@@ -335,18 +335,18 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetPointTransactions: PointTransactionPaginator
+        GetPointTransactions: PointTransactionPaginator;
       }>
     > = this.query(requestData, {
       page,
       count,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetFinancialSummary = (input: FinancialSummaryInput) => {
     const requestData = `
@@ -356,17 +356,17 @@ export default class WalletApi extends BaseApiService {
          debit
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetFinancialSummary: FinancialSummaryResponse
+        GetFinancialSummary: FinancialSummaryResponse;
       }>
     > = this.query(requestData, {
       input,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetTransactions = (
     page: number,
@@ -417,18 +417,18 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetTransactions: TransactionPaginator
+        GetTransactions: TransactionPaginator;
       }>
     > = this.query(requestData, {
       page,
       count,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetExchangeAds = (
     page: number,
@@ -482,18 +482,18 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetExchangeAds: ExchangeAdPaginator
+        GetExchangeAds: ExchangeAdPaginator;
       }>
     > = this.query(requestData, {
       page,
       count,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetRecommendedExchangeAds = (
     page: number,
@@ -550,18 +550,18 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetRecommendedExchangeAds: ExchangeAdPaginator
+        GetRecommendedExchangeAds: ExchangeAdPaginator;
       }>
     > = this.query(requestData, {
       page,
       count,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetExchangeAd = (uuid: string) => {
     const requestData = `
@@ -586,17 +586,17 @@ export default class WalletApi extends BaseApiService {
           updated_at
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetExchangeAd: ExchangeAd
+        GetExchangeAd: ExchangeAd;
       }>
     > = this.query(requestData, {
       uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetSavedAccounts = (first: number, page: number) => {
     const requestData = `
@@ -624,18 +624,18 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetSavedAccounts: UserBankPaginator
+        GetSavedAccounts: UserBankPaginator;
       }>
     > = this.query(requestData, {
       first,
       page,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetSinglePointTransaction = (uuid: string) => {
     const requestData = `
@@ -657,17 +657,17 @@ export default class WalletApi extends BaseApiService {
           uuid
         }
       }
-    `
+    `;
     const response: Promise<
       OperationResult<{
-        GetSinglePointTransaction: PointTransaction
+        GetSinglePointTransaction: PointTransaction;
       }>
     > = this.query(requestData, {
       uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetSingleTransaction = (uuid: string) => {
     const requestData = `
@@ -687,6 +687,7 @@ export default class WalletApi extends BaseApiService {
           status
           updated_at
           uuid
+          blockchain_transid
           wallet_balance
           point_transaction {
            uuid
@@ -694,18 +695,18 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        GetSingleTransaction: Transaction
+        GetSingleTransaction: Transaction;
       }>
     > = this.query(requestData, {
       uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetOfframp = (uuid: string) => {
     const requestData = `
@@ -743,18 +744,18 @@ export default class WalletApi extends BaseApiService {
         updated_at
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        GetOfframp: OffRamp
+        GetOfframp: OffRamp;
       }>
     > = this.query(requestData, {
       uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   // Mutations
 
@@ -772,16 +773,16 @@ export default class WalletApi extends BaseApiService {
             uuid
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        CreateSavedAccount: UserBank
+        CreateSavedAccount: UserBank;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public InitiateWithdrawal = (data: MutationInitiateWithdrawalArgs) => {
     const requestData = `
@@ -827,16 +828,16 @@ export default class WalletApi extends BaseApiService {
              updated_at
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        InitiateWithdrawal: OffRamp
+        InitiateWithdrawal: OffRamp;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public ConfirmWithdrawal = (
     uuid: string,
@@ -892,11 +893,11 @@ export default class WalletApi extends BaseApiService {
              updated_at
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        ConfirmWithdrawal: OffRamp
+        ConfirmWithdrawal: OffRamp;
       }>
     > = this.mutation(requestData, {
       uuid,
@@ -904,10 +905,10 @@ export default class WalletApi extends BaseApiService {
       amount,
       country_code,
       metadata,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public CreateExchangeAd = (data: MutationCreateExchangeAdArgs) => {
     const requestData = `
@@ -954,16 +955,16 @@ export default class WalletApi extends BaseApiService {
               updated_at
             }
           }
-        `
+        `;
 
     const response: Promise<
       OperationResult<{
-        CreateExchangeAd: ExchangeAd
+        CreateExchangeAd: ExchangeAd;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public UpdateExchangeAd = (data: MutationUpdateExchangeAdArgs) => {
     const requestData = `
@@ -1008,34 +1009,34 @@ export default class WalletApi extends BaseApiService {
               updated_at
             }
           }
-        `
+        `;
 
     const response: Promise<
       OperationResult<{
-        UpdateExchangeAd: ExchangeAd
+        UpdateExchangeAd: ExchangeAd;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public RedeemGRPToken = (grpAmount: number) => {
     const requestData = `
         mutation RedeemGRPToken($grpAmount: Float!) {
           RedeemGRPToken(grp_amount: $grpAmount)
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        RedeemGRPToken: Boolean
+        RedeemGRPToken: Boolean;
       }>
     > = this.mutation(requestData, {
       grpAmount,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public CreateCrpytoTransfer = (crypto: string, network: string) => {
     const requestData = `
@@ -1060,55 +1061,55 @@ export default class WalletApi extends BaseApiService {
             updated_at
           }
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        CreateCrpytoTransfer: OffRamp
+        CreateCrpytoTransfer: OffRamp;
       }>
     > = this.mutation(requestData, {
       crypto,
       network,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public RemoveSavedAccount = (saved_account_uuid: string) => {
     const requestData = `
         mutation RemoveSavedAccount($saved_account_uuid: String!) {
           RemoveSavedAccount(saved_account_uuid: $saved_account_uuid)
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        RemoveSavedAccount: Boolean
+        RemoveSavedAccount: Boolean;
       }>
     > = this.mutation(requestData, {
       saved_account_uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public InitiateWalletKYC = (currency: string) => {
     const requestData = `
         mutation InitiateWalletKYC($currency: String!) {
           InitiateWalletKYC(currency: $currency)
         }
-      `
+      `;
 
     const response: Promise<
       OperationResult<{
-        InitiateWalletKYC: string
+        InitiateWalletKYC: string;
       }>
     > = this.mutation(requestData, {
       currency,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public InitiateInteractiveWithdrawal = (
     data: MutationInitiateInteractiveWithdrawalArgs
@@ -1121,16 +1122,16 @@ export default class WalletApi extends BaseApiService {
           id
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        InitiateInteractiveWithdrawal: InteractiveWithdrawalResponse
+        InitiateInteractiveWithdrawal: InteractiveWithdrawalResponse;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public ExtractAnchorTransaction = (
     data: MutationExtractAnchorTransactionArgs
@@ -1161,16 +1162,16 @@ export default class WalletApi extends BaseApiService {
           withdraw_memo_type
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        ExtractAnchorTransaction: AnchorTransation
+        ExtractAnchorTransaction: AnchorTransation;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   // P2P Orders
   public GetP2pOrders = (
@@ -1233,22 +1234,60 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
         GetP2pOrders: {
-          data: ExchangeOrder[]
-          paginatorInfo: any
-        }
+          data: ExchangeOrder[];
+          paginatorInfo: any;
+        };
       }>
     > = this.query(requestData, {
       first: count,
       page,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
+
+  public GetP2pPaymentMethods = (page: number, count: number) => {
+    const requestData = `
+      query GetMyP2pPaymentMethods($page: Int!, $count: Int!) {
+        GetMyP2pPaymentMethods(first: $count, page: $page) {
+          paginatorInfo {
+            total
+            perPage
+            lastPage
+            lastItem
+            hasMorePages
+            firstItem
+            currentPage
+            count
+          }
+          data {
+            uuid
+            user_id
+            account_name
+            account_number
+            bank_name
+            currency
+            meta_data
+            created_at
+            updated_at
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetMyP2pPaymentMethods: P2pPaymentMethodPaginator;
+      }>
+    > = this.query(requestData, { page, count });
+
+    return response;
+  };
 
   public GetP2pOrder = (uuid: string) => {
     const requestData = `
@@ -1300,29 +1339,29 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        GetP2pOrder: ExchangeOrder
+        GetP2pOrder: ExchangeOrder;
       }>
     > = this.query(requestData, {
       uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public CreateP2pOrder = (orderData: {
-    exchange_ad_uuid: string
-    amount: number
-    delivery_address: string
-    city: string
-    country: string
-    payment_type: string
-    payout_option: string
-    conversation_uuid: string
-    metadata?: string
+    exchange_ad_uuid: string;
+    amount: number;
+    delivery_address: string;
+    city: string;
+    country: string;
+    payment_type: string;
+    payout_option: string;
+    conversation_uuid: string;
+    metadata?: string;
   }) => {
     const requestData = `
       mutation CreateP2pOrder(
@@ -1363,32 +1402,32 @@ export default class WalletApi extends BaseApiService {
           expired_at
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        CreateP2pOrder: ExchangeOrder
+        CreateP2pOrder: ExchangeOrder;
       }>
-    > = this.mutation(requestData, orderData)
+    > = this.mutation(requestData, orderData);
 
-    return response
-  }
+    return response;
+  };
 
   public UploadFile = (file: File) => {
     const requestData = `
       mutation UploadFile($file: Upload!) {
         UploadFile(file: $file)
       }
-    `
+    `;
 
     // Ensure file is properly passed and handle potential null/undefined cases
     if (!file) {
-      throw new Error("File is required for upload")
+      throw new Error("File is required for upload");
     }
 
     // Ensure the file is a valid File object
     if (!(file instanceof File)) {
-      throw new Error("Invalid file object provided")
+      throw new Error("Invalid file object provided");
     }
 
     // Log file details for debugging
@@ -1396,16 +1435,16 @@ export default class WalletApi extends BaseApiService {
       name: file.name,
       size: file.size,
       type: file.type,
-    })
+    });
 
     const response: Promise<
       OperationResult<{
-        UploadFile: string
+        UploadFile: string;
       }>
-    > = this.mutation(requestData, { file })
+    > = this.mutation(requestData, { file });
 
-    return response
-  }
+    return response;
+  };
 
   // ✅ NEW: Release P2P Funds mutation
   public ReleaseP2pFunds = (
@@ -1417,20 +1456,20 @@ export default class WalletApi extends BaseApiService {
       mutation ReleaseP2pFunds($order_uuid: String!, $amount: Float!, $metadata: String) {
         ReleaseP2pFunds(order_uuid: $order_uuid, amount: $amount, metadata: $metadata)
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        ReleaseP2pFunds: boolean
+        ReleaseP2pFunds: boolean;
       }>
     > = this.mutation(requestData, {
       order_uuid,
       amount,
       metadata,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   // P2P Payment Methods
   public GetMyP2pPaymentMethods = (first: number, page: number) => {
@@ -1460,19 +1499,19 @@ export default class WalletApi extends BaseApiService {
           }
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        GetMyP2pPaymentMethods: P2pPaymentMethodPaginator
+        GetMyP2pPaymentMethods: P2pPaymentMethodPaginator;
       }>
     > = this.query(requestData, {
       first,
       page,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public GetP2pPaymentMethod = (uuid: string) => {
     const requestData = `
@@ -1489,18 +1528,18 @@ export default class WalletApi extends BaseApiService {
           updated_at
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        GetP2pPaymentMethod: P2pPaymentMethod
+        GetP2pPaymentMethod: P2pPaymentMethod;
       }>
     > = this.query(requestData, {
       uuid,
-    })
+    });
 
-    return response
-  }
+    return response;
+  };
 
   public CreateP2pPaymentMethod = (
     data: MutationCreateP2pPaymentMethodArgs
@@ -1531,16 +1570,16 @@ export default class WalletApi extends BaseApiService {
           updated_at
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        CreateP2pPaymentMethod: P2pPaymentMethod
+        CreateP2pPaymentMethod: P2pPaymentMethod;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public UpdateP2pPaymentMethod = (
     data: MutationUpdateP2pPaymentMethodArgs
@@ -1573,16 +1612,16 @@ export default class WalletApi extends BaseApiService {
           updated_at
         }
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        UpdateP2pPaymentMethod: P2pPaymentMethod
+        UpdateP2pPaymentMethod: P2pPaymentMethod;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 
   public SoftDeleteP2pPaymentMethod = (
     data: MutationSoftDeleteP2pPaymentMethodArgs
@@ -1591,14 +1630,14 @@ export default class WalletApi extends BaseApiService {
       mutation SoftDeleteP2pPaymentMethod($p2p_payment_method_uuid: String!) {
         SoftDeleteP2pPaymentMethod(p2p_payment_method_uuid: $p2p_payment_method_uuid)
       }
-    `
+    `;
 
     const response: Promise<
       OperationResult<{
-        SoftDeleteP2pPaymentMethod: boolean
+        SoftDeleteP2pPaymentMethod: boolean;
       }>
-    > = this.mutation(requestData, data)
+    > = this.mutation(requestData, data);
 
-    return response
-  }
+    return response;
+  };
 }
