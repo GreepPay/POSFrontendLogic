@@ -3,6 +3,8 @@ import {
   MutationUpdateBusinessProfileArgs,
   MutationUpdateProfileArgs,
   MutationCreateStoreLocationArgs,
+  MutationAddDeliveryAddressArgs,
+  MutationUpdateDeliveryAddressArgs,
 } from "src/gql/graphql";
 import { OperationResult } from "urql";
 import { BaseApiService } from "./common/BaseService";
@@ -209,6 +211,106 @@ export default class UserApi extends BaseApiService {
     return response;
   };
 
+  public AddDeliveryAddress = (data: MutationAddDeliveryAddressArgs) => {
+    const requestData = `
+      mutation AddDeliveryAddress(
+        $name: String!
+        $description: String
+        $google_map_link: String
+        $delivery_location_id: String
+        $is_default: Boolean
+      ) {
+        AddDeliveryAddress(
+          name: $name
+          description: $description
+          google_map_link: $google_map_link
+          delivery_location_id: $delivery_location_id
+          is_default: $is_default
+        ) {
+          uuid
+          name
+          description
+          google_map_link
+          delivery_location_id
+          is_default
+          is_active
+          created_at
+          updated_at
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        AddDeliveryAddress: {
+          uuid: string;
+          name: string;
+          description?: string;
+          google_map_link?: string;
+          delivery_location_id?: string;
+          is_default: boolean;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  };
+
+  public UpdateDeliveryAddress = (data: MutationUpdateDeliveryAddressArgs) => {
+    const requestData = `
+      mutation UpdateDeliveryAddress(
+        $id: ID!
+        $name: String
+        $description: String
+        $google_map_link: String
+        $delivery_location_id: String
+        $is_default: Boolean
+        $is_active: Boolean
+      ) {
+        UpdateDeliveryAddress(
+          id: $id
+          name: $name
+          description: $description
+          google_map_link: $google_map_link
+          delivery_location_id: $delivery_location_id
+          is_default: $is_default
+          is_active: $is_active
+        ) {
+          uuid
+          name
+          description
+          google_map_link
+          delivery_location_id
+          is_default
+          is_active
+          created_at
+          updated_at
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        UpdateDeliveryAddress: {
+          uuid: string;
+          name: string;
+          description?: string;
+          google_map_link?: string;
+          delivery_location_id?: string;
+          is_default: boolean;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  };
+
   public GetStoreLocations = (first: number = 20, page: number = 1) => {
     const requestData = `
       query GetStoreLocations($first: Int!, $page: Int) {
@@ -269,6 +371,102 @@ export default class UserApi extends BaseApiService {
         };
       }>
     > = this.query(requestData, { first, page });
+
+    return response;
+  };
+
+  public GetDeliveryAddresses = (first: number = 20, page: number = 1) => {
+    const requestData = `
+      query GetDeliveryAddresses($first: Int!, $page: Int) {
+        GetDeliveryAddresses(first: $first, page: $page) {
+          data {
+            uuid
+            name
+            description
+            google_map_link
+            delivery_location_id
+            is_default
+            is_active
+            created_at
+            updated_at
+          }
+          paginatorInfo {
+            count
+            currentPage
+            firstItem
+            hasMorePages
+            lastItem
+            lastPage
+            perPage
+            total
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetDeliveryAddresses: {
+          data: Array<{
+            uuid: string;
+            name: string;
+            description?: string;
+            google_map_link?: string;
+            delivery_location_id?: string;
+            is_default: boolean;
+            is_active: boolean;
+            created_at: string;
+            updated_at: string;
+          }>;
+          paginatorInfo: {
+            count: number;
+            currentPage: number;
+            firstItem: number;
+            hasMorePages: boolean;
+            lastItem: number;
+            lastPage: number;
+            perPage: number;
+            total: number;
+          };
+        };
+      }>
+    > = this.query(requestData, { first, page });
+
+    return response;
+  };
+
+  public GetDeliveryAddress = (uuid: string) => {
+    const requestData = `
+      query GetDeliveryAddress($uuid: String!) {
+        GetDeliveryAddress(uuid: $uuid) {
+          uuid
+          name
+          description
+          google_map_link
+          delivery_location_id
+          is_default
+          is_active
+          created_at
+          updated_at
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetDeliveryAddress: {
+          uuid: string;
+          name: string;
+          description?: string;
+          google_map_link?: string;
+          delivery_location_id?: string;
+          is_default: boolean;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+      }>
+    > = this.query(requestData, { uuid });
 
     return response;
   };
