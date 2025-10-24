@@ -74,6 +74,10 @@ export default class CommerceApi extends BaseApiService {
           business {
             id
           }
+            category{
+              id
+              name
+            }
           sku
           name
           slug
@@ -230,6 +234,10 @@ export default class CommerceApi extends BaseApiService {
         business {
           id
         }
+          category{
+            id
+            name
+          }
         sku
         name
         slug

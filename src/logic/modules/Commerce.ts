@@ -77,25 +77,16 @@ export default class Commerce extends Common {
           value: "%${searchQuery}%"
           AND: {
             column: TYPE
-            operator: EQ
-            value: "physical"
-            OR: {
-              column: TYPE
-              operator: EQ
-              value: "digital"
-            }
+            operator: NEQ
+            value: "event"
           }
         }`;
     } else {
       whereQuery = `{
           column: TYPE
-          operator: EQ
-          value: "physical"
-          OR: {
-            column: TYPE
-            operator: EQ
-            value: "digital"
-          }
+          operator: NEQ
+          value: "event"
+          
         }`;
     }
 

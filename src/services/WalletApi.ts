@@ -1251,10 +1251,20 @@ export default class WalletApi extends BaseApiService {
     return response;
   };
 
-  public GetP2pPaymentMethods = (page: number, count: number) => {
+  public GetP2pPaymentMethods = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC" = "DESC",
+    whereQuery = ""
+  ) => {
     const requestData = `
       query GetMyP2pPaymentMethods($page: Int!, $count: Int!) {
-        GetMyP2pPaymentMethods(first: $count, page: $page) {
+        GetMyP2pPaymentMethods(first: $count, page: $page,   orderBy: {
+            column: ${orderType ? orderType : "CREATED_AT"},
+            order: ${order}
+          }
+          ${whereQuery ? `where: ${whereQuery}` : ""}) {
           paginatorInfo {
             total
             perPage
@@ -1313,6 +1323,7 @@ export default class WalletApi extends BaseApiService {
             to_currency
             rate
             status
+            ad_type
             business {
               uuid
               business_name
@@ -1472,10 +1483,20 @@ export default class WalletApi extends BaseApiService {
   };
 
   // P2P Payment Methods
-  public GetMyP2pPaymentMethods = (first: number, page: number) => {
+  public GetMyP2pPaymentMethods = (
+    first: number,
+    page: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC" = "DESC",
+    whereQuery = ""
+  ) => {
     const requestData = `
       query GetMyP2pPaymentMethods($first: Int!, $page: Int) {
-        GetMyP2pPaymentMethods(first: $first, page: $page) {
+        GetMyP2pPaymentMethods(first: $first, page: $page,    orderBy: {
+            column: ${orderType ? orderType : "CREATED_AT"},
+            order: ${order}
+          }
+          ${whereQuery ? `where: ${whereQuery}` : ""}) {
           paginatorInfo {
             count
             currentPage
