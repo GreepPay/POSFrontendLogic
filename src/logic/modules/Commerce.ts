@@ -7,6 +7,7 @@ import {
   ProductPaginator,
   TicketPaginator,
   Delivery,
+  DeliveryLocationPaginator,
 } from "../../gql/graphql";
 import { $api } from "../../services";
 import Common from "./Common";
@@ -40,6 +41,7 @@ export default class Commerce extends Common {
   public ManyDeliveries: DeliveryPaginator | undefined;
   public ManyBusinessDeliveries: DeliveryPaginator | undefined;
   public SingleDelivery: Delivery | undefined;
+  public ManyDeliveryLocations: DeliveryLocationPaginator | undefined;
 
   // Mutations
   public CreateProductForm: MutationCreateProductArgs | undefined;
@@ -57,6 +59,7 @@ export default class Commerce extends Common {
     this.defineReactiveProperty("ManyDeliveries", undefined);
     this.defineReactiveProperty("ManyBusinessDeliveries", undefined);
     this.defineReactiveProperty("SingleDelivery", undefined);
+    this.defineReactiveProperty("ManyDeliveryLocations", undefined);
   }
 
   // Queries
@@ -273,6 +276,21 @@ export default class Commerce extends Common {
       this.SingleDelivery = response.data?.GetDeliveryByUuid;
       return response.data?.GetDeliveryByUuid;
     });
+  };
+
+  public GetDeliveryLocations = async (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "DESC" | "ASC" = "DESC",
+    whereQuery = ""
+  ) => {
+    return $api.commerce
+      .GetDeliveryLocations(page, count, orderType, order, whereQuery)
+      .then((response) => {
+        this.ManyDeliveryLocations = response.data?.GetDeliveryLocations;
+        return this.ManyDeliveryLocations;
+      });
   };
 
   // Mutations

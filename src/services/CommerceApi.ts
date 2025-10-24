@@ -873,4 +873,56 @@ export default class CommerceApi extends BaseApiService {
 
     return response;
   };
+
+  public GetDeliveryLocations = (
+    page: number,
+    count: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC" = "DESC",
+    whereQuery = ""
+  ) => {
+    const requestData = `
+      query GetDeliveryLocations($page: Int!, $count: Int!) {
+        GetDeliveryLocations(
+          first: $count,
+          page: $page,
+          orderBy: {
+            column: AREA,
+            order: ${order}
+          }
+          ${whereQuery ? `where: ${whereQuery}` : ""}
+        ) {
+          paginatorInfo {
+            count
+            currentPage
+            firstItem
+            hasMorePages
+            lastItem
+            lastPage
+            perPage
+            total
+          }
+          data {
+            id
+            country
+            area
+            status
+            createdAt
+            updatedAt
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetDeliveryLocations: any;
+      }>
+    > = this.query(requestData, {
+      page,
+      count,
+    });
+
+    return response;
+  };
 }
