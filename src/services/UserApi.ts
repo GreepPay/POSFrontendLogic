@@ -5,6 +5,7 @@ import {
   MutationCreateStoreLocationArgs,
   MutationAddDeliveryAddressArgs,
   MutationUpdateDeliveryAddressArgs,
+  DeliveryAddressPaginator,
 } from "src/gql/graphql";
 import { OperationResult } from "urql";
 import { BaseApiService } from "./common/BaseService";
@@ -467,6 +468,56 @@ export default class UserApi extends BaseApiService {
         };
       }>
     > = this.query(requestData, { uuid });
+
+    return response;
+  };
+
+  public GetP2PDeliveryAddresses = (
+    first: number,
+    page: number,
+    orderType = "CREATED_AT",
+    order: "ASC" | "DESC" = "DESC",
+    whereQuery = ""
+  ) => {
+    const requestData = `
+    query GetP2PDeliveryAddresses($first: Int!, $page: Int!) {
+      GetP2PDeliveryAddresses(first: $first, page: $page, orderBy: {
+            column: ${orderType ? orderType : "CREATED_AT"},
+            order: ${order}
+          }
+          ${whereQuery ? `where: ${whereQuery}` : ""}) {
+        data {
+          id
+          uuid
+          auth_user_id
+          name
+          delivery_location_id
+          google_map_link
+          description
+          is_default
+          is_active
+          created_at
+          updated_at
+        }
+        paginatorInfo {
+          count
+          currentPage
+          firstItem
+          hasMorePages
+          lastItem
+          lastPage
+          perPage
+          total
+        }
+      }
+    }
+  `;
+
+    const response: Promise<
+      OperationResult<{
+        GetP2PDeliveryAddresses: DeliveryAddressPaginator;
+      }>
+    > = this.query(requestData, { first, page });
 
     return response;
   };
