@@ -21,6 +21,9 @@ export default class MessagingApi extends BaseApiService {
           entity_type
           metadata
           stage
+          p2p_order {
+            uuid
+          }
           participants {
             id
             user_id
@@ -35,10 +38,12 @@ export default class MessagingApi extends BaseApiService {
             uuid
             from_currency
             to_currency
+            ad_type
             business {
                 uuid
                 id
                 business_name
+                auth_user_id
                 storeLocations {
                 name
                 address

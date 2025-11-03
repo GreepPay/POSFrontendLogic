@@ -118,6 +118,18 @@ export default class Auth extends Common {
   }
 
   public GetDefaultBusiness = () => {
+    const currentBusinessId = localStorage.getItem("current_business_id");
+
+    if (currentBusinessId) {
+      const business = this.AuthUser?.businesses?.find(business => parseInt(business.id) == parseInt(currentBusinessId));
+
+      if(!business) {
+        this.AuthUser?.businesses?.[0]
+      }
+
+      return business;
+    }
+
     return this.AuthUser?.businesses?.[0]
   }
 
