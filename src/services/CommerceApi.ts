@@ -277,6 +277,27 @@ export default class CommerceApi extends BaseApiService {
         images
         createdAt
         updatedAt
+        tickets{
+         variantId
+         status
+         user {
+            first_name
+            last_name
+            profile {
+              profile_picture
+            }
+          }
+        }
+        productSales {
+          uuid
+          amount
+          extra_data
+          user {
+            first_name
+            last_name
+          }
+          created_at
+        }
           eventOveview {
           revenue
           tickets_sold

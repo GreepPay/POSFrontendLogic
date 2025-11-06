@@ -297,8 +297,6 @@ export type Delivery = {
   deliveryAddress: Scalars['String'];
   /** Delivery Attempts */
   deliveryAttempts?: Maybe<Scalars['String']>;
-  /** Delivery Price */
-  deliveryPrice: Scalars['Float'];
   /** Estimated Delivery Date */
   estimatedDeliveryDate?: Maybe<Scalars['String']>;
   /** Unique ID */
@@ -319,6 +317,8 @@ export type Delivery = {
   phone?: Maybe<Scalars['String']>;
   /** Pickup Address */
   pickupAddress: Scalars['String'];
+  /** Delivery Price */
+  price: Scalars['Float'];
   /** Scheduled Date */
   scheduledDate?: Maybe<Scalars['String']>;
   /** Scheduled Time */
@@ -1629,6 +1629,8 @@ export type Product = {
   name: Scalars['String'];
   /** Price */
   price: Scalars['Float'];
+  /** Product sales */
+  productSales: Array<Transaction>;
   /** Renewal */
   renewal?: Maybe<Scalars['String']>;
   /** SKU */
@@ -1641,6 +1643,8 @@ export type Product = {
   stockThreshold?: Maybe<Scalars['Int']>;
   /** Tax Code */
   taxCode?: Maybe<Scalars['String']>;
+  /** All Tickets */
+  tickets: Array<Ticket>;
   /** Trial Period Days */
   trialPeriodDays?: Maybe<Scalars['Int']>;
   /** Type */
@@ -3016,7 +3020,7 @@ export type Ticket = {
   /** Ticket Updated At */
   updatedAt: Scalars['String'];
   /** User */
-  user: User;
+  user?: Maybe<User>;
   /** User ID */
   userId: Scalars['Int'];
   /** UUID */
@@ -3069,6 +3073,8 @@ export type Transaction = {
   status: Scalars['String'];
   /** Transaction Updated At */
   updated_at: Scalars['DateTime'];
+  /** attached user */
+  user?: Maybe<User>;
   /** User ID */
   user_id: Scalars['Int'];
   /** Unique UUID */
