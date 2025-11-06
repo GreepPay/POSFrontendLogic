@@ -485,6 +485,7 @@ export default class CommerceApi extends BaseApiService {
             trackingNumber
             estimatedDeliveryDate
             actualDeliveryDate
+            price
             trackingUpdates
             deliveryAttempts
             order {
