@@ -15,12 +15,14 @@ import {
   MutationExtractAnchorTransactionArgs,
   MutationInitiateInteractiveWithdrawalArgs,
   MutationInitiateWithdrawalArgs,
+  MutationMakePaymentArgs,
   MutationSoftDeleteP2pPaymentMethodArgs,
   MutationUpdateExchangeAdArgs,
   MutationUpdateP2pPaymentMethodArgs,
   OffRamp,
   P2pPaymentMethod,
   P2pPaymentMethodPaginator,
+  PaymentDetailsResponse,
   PointTransaction,
   PointTransactionPaginator,
   SupportedCurrency,
@@ -64,6 +66,7 @@ export default class Wallet extends Common {
   public ManyBanksByCountry: FlutterwaveBank[] | undefined;
   public ManyBankBranches: FlutterwaveBankBranch[] | undefined;
   public ResolvedBankAccountName: BankAccountNameResponse | undefined;
+  public CurrentPaymentDetail: PaymentDetailsResponse | undefined;
 
   // Mutation Variables
   public CreateSavedAccountForm: MutationCreateSavedAccountArgs | undefined;
@@ -87,6 +90,8 @@ export default class Wallet extends Common {
   public SoftDeleteP2pPaymentMethodForm:
     | MutationSoftDeleteP2pPaymentMethodArgs
     | undefined;
+
+  public MakePaymentForm: MutationMakePaymentArgs | undefined;
 
   constructor() {
     super();
@@ -116,6 +121,7 @@ export default class Wallet extends Common {
     this.defineReactiveProperty("ManyBanksByCountry", undefined);
     this.defineReactiveProperty("ManyBankBranches", undefined);
     this.defineReactiveProperty("ResolvedBankAccountName", undefined);
+    this.defineReactiveProperty("CurrentPaymentDetail", undefined);
   }
 
   // Queries
@@ -282,6 +288,14 @@ export default class Wallet extends Common {
       });
   };
 
+  public GetPaymentDetails = async (payment_uuid: string) => {
+    return $api.wallet.GetPaymentDetails(payment_uuid).then((response) => {
+      this.CurrentPaymentDetail = response.data?.GetPaymentDetails;
+
+      return response.data?.GetPaymentDetails;
+    });
+  };
+
   public GetPointFinancialSummary = async (from = "", to = "") => {
     const input: FinancialSummaryInput = {
       type: "point",
@@ -411,6 +425,22 @@ export default class Wallet extends Common {
         .catch((error: CombinedError) => {
           Logic.Common.showError(error, "Oops!", "error-alert");
           throw error;
+        });
+    }
+  };
+
+  public MakePayment = async () => {
+    if (this.MakePaymentForm) {
+      return $api.wallet
+        .MakePayment(this.MakePaymentForm)
+        .then((response) => {
+          if (response.data?.MakePayment) {
+            return response.data.MakePayment;
+          }
+        })
+        .catch((error: CombinedError) => {
+          Logic.Common.showError(error, "Oops!", "error-alert");
+          throw new Error(error.message);
         });
     }
   };

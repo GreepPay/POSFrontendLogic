@@ -18,12 +18,14 @@ import {
   MutationExtractAnchorTransactionArgs,
   MutationInitiateInteractiveWithdrawalArgs,
   MutationInitiateWithdrawalArgs,
+  MutationMakePaymentArgs,
   MutationSoftDeleteP2pPaymentMethodArgs,
   MutationUpdateExchangeAdArgs,
   MutationUpdateP2pPaymentMethodArgs,
   OffRamp,
   P2pPaymentMethod,
   P2pPaymentMethodPaginator,
+  PaymentDetailsResponse,
   PointTransaction,
   PointTransactionPaginator,
   SupportedCurrency,
@@ -120,6 +122,30 @@ export default class WalletApi extends BaseApiService {
       }>
     > = this.query(requestData, {
       country,
+    });
+
+    return response;
+  };
+
+  public GetPaymentDetails = (payment_uuid: string) => {
+    const requestData = `
+      query GetPaymentDetails($payment_uuid: String!) {
+        GetPaymentDetails(payment_uuid: $payment_uuid) {
+          user_uuid
+          wallet_uuid
+          profile_image_url
+          user_type
+          user_name
+        }
+      }
+		`;
+
+    const response: Promise<
+      OperationResult<{
+        GetPaymentDetails: PaymentDetailsResponse;
+      }>
+    > = this.query(requestData, {
+      payment_uuid,
     });
 
     return response;
@@ -1107,6 +1133,29 @@ export default class WalletApi extends BaseApiService {
     > = this.mutation(requestData, {
       currency,
     });
+
+    return response;
+  };
+
+  public MakePayment = (data: MutationMakePaymentArgs) => {
+    const requestData = `
+    mutation MakePayment(
+      $receiver_uuid: String!,
+      $amount: Float!,
+      $currency: String!
+      $business_uuid: String
+    ) {
+      MakePayment(
+        receiver_uuid: $receiver_uuid,
+        amount: $amount,
+        currency: $currency,
+        business_uuid: $business_uuid
+      )
+    }
+  `;
+
+    const response: Promise<OperationResult<{ MakePayment: boolean }>> =
+      this.mutation(requestData, data);
 
     return response;
   };

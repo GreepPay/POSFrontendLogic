@@ -6,6 +6,8 @@ import {
   MutationAddDeliveryAddressArgs,
   MutationUpdateDeliveryAddressArgs,
   DeliveryAddressPaginator,
+  User as UserModel,
+  Business as BusinessModel,
 } from "../../gql/graphql";
 import { $api } from "../../services";
 import { CombinedError } from "urql";
@@ -20,6 +22,9 @@ export default class User extends Common {
     this.defineReactiveProperty("DeliveryAddresses", null);
     this.defineReactiveProperty("SelectedDeliveryAddress", null);
     this.defineReactiveProperty("ManyP2PDeliveryAddresses", undefined);
+    this.defineReactiveProperty("SearchedUsers", undefined);
+    this.defineReactiveProperty("SingleUser", undefined);
+    this.defineReactiveProperty("SearchedBusinesses", undefined);
   }
 
   // Base Variables
@@ -27,6 +32,9 @@ export default class User extends Common {
   public DeliveryAddresses: any = null;
   public SelectedDeliveryAddress: any = null;
   public ManyP2PDeliveryAddresses: DeliveryAddressPaginator | undefined;
+  public SearchedUsers: UserModel[] | undefined;
+  public SingleUser: UserModel | undefined;
+  public SearchedBusinesses: BusinessModel[] | undefined;
 
   // Mutation Variables
   public UpdateProfileForm: MutationUpdateProfileArgs | undefined;
@@ -43,6 +51,36 @@ export default class User extends Common {
     | undefined;
 
   // Queries
+  public SearchForUsers = async (query: string) => {
+    return $api.user
+      .SearchUsers({
+        query,
+      })
+      .then((response) => {
+        this.SearchedUsers = response.data?.SearchUsers;
+        return response.data?.SearchUsers;
+      });
+  };
+
+  public SearchForBusinesses = async (query: string) => {
+    return $api.user
+      .SearchBusinesses({
+        query,
+      })
+      .then((response) => {
+        this.SearchedBusinesses = response.data?.SearchBusinesses;
+        return response.data?.SearchBusinesses;
+      });
+  };
+
+  public GetSingleUser = async (
+    uuid: string
+  ): Promise<UserModel | undefined> => {
+    return $api.user.GetSingleUser(uuid).then((response) => {
+      this.SingleUser = response.data?.GetSingleUser;
+      return response.data?.GetSingleUser;
+    });
+  };
 
   // Mutations
   public UpdateProfile = async () => {

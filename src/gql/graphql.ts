@@ -118,6 +118,34 @@ export type BankAccountNameResponse = {
   account_number: Scalars['String'];
 };
 
+/** A single beneficiary */
+export type Beneficiary = {
+  __typename?: 'Beneficiary';
+  /** The beneficiary user */
+  beneficiary: User;
+  /** Beneficiary Created At */
+  created_at: Scalars['DateTime'];
+  /** Unique ID */
+  id: Scalars['Int'];
+  /** Metadata associated with the beneficiary */
+  metadata: Scalars['String'];
+  /** Owner ID of the beneficiary */
+  owner: User;
+  /** State of the beneficiary (active or archived) */
+  state: Scalars['String'];
+  /** Beneficiary Updated At */
+  updated_at: Scalars['DateTime'];
+};
+
+/** A paginated list of Beneficiary items. */
+export type BeneficiaryPaginator = {
+  __typename?: 'BeneficiaryPaginator';
+  /** A list of Beneficiary items. */
+  data: Array<Beneficiary>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
+};
+
 export type BillingInput = {
   gracePeriod: Scalars['Int'];
   interval: BillingInterval;
@@ -807,6 +835,8 @@ export type Mutation = {
   InitiateWalletKYC?: Maybe<Scalars['String']>;
   /** Initiate withdrawal */
   InitiateWithdrawal?: Maybe<OffRamp>;
+  /** Make a payment to another user */
+  MakePayment: Scalars['Boolean'];
   /** Mark specific notifications as read for the authenticated user. */
   MarkNotificationsAsRead?: Maybe<Scalars['Boolean']>;
   /** Redeem GRP tokens */
@@ -1010,6 +1040,14 @@ export type MutationInitiateWithdrawalArgs = {
   amount: Scalars['Float'];
   saved_account_uuid: Scalars['String'];
   withdrawal_currency: Scalars['String'];
+};
+
+
+export type MutationMakePaymentArgs = {
+  amount: Scalars['Float'];
+  business_uuid?: InputMaybe<Scalars['String']>;
+  currency: Scalars['String'];
+  receiver_uuid: Scalars['String'];
 };
 
 
@@ -1339,8 +1377,8 @@ export type Order = {
   paymentStatus: Scalars['String'];
   /** Refund Details */
   refundDetails?: Maybe<Scalars['String']>;
-  /** Sale */
-  sale: Sale;
+  /** Sales */
+  sales: Array<Sale>;
   /** Shipping Address */
   shippingAddress?: Maybe<Scalars['String']>;
   /** Status */
@@ -1472,6 +1510,21 @@ export type Participant = {
   user?: Maybe<User>;
   /** The user id */
   user_id: Scalars['Int'];
+};
+
+/** Payment details response */
+export type PaymentDetailsResponse = {
+  __typename?: 'PaymentDetailsResponse';
+  /** Profile image URL */
+  profile_image_url: Scalars['String'];
+  /** User name */
+  user_name: Scalars['String'];
+  /** User type */
+  user_type: Scalars['String'];
+  /** User UUID */
+  user_uuid: Scalars['String'];
+  /** Wallet UUID */
+  wallet_uuid: Scalars['String'];
 };
 
 /** Payment Request Response */
@@ -1700,6 +1753,8 @@ export type Profile = {
   auth_user_id: Scalars['String'];
   /** The attached customer */
   business?: Maybe<Business>;
+  /** User country code */
+  country_code?: Maybe<Scalars['String']>;
   /** Profile Created At */
   created_at: Scalars['DateTime'];
   /** Default Currency */
@@ -1730,6 +1785,8 @@ export type Query = {
   GetBankBranchesByBankId?: Maybe<Array<FlutterwaveBankBranch>>;
   /** Get banks by country */
   GetBanksByCountry: Array<FlutterwaveBank>;
+  /** Get a paginated list of beneficiaries for the authenticated user */
+  GetBeneficiaries: BeneficiaryPaginator;
   /** Get deliveries for authenticated business */
   GetBusinessDeliveries: DeliveryPaginator;
   /** Get a conversation */
@@ -1782,6 +1839,8 @@ export type Query = {
   GetP2pOrders: ExchangeOrderPaginator;
   /** Get a single P2P payment method by UUID */
   GetP2pPaymentMethod?: Maybe<P2pPaymentMethod>;
+  /** Get Payment Details */
+  GetPaymentDetails: PaymentDetailsResponse;
   /** Get many point transactions */
   GetPointTransactions: PointTransactionPaginator;
   /** Get a product by UUID */
@@ -1792,10 +1851,14 @@ export type Query = {
   GetRecommendedExchangeAds: ExchangeAdPaginator;
   /** Get a paginated list of saved accounts for the authenticated user */
   GetSavedAccounts: UserBankPaginator;
+  /** Get Single business */
+  GetSingleBusiness?: Maybe<Business>;
   /** Get a single point transaction by UUID */
   GetSinglePointTransaction?: Maybe<PointTransaction>;
   /** Get a single transaction by UUID */
   GetSingleTransaction?: Maybe<Transaction>;
+  /** Get user by UUID */
+  GetSingleUser?: Maybe<User>;
   /** Get a single store location by UUID */
   GetStoreLocation?: Maybe<StoreLocation>;
   /** Get store locations */
@@ -1810,6 +1873,10 @@ export type Query = {
   GetYellowCardNetwork: Array<YellowcardNetwork>;
   /** Resolve bank account name */
   ResolveBankAccountName?: Maybe<BankAccountNameResponse>;
+  /** Search businesses by name */
+  SearchBusinesses: Array<Business>;
+  /** Search users by name */
+  SearchUsers: Array<User>;
 };
 
 
@@ -1833,6 +1900,12 @@ export type QueryGetBankBranchesByBankIdArgs = {
 
 export type QueryGetBanksByCountryArgs = {
   country: Scalars['String'];
+};
+
+
+export type QueryGetBeneficiariesArgs = {
+  first: Scalars['Int'];
+  page?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -1996,6 +2069,11 @@ export type QueryGetP2pPaymentMethodArgs = {
 };
 
 
+export type QueryGetPaymentDetailsArgs = {
+  payment_uuid: Scalars['String'];
+};
+
+
 export type QueryGetPointTransactionsArgs = {
   first: Scalars['Int'];
   orderBy?: InputMaybe<Array<QueryGetPointTransactionsOrderByOrderByClause>>;
@@ -2031,12 +2109,22 @@ export type QueryGetSavedAccountsArgs = {
 };
 
 
+export type QueryGetSingleBusinessArgs = {
+  uuid: Scalars['String'];
+};
+
+
 export type QueryGetSinglePointTransactionArgs = {
   uuid: Scalars['String'];
 };
 
 
 export type QueryGetSingleTransactionArgs = {
+  uuid: Scalars['String'];
+};
+
+
+export type QueryGetSingleUserArgs = {
   uuid: Scalars['String'];
 };
 
@@ -2082,6 +2170,16 @@ export type QueryGetYellowCardNetworkArgs = {
 export type QueryResolveBankAccountNameArgs = {
   account_number: Scalars['String'];
   bank_code: Scalars['String'];
+};
+
+
+export type QuerySearchBusinessesArgs = {
+  query: Scalars['String'];
+};
+
+
+export type QuerySearchUsersArgs = {
+  query: Scalars['String'];
 };
 
 /** Allowed column names for Query.GetBusinessDeliveries.orderBy. */
