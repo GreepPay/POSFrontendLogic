@@ -2980,6 +2980,8 @@ export type Sale = {
   metadata?: Maybe<Scalars['String']>;
   /** Payment Details */
   paymentDetails: Scalars['String'];
+  /** Products in this sale */
+  products: Array<Product>;
   /** Refund Details */
   refundDetails?: Maybe<Scalars['String']>;
   /** Status */

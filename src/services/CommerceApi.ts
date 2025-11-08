@@ -352,14 +352,16 @@ export default class CommerceApi extends BaseApiService {
           data {
           id
           orderNumber
+          uuid
           customerId
           user {
             id
           }
-          sale {
-            id
-          }
           items
+          sales {
+            id
+            items
+          }
           subtotalAmount
           taxAmount
           discountAmount
@@ -401,13 +403,24 @@ export default class CommerceApi extends BaseApiService {
       query GetOrder($uuid: String!) {
         GetOrder(uuid: $uuid) {
         id
+        uuid
         orderNumber
         customerId
         user {
           id
+          first_name
+          last_name
+          email
+          phone
         }
-        sale {
+        sales {
           id
+          items
+          products {
+           id
+           name
+           images
+         }
         }
         items
         subtotalAmount
@@ -589,6 +602,7 @@ export default class CommerceApi extends BaseApiService {
             metadata
             trackingUpdates
             deliveryAttempts
+            price
             order {
               id
               uuid
