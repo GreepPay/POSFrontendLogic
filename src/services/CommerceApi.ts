@@ -111,6 +111,8 @@ export default class CommerceApi extends BaseApiService {
           eventCapacity
           eventRegisteredCount
           eventWaitlistEnabled
+          national_cuisine
+          national_cuisine_country
           metaTitle
           metaDescription
           isVisible
@@ -271,6 +273,8 @@ export default class CommerceApi extends BaseApiService {
         eventCapacity
         eventRegisteredCount
         eventWaitlistEnabled
+        national_cuisine
+        national_cuisine_country
         metaTitle
         metaDescription
         isVisible

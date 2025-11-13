@@ -346,6 +346,8 @@ export type CreateProductInput = {
   inventoryCount?: InputMaybe<Scalars['Int']>;
   isBackorderAllowed?: InputMaybe<Scalars['Boolean']>;
   name: Scalars['String'];
+  national_cuisine?: InputMaybe<Scalars['Boolean']>;
+  national_cuisine_country?: InputMaybe<Scalars['String']>;
   physicalDetails?: InputMaybe<PhysicalProductInput>;
   price: Scalars['Float'];
   sku: Scalars['String'];
@@ -1763,6 +1765,10 @@ export type Product = {
   metaTitle?: Maybe<Scalars['String']>;
   /** Product Name */
   name: Scalars['String'];
+  /** National Cuisine */
+  national_cuisine?: Maybe<Scalars['Boolean']>;
+  /** National Cuisine Country */
+  national_cuisine_country?: Maybe<Scalars['String']>;
   /** Price */
   price: Scalars['Float'];
   /** Product sales */
@@ -1777,6 +1783,8 @@ export type Product = {
   status: Scalars['String'];
   /** Stock Threshold */
   stockThreshold?: Maybe<Scalars['Int']>;
+  /** Tags */
+  tags?: Maybe<Array<Maybe<Scalars['String']>>>;
   /** Tax Code */
   taxCode?: Maybe<Scalars['String']>;
   /** All Tickets */
@@ -3395,6 +3403,8 @@ export type UpdateProductInput = {
   inventoryCount?: InputMaybe<Scalars['Int']>;
   isBackorderAllowed?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
+  national_cuisine?: InputMaybe<Scalars['Boolean']>;
+  national_cuisine_country?: InputMaybe<Scalars['String']>;
   physicalDetails?: InputMaybe<PhysicalProductInput>;
   price?: InputMaybe<Scalars['Float']>;
   sku?: InputMaybe<Scalars['String']>;
