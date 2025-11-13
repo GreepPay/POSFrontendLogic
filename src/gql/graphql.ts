@@ -167,6 +167,8 @@ export type Business = {
   auth_user_id: Scalars['Int'];
   /** Business banner URL. */
   banner?: Maybe<Scalars['String']>;
+  /** Business schedules for each day of the week */
+  businessSchedules: Array<BusinessSchedule>;
   /** Business name. */
   business_name?: Maybe<Scalars['String']>;
   /** Business Type */
@@ -209,6 +211,51 @@ export type Business = {
   wallet?: Maybe<Wallet>;
   /** Business website URL. */
   website?: Maybe<Scalars['String']>;
+};
+
+/**
+ * Business schedule for each day of the week.
+ * Day mapping: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
+ */
+export type BusinessSchedule = {
+  __typename?: 'BusinessSchedule';
+  /** Break end time in HH:mm format */
+  break_end_time?: Maybe<Scalars['String']>;
+  /** Break start time in HH:mm format */
+  break_start_time?: Maybe<Scalars['String']>;
+  /** Associated business */
+  business: Business;
+  /** Business ID this schedule belongs to */
+  business_id: Scalars['Int'];
+  /** Closing time in HH:mm format */
+  close_time?: Maybe<Scalars['String']>;
+  /** When the schedule was created */
+  created_at: Scalars['DateTime'];
+  /** Day of week (0-6: Monday to Sunday) */
+  day_of_week: Scalars['Int'];
+  /** Unique identifier */
+  id: Scalars['ID'];
+  /** Whether the business is open on this day */
+  is_open: Scalars['Boolean'];
+  /** Maximum orders per hour (optional capacity limit) */
+  max_orders_per_hour?: Maybe<Scalars['Int']>;
+  /** Additional metadata */
+  metadata?: Maybe<Scalars['JSON']>;
+  /** Opening time in HH:mm format */
+  open_time?: Maybe<Scalars['String']>;
+  /** When the schedule was last updated */
+  updated_at: Scalars['DateTime'];
+  /** Unique UUID */
+  uuid: Scalars['String'];
+};
+
+/** A paginated list of BusinessSchedule items. */
+export type BusinessSchedulePaginator = {
+  __typename?: 'BusinessSchedulePaginator';
+  /** A list of BusinessSchedule items. */
+  data: Array<BusinessSchedule>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
 };
 
 /** A category */
@@ -806,6 +853,8 @@ export type Mutation = {
   ConfirmWithdrawal?: Maybe<OffRamp>;
   /** Create a business profile */
   CreateBusinessProfile: Business;
+  /** Create a new business schedule */
+  CreateBusinessSchedule: BusinessSchedule;
   /** Create Crypto Transfer */
   CreateCrpytoTransfer: OffRamp;
   /** Create exchange ad */
@@ -821,6 +870,8 @@ export type Mutation = {
   /** Create a saved account */
   CreateSavedAccount: UserBank;
   CreateStoreLocation: StoreLocation;
+  /** Delete a business schedule */
+  DeleteBusinessSchedule: Scalars['Boolean'];
   /** Delete Product */
   DeleteProduct: Scalars['Boolean'];
   /** Delete User */
@@ -867,6 +918,8 @@ export type Mutation = {
   SoftDeleteP2pPaymentMethod: Scalars['Boolean'];
   /** Update a business profile */
   UpdateBusinessProfile: Business;
+  /** Update an existing business schedule */
+  UpdateBusinessSchedule: BusinessSchedule;
   /** Update an existing delivery address */
   UpdateDeliveryAddress: DeliveryAddress;
   /** Update exchange ad */
@@ -934,6 +987,18 @@ export type MutationCreateBusinessProfileArgs = {
   registration_number?: InputMaybe<Scalars['String']>;
   resident_permit?: InputMaybe<Scalars['Upload']>;
   website?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationCreateBusinessScheduleArgs = {
+  break_end_time?: InputMaybe<Scalars['String']>;
+  break_start_time?: InputMaybe<Scalars['String']>;
+  close_time?: InputMaybe<Scalars['String']>;
+  day_of_week: Scalars['Int'];
+  is_open: Scalars['Boolean'];
+  max_orders_per_hour?: InputMaybe<Scalars['Int']>;
+  metadata?: InputMaybe<Scalars['String']>;
+  open_time?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -1006,6 +1071,11 @@ export type MutationCreateStoreLocationArgs = {
   longitude?: InputMaybe<Scalars['Float']>;
   meta_data?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
+};
+
+
+export type MutationDeleteBusinessScheduleArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -1154,6 +1224,19 @@ export type MutationUpdateBusinessProfileArgs = {
   registration_number?: InputMaybe<Scalars['String']>;
   resident_permit?: InputMaybe<Scalars['Upload']>;
   website?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateBusinessScheduleArgs = {
+  break_end_time?: InputMaybe<Scalars['String']>;
+  break_start_time?: InputMaybe<Scalars['String']>;
+  close_time?: InputMaybe<Scalars['String']>;
+  day_of_week?: InputMaybe<Scalars['Int']>;
+  id: Scalars['ID'];
+  is_open?: InputMaybe<Scalars['Boolean']>;
+  max_orders_per_hour?: InputMaybe<Scalars['Int']>;
+  metadata?: InputMaybe<Scalars['String']>;
+  open_time?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -1789,6 +1872,12 @@ export type Query = {
   GetBeneficiaries: BeneficiaryPaginator;
   /** Get deliveries for authenticated business */
   GetBusinessDeliveries: DeliveryPaginator;
+  /** Get a single business schedule by UUID */
+  GetBusinessSchedule?: Maybe<BusinessSchedule>;
+  /** Get business schedule for a specific day */
+  GetBusinessScheduleForDay?: Maybe<BusinessSchedule>;
+  /** Get all business schedules for a business */
+  GetBusinessSchedules: BusinessSchedulePaginator;
   /** Get a conversation */
   GetConversation?: Maybe<Conversation>;
   /** Get country information for verification */
@@ -1914,6 +2003,25 @@ export type QueryGetBusinessDeliveriesArgs = {
   orderBy?: InputMaybe<Array<QueryGetBusinessDeliveriesOrderByOrderByClause>>;
   page?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<QueryGetBusinessDeliveriesWhereWhereConditions>;
+};
+
+
+export type QueryGetBusinessScheduleArgs = {
+  uuid: Scalars['String'];
+};
+
+
+export type QueryGetBusinessScheduleForDayArgs = {
+  business_uuid: Scalars['Int'];
+  day_of_week: Scalars['Int'];
+};
+
+
+export type QueryGetBusinessSchedulesArgs = {
+  first: Scalars['Int'];
+  orderBy?: InputMaybe<Array<QueryGetBusinessSchedulesOrderByOrderByClause>>;
+  page?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<QueryGetBusinessSchedulesWhereWhereConditions>;
 };
 
 
@@ -2229,6 +2337,57 @@ export type QueryGetBusinessDeliveriesWhereWhereConditionsRelation = {
   amount?: InputMaybe<Scalars['Int']>;
   /** Additional condition logic. */
   condition?: InputMaybe<QueryGetBusinessDeliveriesWhereWhereConditions>;
+  /** The comparison operator to test against the amount. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The relation that is checked. */
+  relation: Scalars['String'];
+};
+
+/** Allowed column names for Query.GetBusinessSchedules.orderBy. */
+export enum QueryGetBusinessSchedulesOrderByColumn {
+  CreatedAt = 'CREATED_AT',
+  DayOfWeek = 'DAY_OF_WEEK',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Order by clause for Query.GetBusinessSchedules.orderBy. */
+export type QueryGetBusinessSchedulesOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetBusinessSchedulesOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetBusinessSchedules.where. */
+export enum QueryGetBusinessSchedulesWhereColumn {
+  CreatedAt = 'CREATED_AT',
+  DayOfWeek = 'DAY_OF_WEEK',
+  IsOpen = 'IS_OPEN',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Dynamic WHERE conditions for the `where` argument of the query `GetBusinessSchedules`. */
+export type QueryGetBusinessSchedulesWhereWhereConditions = {
+  /** A set of conditions that requires all conditions to match. */
+  AND?: InputMaybe<Array<QueryGetBusinessSchedulesWhereWhereConditions>>;
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied. */
+  HAS?: InputMaybe<QueryGetBusinessSchedulesWhereWhereConditionsRelation>;
+  /** A set of conditions that requires at least one condition to match. */
+  OR?: InputMaybe<Array<QueryGetBusinessSchedulesWhereWhereConditions>>;
+  /** The column that is used for the condition. */
+  column?: InputMaybe<QueryGetBusinessSchedulesWhereColumn>;
+  /** The operator that is used for the condition. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The value that is used for the condition. */
+  value?: InputMaybe<Scalars['Mixed']>;
+};
+
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `GetBusinessSchedules`. */
+export type QueryGetBusinessSchedulesWhereWhereConditionsRelation = {
+  /** The amount to test. */
+  amount?: InputMaybe<Scalars['Int']>;
+  /** Additional condition logic. */
+  condition?: InputMaybe<QueryGetBusinessSchedulesWhereWhereConditions>;
   /** The comparison operator to test against the amount. */
   operator?: InputMaybe<SqlOperator>;
   /** The relation that is checked. */
@@ -2964,6 +3123,7 @@ export type Sale = {
   __typename?: 'Sale';
   /** Applied Discounts */
   appliedDiscounts?: Maybe<Scalars['String']>;
+  business: Business;
   /** Sale Created At */
   createdAt: Scalars['String'];
   /** Currency */

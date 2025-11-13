@@ -5,9 +5,13 @@ import {
   MutationCreateStoreLocationArgs,
   MutationAddDeliveryAddressArgs,
   MutationUpdateDeliveryAddressArgs,
+  MutationCreateBusinessScheduleArgs,
+  MutationUpdateBusinessScheduleArgs,
+  QueryGetBusinessSchedulesArgs,
   DeliveryAddressPaginator,
   User as UserModel,
   Business as BusinessModel,
+  BusinessSchedulePaginator,
 } from "../../gql/graphql";
 import { $api } from "../../services";
 import { CombinedError } from "urql";
@@ -25,6 +29,7 @@ export default class User extends Common {
     this.defineReactiveProperty("SearchedUsers", undefined);
     this.defineReactiveProperty("SingleUser", undefined);
     this.defineReactiveProperty("SearchedBusinesses", undefined);
+    this.defineReactiveProperty("BusinessSchedules", undefined);
   }
 
   // Base Variables
@@ -35,6 +40,7 @@ export default class User extends Common {
   public SearchedUsers: UserModel[] | undefined;
   public SingleUser: UserModel | undefined;
   public SearchedBusinesses: BusinessModel[] | undefined;
+  public BusinessSchedules: BusinessSchedulePaginator | undefined;
 
   // Mutation Variables
   public UpdateProfileForm: MutationUpdateProfileArgs | undefined;
@@ -48,6 +54,12 @@ export default class User extends Common {
   public AddDeliveryAddressForm: MutationAddDeliveryAddressArgs | undefined;
   public UpdateDeliveryAddressForm:
     | MutationUpdateDeliveryAddressArgs
+    | undefined;
+  public UpdateBusinessScheduleForm:
+    | MutationUpdateBusinessScheduleArgs
+    | undefined;
+  public CreateBusinessScheduleForm:
+    | MutationCreateBusinessScheduleArgs
     | undefined;
 
   // Queries
@@ -254,6 +266,68 @@ export default class User extends Common {
       .catch((error: CombinedError) => {
         Logic.Common.hideLoader();
         Logic.Common.showError(error, "Oops!", "error-alert");
+        throw error;
+      });
+  };
+
+  public UpdateBusinessSchedule = async (
+    data: MutationUpdateBusinessScheduleArgs
+  ) => {
+    return $api.user
+      .UpdateBusinessSchedule(data)
+      .then((response) => {
+        if (response.data?.UpdateBusinessSchedule) {
+          return response.data.UpdateBusinessSchedule;
+        }
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(
+          error,
+          "Failed to update schedule",
+          "error-alert"
+        );
+        throw error;
+      });
+  };
+
+  public GetBusinessSchedules = async (
+    first: number = 50,
+    page: number = 1
+  ) => {
+    return $api.user
+      .GetBusinessSchedules({ first, page })
+      .then((response) => {
+        if (response.data?.GetBusinessSchedules) {
+          this.BusinessSchedules = response.data.GetBusinessSchedules;
+          return response.data.GetBusinessSchedules;
+        }
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(
+          error,
+          "Failed to load schedules",
+          "error-alert"
+        );
+        throw error;
+      });
+  };
+
+  public CreateBusinessSchedule = async (
+    data: MutationCreateBusinessScheduleArgs
+  ) => {
+    return $api.user
+      .CreateBusinessSchedule(data)
+      .then((response) => {
+        if (response.data?.CreateBusinessSchedule) {
+          return response.data.CreateBusinessSchedule;
+        }
+      })
+      .catch((error: CombinedError) => {
+        Logic.Common.showError(
+          error,
+          "Failed to create schedule",
+          "error-alert"
+        );
         throw error;
       });
   };
