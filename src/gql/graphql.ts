@@ -54,6 +54,29 @@ export type AdditionalIdInput = {
   type: Scalars['String'];
 };
 
+/** A paginated list of Category items. */
+export type CategoryPaginator = {
+  __typename?: 'CategoryPaginator';
+  /** A list of Category items. */
+  data: Array<Category>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
+};
+
+/** Order by clause for Query.GetCategories.orderBy. */
+export type QueryGetCategoriesOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetCategoriesOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetCategories.orderBy. */
+export enum QueryGetCategoriesOrderByColumn {
+  Name = 'NAME'
+}
+
+
 /** Represents an Anchor Transaction in the Stellar network */
 export type AnchorTransation = {
   __typename?: 'AnchorTransation';

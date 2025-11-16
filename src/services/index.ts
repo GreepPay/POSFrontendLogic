@@ -4,6 +4,7 @@ import NotificationApi from "./NotificationApi";
 import WalletApi from "./WalletApi";
 import CommerceApi from "./CommerceApi";
 import MessagingApi from "./MessagingApi";
+import ProductApi from "./ProductApi"
 import BeneficiaryApi from "./BeneficiaryApi";
 
 export const $api = {
@@ -12,6 +13,7 @@ export const $api = {
   commerce: new CommerceApi(),
   notification: new NotificationApi(),
   wallet: new WalletApi(),
+  product: new ProductApi(),
   messaging: new MessagingApi(),
   beneficiary: new BeneficiaryApi(),
 };
