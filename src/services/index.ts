@@ -8,8 +8,8 @@ import MessagingApi from "./MessagingApi";
 export const $api = {
   auth: new AuthApi(),
   user: new UserApi(),
+  commerce: new CommerceApi(),
   notification: new NotificationApi(),
   wallet: new WalletApi(),
-  commerce: new CommerceApi(),
   messaging: new MessagingApi(),
 };
