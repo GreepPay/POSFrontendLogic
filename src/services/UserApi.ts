@@ -5,7 +5,15 @@ import {
   MutationCreateStoreLocationArgs,
   MutationAddDeliveryAddressArgs,
   MutationUpdateDeliveryAddressArgs,
+  MutationCreateBusinessScheduleArgs,
+  MutationUpdateBusinessScheduleArgs,
+  QueryGetBusinessSchedulesArgs,
   DeliveryAddressPaginator,
+  User,
+  QuerySearchUsersArgs,
+  QuerySearchBusinessesArgs,
+  Business,
+  BusinessSchedulePaginator,
 } from "src/gql/graphql";
 import { OperationResult } from "urql";
 import { BaseApiService } from "./common/BaseService";
@@ -518,6 +526,262 @@ export default class UserApi extends BaseApiService {
         GetP2PDeliveryAddresses: DeliveryAddressPaginator;
       }>
     > = this.query(requestData, { first, page });
+
+    return response;
+  };
+
+  public SearchUsers = (data: QuerySearchUsersArgs) => {
+    const requestData = `
+      query SearchUsers($query: String!) {
+        SearchUsers(query: $query) {
+          uuid
+          first_name
+          last_name
+          username
+          profile {
+            profile_picture
+            verification_status
+            default_currency
+            country_code
+            user_type
+          }
+          wallet {
+            uuid
+          }
+          businesses {
+            uuid
+            business_name
+            logo
+            default_currency
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        SearchUsers: User[];
+      }>
+    > = this.query(requestData, data);
+
+    return response;
+  };
+
+  public SearchBusiness = (data: QuerySearchBusinessesArgs) => {
+    const requestData = `
+      query SearchBusinesses($query: String!) {
+        SearchBusinesses(query: $query) {
+           uuid
+           business_name
+           user {
+             uuid
+             }
+           logo
+           default_currency
+           wallet {
+             uuid
+           }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        SearchBusinesses: Business[];
+      }>
+    > = this.query(requestData, data);
+
+    return response;
+  };
+
+  public GetSingleUser = (uuid: string) => {
+    const requestData = `
+      query GetSingleUser($uuid: String!) {
+        GetSingleUser(uuid: $uuid) {
+          uuid
+          first_name
+          last_name
+          username
+          profile {
+            profile_picture
+            default_currency
+            country_code
+            user_type
+          }
+          businesses {
+            uuid
+            business_name
+            logo
+            default_currency
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetSingleUser: User;
+      }>
+    > = this.query(requestData, { uuid });
+
+    return response;
+  };
+
+  public SearchBusinesses = (data: QuerySearchBusinessesArgs) => {
+    const requestData = `
+      query SearchBusinesses($query: String!) {
+        SearchBusinesses(query: $query) { 
+          logo
+          business_name
+          description
+          default_currency
+          user {
+            uuid
+          }
+          wallet {
+             uuid
+            }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        SearchBusinesses: Business[];
+      }>
+    > = this.query(requestData, data);
+
+    return response;
+  };
+
+  public GetBusinessSchedules = (data: QueryGetBusinessSchedulesArgs) => {
+    const requestData = `
+      query GetBusinessSchedules($first: Int!, $page: Int) {
+        GetBusinessSchedules(first: $first, page: $page) {
+          data {
+            id
+            uuid
+            business_id
+            day_of_week
+            is_open
+            open_time
+            close_time
+            break_start_time
+            break_end_time
+            max_orders_per_hour
+            metadata
+            created_at
+            updated_at
+          }
+          paginatorInfo {
+            count
+            currentPage
+            firstItem
+            hasMorePages
+            lastItem
+            lastPage
+            perPage
+            total
+          }
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        GetBusinessSchedules: BusinessSchedulePaginator;
+      }>
+    > = this.query(requestData, data);
+
+    return response;
+  };
+
+  public UpdateBusinessSchedule = (
+    data: MutationUpdateBusinessScheduleArgs
+  ) => {
+    const requestData = `
+      mutation UpdateBusinessSchedule(
+        $id: ID!
+        $is_open: Boolean
+        $open_time: String
+        $close_time: String
+        $break_start_time: String
+        $break_end_time: String
+        $day_of_week: Int
+        $max_orders_per_hour: Int
+        $metadata: String
+      ) {
+        UpdateBusinessSchedule(
+          id: $id
+          is_open: $is_open
+          open_time: $open_time
+          close_time: $close_time
+          break_start_time: $break_start_time
+          break_end_time: $break_end_time
+          day_of_week: $day_of_week
+          max_orders_per_hour: $max_orders_per_hour
+          metadata: $metadata
+        ) {
+          id
+          day_of_week
+          is_open
+          open_time
+          close_time
+          break_start_time
+          break_end_time
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        UpdateBusinessSchedule: any;
+      }>
+    > = this.mutation(requestData, data);
+
+    return response;
+  };
+
+  public CreateBusinessSchedule = (
+    data: MutationCreateBusinessScheduleArgs
+  ) => {
+    const requestData = `
+      mutation CreateBusinessSchedule(
+        $day_of_week: Int!
+        $is_open: Boolean!
+        $open_time: String
+        $close_time: String
+        $break_start_time: String
+        $break_end_time: String
+        $max_orders_per_hour: Int
+        $metadata: String
+      ) {
+        CreateBusinessSchedule(
+          day_of_week: $day_of_week
+          is_open: $is_open
+          open_time: $open_time
+          close_time: $close_time
+          break_start_time: $break_start_time
+          break_end_time: $break_end_time
+          max_orders_per_hour: $max_orders_per_hour
+          metadata: $metadata
+        ) {
+          id
+          day_of_week
+          is_open
+          open_time
+          close_time
+          break_start_time
+          break_end_time
+        }
+      }
+    `;
+
+    const response: Promise<
+      OperationResult<{
+        CreateBusinessSchedule: any;
+      }>
+    > = this.mutation(requestData, data);
 
     return response;
   };

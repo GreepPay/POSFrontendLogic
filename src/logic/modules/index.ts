@@ -6,6 +6,7 @@ import User from "./User";
 import Notification from "./Notification";
 import Commerce from "./Commerce";
 import Messaging from "./Messaging";
+import Beneficiary from "./Beneficiary";
 
 export const Logic = {
   Auth: new Auth(),
@@ -16,4 +17,5 @@ export const Logic = {
   Wallet: new Wallet(),
   Commerce: new Commerce(),
   Messaging: new Messaging(),
+  Beneficiary: new Beneficiary(),
 };

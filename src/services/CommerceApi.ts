@@ -111,6 +111,8 @@ export default class CommerceApi extends BaseApiService {
           eventCapacity
           eventRegisteredCount
           eventWaitlistEnabled
+          national_cuisine
+          national_cuisine_country
           metaTitle
           metaDescription
           isVisible
@@ -271,12 +273,35 @@ export default class CommerceApi extends BaseApiService {
         eventCapacity
         eventRegisteredCount
         eventWaitlistEnabled
+        national_cuisine
+        national_cuisine_country
         metaTitle
         metaDescription
         isVisible
         images
         createdAt
         updatedAt
+        tickets{
+         variantId
+         status
+         user {
+            first_name
+            last_name
+            profile {
+              profile_picture
+            }
+          }
+        }
+        productSales {
+          uuid
+          amount
+          extra_data
+          user {
+            first_name
+            last_name
+          }
+          created_at
+        }
           eventOveview {
           revenue
           tickets_sold
@@ -331,14 +356,16 @@ export default class CommerceApi extends BaseApiService {
           data {
           id
           orderNumber
+          uuid
           customerId
           user {
             id
           }
-          sale {
-            id
-          }
           items
+          sales {
+            id
+            items
+          }
           subtotalAmount
           taxAmount
           discountAmount
@@ -380,13 +407,24 @@ export default class CommerceApi extends BaseApiService {
       query GetOrder($uuid: String!) {
         GetOrder(uuid: $uuid) {
         id
+        uuid
         orderNumber
         customerId
         user {
           id
+          first_name
+          last_name
+          email
+          phone
         }
-        sale {
+        sales {
           id
+          items
+          products {
+           id
+           name
+           images
+         }
         }
         items
         subtotalAmount
@@ -464,6 +502,7 @@ export default class CommerceApi extends BaseApiService {
             trackingNumber
             estimatedDeliveryDate
             actualDeliveryDate
+            price
             trackingUpdates
             deliveryAttempts
             order {
@@ -567,6 +606,7 @@ export default class CommerceApi extends BaseApiService {
             metadata
             trackingUpdates
             deliveryAttempts
+            price
             order {
               id
               uuid

@@ -118,6 +118,34 @@ export type BankAccountNameResponse = {
   account_number: Scalars['String'];
 };
 
+/** A single beneficiary */
+export type Beneficiary = {
+  __typename?: 'Beneficiary';
+  /** The beneficiary user */
+  beneficiary: User;
+  /** Beneficiary Created At */
+  created_at: Scalars['DateTime'];
+  /** Unique ID */
+  id: Scalars['Int'];
+  /** Metadata associated with the beneficiary */
+  metadata: Scalars['String'];
+  /** Owner ID of the beneficiary */
+  owner: User;
+  /** State of the beneficiary (active or archived) */
+  state: Scalars['String'];
+  /** Beneficiary Updated At */
+  updated_at: Scalars['DateTime'];
+};
+
+/** A paginated list of Beneficiary items. */
+export type BeneficiaryPaginator = {
+  __typename?: 'BeneficiaryPaginator';
+  /** A list of Beneficiary items. */
+  data: Array<Beneficiary>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
+};
+
 export type BillingInput = {
   gracePeriod: Scalars['Int'];
   interval: BillingInterval;
@@ -139,6 +167,8 @@ export type Business = {
   auth_user_id: Scalars['Int'];
   /** Business banner URL. */
   banner?: Maybe<Scalars['String']>;
+  /** Business schedules for each day of the week */
+  businessSchedules: Array<BusinessSchedule>;
   /** Business name. */
   business_name?: Maybe<Scalars['String']>;
   /** Business Type */
@@ -181,6 +211,51 @@ export type Business = {
   wallet?: Maybe<Wallet>;
   /** Business website URL. */
   website?: Maybe<Scalars['String']>;
+};
+
+/**
+ * Business schedule for each day of the week.
+ * Day mapping: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
+ */
+export type BusinessSchedule = {
+  __typename?: 'BusinessSchedule';
+  /** Break end time in HH:mm format */
+  break_end_time?: Maybe<Scalars['String']>;
+  /** Break start time in HH:mm format */
+  break_start_time?: Maybe<Scalars['String']>;
+  /** Associated business */
+  business: Business;
+  /** Business ID this schedule belongs to */
+  business_id: Scalars['Int'];
+  /** Closing time in HH:mm format */
+  close_time?: Maybe<Scalars['String']>;
+  /** When the schedule was created */
+  created_at: Scalars['DateTime'];
+  /** Day of week (0-6: Monday to Sunday) */
+  day_of_week: Scalars['Int'];
+  /** Unique identifier */
+  id: Scalars['ID'];
+  /** Whether the business is open on this day */
+  is_open: Scalars['Boolean'];
+  /** Maximum orders per hour (optional capacity limit) */
+  max_orders_per_hour?: Maybe<Scalars['Int']>;
+  /** Additional metadata */
+  metadata?: Maybe<Scalars['JSON']>;
+  /** Opening time in HH:mm format */
+  open_time?: Maybe<Scalars['String']>;
+  /** When the schedule was last updated */
+  updated_at: Scalars['DateTime'];
+  /** Unique UUID */
+  uuid: Scalars['String'];
+};
+
+/** A paginated list of BusinessSchedule items. */
+export type BusinessSchedulePaginator = {
+  __typename?: 'BusinessSchedulePaginator';
+  /** A list of BusinessSchedule items. */
+  data: Array<BusinessSchedule>;
+  /** Pagination information about the list of items. */
+  paginatorInfo: PaginatorInfo;
 };
 
 /** A category */
@@ -271,6 +346,8 @@ export type CreateProductInput = {
   inventoryCount?: InputMaybe<Scalars['Int']>;
   isBackorderAllowed?: InputMaybe<Scalars['Boolean']>;
   name: Scalars['String'];
+  national_cuisine?: InputMaybe<Scalars['Boolean']>;
+  national_cuisine_country?: InputMaybe<Scalars['String']>;
   physicalDetails?: InputMaybe<PhysicalProductInput>;
   price: Scalars['Float'];
   sku: Scalars['String'];
@@ -297,8 +374,6 @@ export type Delivery = {
   deliveryAddress: Scalars['String'];
   /** Delivery Attempts */
   deliveryAttempts?: Maybe<Scalars['String']>;
-  /** Delivery Price */
-  deliveryPrice: Scalars['Float'];
   /** Estimated Delivery Date */
   estimatedDeliveryDate?: Maybe<Scalars['String']>;
   /** Unique ID */
@@ -319,6 +394,8 @@ export type Delivery = {
   phone?: Maybe<Scalars['String']>;
   /** Pickup Address */
   pickupAddress: Scalars['String'];
+  /** Delivery Price */
+  price: Scalars['Float'];
   /** Scheduled Date */
   scheduledDate?: Maybe<Scalars['String']>;
   /** Scheduled Time */
@@ -778,6 +855,8 @@ export type Mutation = {
   ConfirmWithdrawal?: Maybe<OffRamp>;
   /** Create a business profile */
   CreateBusinessProfile: Business;
+  /** Create a new business schedule */
+  CreateBusinessSchedule: BusinessSchedule;
   /** Create Crypto Transfer */
   CreateCrpytoTransfer: OffRamp;
   /** Create exchange ad */
@@ -793,6 +872,8 @@ export type Mutation = {
   /** Create a saved account */
   CreateSavedAccount: UserBank;
   CreateStoreLocation: StoreLocation;
+  /** Delete a business schedule */
+  DeleteBusinessSchedule: Scalars['Boolean'];
   /** Delete Product */
   DeleteProduct: Scalars['Boolean'];
   /** Delete User */
@@ -807,6 +888,8 @@ export type Mutation = {
   InitiateWalletKYC?: Maybe<Scalars['String']>;
   /** Initiate withdrawal */
   InitiateWithdrawal?: Maybe<OffRamp>;
+  /** Make a payment to another user */
+  MakePayment: Scalars['Boolean'];
   /** Mark specific notifications as read for the authenticated user. */
   MarkNotificationsAsRead?: Maybe<Scalars['Boolean']>;
   /** Redeem GRP tokens */
@@ -837,6 +920,8 @@ export type Mutation = {
   SoftDeleteP2pPaymentMethod: Scalars['Boolean'];
   /** Update a business profile */
   UpdateBusinessProfile: Business;
+  /** Update an existing business schedule */
+  UpdateBusinessSchedule: BusinessSchedule;
   /** Update an existing delivery address */
   UpdateDeliveryAddress: DeliveryAddress;
   /** Update exchange ad */
@@ -904,6 +989,18 @@ export type MutationCreateBusinessProfileArgs = {
   registration_number?: InputMaybe<Scalars['String']>;
   resident_permit?: InputMaybe<Scalars['Upload']>;
   website?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationCreateBusinessScheduleArgs = {
+  break_end_time?: InputMaybe<Scalars['String']>;
+  break_start_time?: InputMaybe<Scalars['String']>;
+  close_time?: InputMaybe<Scalars['String']>;
+  day_of_week: Scalars['Int'];
+  is_open: Scalars['Boolean'];
+  max_orders_per_hour?: InputMaybe<Scalars['Int']>;
+  metadata?: InputMaybe<Scalars['String']>;
+  open_time?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -979,6 +1076,11 @@ export type MutationCreateStoreLocationArgs = {
 };
 
 
+export type MutationDeleteBusinessScheduleArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationDeleteProductArgs = {
   product_id: Scalars['Int'];
 };
@@ -1010,6 +1112,14 @@ export type MutationInitiateWithdrawalArgs = {
   amount: Scalars['Float'];
   saved_account_uuid: Scalars['String'];
   withdrawal_currency: Scalars['String'];
+};
+
+
+export type MutationMakePaymentArgs = {
+  amount: Scalars['Float'];
+  business_uuid?: InputMaybe<Scalars['String']>;
+  currency: Scalars['String'];
+  receiver_uuid: Scalars['String'];
 };
 
 
@@ -1116,6 +1226,19 @@ export type MutationUpdateBusinessProfileArgs = {
   registration_number?: InputMaybe<Scalars['String']>;
   resident_permit?: InputMaybe<Scalars['Upload']>;
   website?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateBusinessScheduleArgs = {
+  break_end_time?: InputMaybe<Scalars['String']>;
+  break_start_time?: InputMaybe<Scalars['String']>;
+  close_time?: InputMaybe<Scalars['String']>;
+  day_of_week?: InputMaybe<Scalars['Int']>;
+  id: Scalars['ID'];
+  is_open?: InputMaybe<Scalars['Boolean']>;
+  max_orders_per_hour?: InputMaybe<Scalars['Int']>;
+  metadata?: InputMaybe<Scalars['String']>;
+  open_time?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -1339,8 +1462,8 @@ export type Order = {
   paymentStatus: Scalars['String'];
   /** Refund Details */
   refundDetails?: Maybe<Scalars['String']>;
-  /** Sale */
-  sale: Sale;
+  /** Sales */
+  sales: Array<Sale>;
   /** Shipping Address */
   shippingAddress?: Maybe<Scalars['String']>;
   /** Status */
@@ -1472,6 +1595,21 @@ export type Participant = {
   user?: Maybe<User>;
   /** The user id */
   user_id: Scalars['Int'];
+};
+
+/** Payment details response */
+export type PaymentDetailsResponse = {
+  __typename?: 'PaymentDetailsResponse';
+  /** Profile image URL */
+  profile_image_url: Scalars['String'];
+  /** User name */
+  user_name: Scalars['String'];
+  /** User type */
+  user_type: Scalars['String'];
+  /** User UUID */
+  user_uuid: Scalars['String'];
+  /** Wallet UUID */
+  wallet_uuid: Scalars['String'];
 };
 
 /** Payment Request Response */
@@ -1627,8 +1765,14 @@ export type Product = {
   metaTitle?: Maybe<Scalars['String']>;
   /** Product Name */
   name: Scalars['String'];
+  /** National Cuisine */
+  national_cuisine?: Maybe<Scalars['Boolean']>;
+  /** National Cuisine Country */
+  national_cuisine_country?: Maybe<Scalars['String']>;
   /** Price */
   price: Scalars['Float'];
+  /** Product sales */
+  productSales: Array<Transaction>;
   /** Renewal */
   renewal?: Maybe<Scalars['String']>;
   /** SKU */
@@ -1639,8 +1783,12 @@ export type Product = {
   status: Scalars['String'];
   /** Stock Threshold */
   stockThreshold?: Maybe<Scalars['Int']>;
+  /** Tags */
+  tags?: Maybe<Array<Maybe<Scalars['String']>>>;
   /** Tax Code */
   taxCode?: Maybe<Scalars['String']>;
+  /** All Tickets */
+  tickets: Array<Ticket>;
   /** Trial Period Days */
   trialPeriodDays?: Maybe<Scalars['Int']>;
   /** Type */
@@ -1696,6 +1844,8 @@ export type Profile = {
   auth_user_id: Scalars['String'];
   /** The attached customer */
   business?: Maybe<Business>;
+  /** User country code */
+  country_code?: Maybe<Scalars['String']>;
   /** Profile Created At */
   created_at: Scalars['DateTime'];
   /** Default Currency */
@@ -1726,8 +1876,16 @@ export type Query = {
   GetBankBranchesByBankId?: Maybe<Array<FlutterwaveBankBranch>>;
   /** Get banks by country */
   GetBanksByCountry: Array<FlutterwaveBank>;
+  /** Get a paginated list of beneficiaries for the authenticated user */
+  GetBeneficiaries: BeneficiaryPaginator;
   /** Get deliveries for authenticated business */
   GetBusinessDeliveries: DeliveryPaginator;
+  /** Get a single business schedule by UUID */
+  GetBusinessSchedule?: Maybe<BusinessSchedule>;
+  /** Get business schedule for a specific day */
+  GetBusinessScheduleForDay?: Maybe<BusinessSchedule>;
+  /** Get all business schedules for a business */
+  GetBusinessSchedules: BusinessSchedulePaginator;
   /** Get a conversation */
   GetConversation?: Maybe<Conversation>;
   /** Get country information for verification */
@@ -1778,6 +1936,8 @@ export type Query = {
   GetP2pOrders: ExchangeOrderPaginator;
   /** Get a single P2P payment method by UUID */
   GetP2pPaymentMethod?: Maybe<P2pPaymentMethod>;
+  /** Get Payment Details */
+  GetPaymentDetails: PaymentDetailsResponse;
   /** Get many point transactions */
   GetPointTransactions: PointTransactionPaginator;
   /** Get a product by UUID */
@@ -1788,10 +1948,14 @@ export type Query = {
   GetRecommendedExchangeAds: ExchangeAdPaginator;
   /** Get a paginated list of saved accounts for the authenticated user */
   GetSavedAccounts: UserBankPaginator;
+  /** Get Single business */
+  GetSingleBusiness?: Maybe<Business>;
   /** Get a single point transaction by UUID */
   GetSinglePointTransaction?: Maybe<PointTransaction>;
   /** Get a single transaction by UUID */
   GetSingleTransaction?: Maybe<Transaction>;
+  /** Get user by UUID */
+  GetSingleUser?: Maybe<User>;
   /** Get a single store location by UUID */
   GetStoreLocation?: Maybe<StoreLocation>;
   /** Get store locations */
@@ -1806,6 +1970,10 @@ export type Query = {
   GetYellowCardNetwork: Array<YellowcardNetwork>;
   /** Resolve bank account name */
   ResolveBankAccountName?: Maybe<BankAccountNameResponse>;
+  /** Search businesses by name */
+  SearchBusinesses: Array<Business>;
+  /** Search users by name */
+  SearchUsers: Array<User>;
 };
 
 
@@ -1832,11 +2000,36 @@ export type QueryGetBanksByCountryArgs = {
 };
 
 
+export type QueryGetBeneficiariesArgs = {
+  first: Scalars['Int'];
+  page?: InputMaybe<Scalars['Int']>;
+};
+
+
 export type QueryGetBusinessDeliveriesArgs = {
   first: Scalars['Int'];
   orderBy?: InputMaybe<Array<QueryGetBusinessDeliveriesOrderByOrderByClause>>;
   page?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<QueryGetBusinessDeliveriesWhereWhereConditions>;
+};
+
+
+export type QueryGetBusinessScheduleArgs = {
+  uuid: Scalars['String'];
+};
+
+
+export type QueryGetBusinessScheduleForDayArgs = {
+  business_uuid: Scalars['Int'];
+  day_of_week: Scalars['Int'];
+};
+
+
+export type QueryGetBusinessSchedulesArgs = {
+  first: Scalars['Int'];
+  orderBy?: InputMaybe<Array<QueryGetBusinessSchedulesOrderByOrderByClause>>;
+  page?: InputMaybe<Scalars['Int']>;
+  where?: InputMaybe<QueryGetBusinessSchedulesWhereWhereConditions>;
 };
 
 
@@ -1992,6 +2185,11 @@ export type QueryGetP2pPaymentMethodArgs = {
 };
 
 
+export type QueryGetPaymentDetailsArgs = {
+  payment_uuid: Scalars['String'];
+};
+
+
 export type QueryGetPointTransactionsArgs = {
   first: Scalars['Int'];
   orderBy?: InputMaybe<Array<QueryGetPointTransactionsOrderByOrderByClause>>;
@@ -2027,12 +2225,22 @@ export type QueryGetSavedAccountsArgs = {
 };
 
 
+export type QueryGetSingleBusinessArgs = {
+  uuid: Scalars['String'];
+};
+
+
 export type QueryGetSinglePointTransactionArgs = {
   uuid: Scalars['String'];
 };
 
 
 export type QueryGetSingleTransactionArgs = {
+  uuid: Scalars['String'];
+};
+
+
+export type QueryGetSingleUserArgs = {
   uuid: Scalars['String'];
 };
 
@@ -2078,6 +2286,16 @@ export type QueryGetYellowCardNetworkArgs = {
 export type QueryResolveBankAccountNameArgs = {
   account_number: Scalars['String'];
   bank_code: Scalars['String'];
+};
+
+
+export type QuerySearchBusinessesArgs = {
+  query: Scalars['String'];
+};
+
+
+export type QuerySearchUsersArgs = {
+  query: Scalars['String'];
 };
 
 /** Allowed column names for Query.GetBusinessDeliveries.orderBy. */
@@ -2127,6 +2345,57 @@ export type QueryGetBusinessDeliveriesWhereWhereConditionsRelation = {
   amount?: InputMaybe<Scalars['Int']>;
   /** Additional condition logic. */
   condition?: InputMaybe<QueryGetBusinessDeliveriesWhereWhereConditions>;
+  /** The comparison operator to test against the amount. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The relation that is checked. */
+  relation: Scalars['String'];
+};
+
+/** Allowed column names for Query.GetBusinessSchedules.orderBy. */
+export enum QueryGetBusinessSchedulesOrderByColumn {
+  CreatedAt = 'CREATED_AT',
+  DayOfWeek = 'DAY_OF_WEEK',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Order by clause for Query.GetBusinessSchedules.orderBy. */
+export type QueryGetBusinessSchedulesOrderByOrderByClause = {
+  /** The column that is used for ordering. */
+  column: QueryGetBusinessSchedulesOrderByColumn;
+  /** The direction that is used for ordering. */
+  order: SortOrder;
+};
+
+/** Allowed column names for Query.GetBusinessSchedules.where. */
+export enum QueryGetBusinessSchedulesWhereColumn {
+  CreatedAt = 'CREATED_AT',
+  DayOfWeek = 'DAY_OF_WEEK',
+  IsOpen = 'IS_OPEN',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Dynamic WHERE conditions for the `where` argument of the query `GetBusinessSchedules`. */
+export type QueryGetBusinessSchedulesWhereWhereConditions = {
+  /** A set of conditions that requires all conditions to match. */
+  AND?: InputMaybe<Array<QueryGetBusinessSchedulesWhereWhereConditions>>;
+  /** Check whether a relation exists. Extra conditions or a minimum amount can be applied. */
+  HAS?: InputMaybe<QueryGetBusinessSchedulesWhereWhereConditionsRelation>;
+  /** A set of conditions that requires at least one condition to match. */
+  OR?: InputMaybe<Array<QueryGetBusinessSchedulesWhereWhereConditions>>;
+  /** The column that is used for the condition. */
+  column?: InputMaybe<QueryGetBusinessSchedulesWhereColumn>;
+  /** The operator that is used for the condition. */
+  operator?: InputMaybe<SqlOperator>;
+  /** The value that is used for the condition. */
+  value?: InputMaybe<Scalars['Mixed']>;
+};
+
+/** Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `GetBusinessSchedules`. */
+export type QueryGetBusinessSchedulesWhereWhereConditionsRelation = {
+  /** The amount to test. */
+  amount?: InputMaybe<Scalars['Int']>;
+  /** Additional condition logic. */
+  condition?: InputMaybe<QueryGetBusinessSchedulesWhereWhereConditions>;
   /** The comparison operator to test against the amount. */
   operator?: InputMaybe<SqlOperator>;
   /** The relation that is checked. */
@@ -2862,6 +3131,7 @@ export type Sale = {
   __typename?: 'Sale';
   /** Applied Discounts */
   appliedDiscounts?: Maybe<Scalars['String']>;
+  business: Business;
   /** Sale Created At */
   createdAt: Scalars['String'];
   /** Currency */
@@ -2878,6 +3148,8 @@ export type Sale = {
   metadata?: Maybe<Scalars['String']>;
   /** Payment Details */
   paymentDetails: Scalars['String'];
+  /** Products in this sale */
+  products: Array<Product>;
   /** Refund Details */
   refundDetails?: Maybe<Scalars['String']>;
   /** Status */
@@ -3016,7 +3288,7 @@ export type Ticket = {
   /** Ticket Updated At */
   updatedAt: Scalars['String'];
   /** User */
-  user: User;
+  user?: Maybe<User>;
   /** User ID */
   userId: Scalars['Int'];
   /** UUID */
@@ -3069,6 +3341,8 @@ export type Transaction = {
   status: Scalars['String'];
   /** Transaction Updated At */
   updated_at: Scalars['DateTime'];
+  /** attached user */
+  user?: Maybe<User>;
   /** User ID */
   user_id: Scalars['Int'];
   /** Unique UUID */
@@ -3129,6 +3403,8 @@ export type UpdateProductInput = {
   inventoryCount?: InputMaybe<Scalars['Int']>;
   isBackorderAllowed?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
+  national_cuisine?: InputMaybe<Scalars['Boolean']>;
+  national_cuisine_country?: InputMaybe<Scalars['String']>;
   physicalDetails?: InputMaybe<PhysicalProductInput>;
   price?: InputMaybe<Scalars['Float']>;
   sku?: InputMaybe<Scalars['String']>;
