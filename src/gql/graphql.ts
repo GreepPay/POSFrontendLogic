@@ -54,29 +54,6 @@ export type AdditionalIdInput = {
   type: Scalars['String'];
 };
 
-/** A paginated list of Category items. */
-export type CategoryPaginator = {
-  __typename?: 'CategoryPaginator';
-  /** A list of Category items. */
-  data: Array<Category>;
-  /** Pagination information about the list of items. */
-  paginatorInfo: PaginatorInfo;
-};
-
-/** Order by clause for Query.GetCategories.orderBy. */
-export type QueryGetCategoriesOrderByOrderByClause = {
-  /** The column that is used for ordering. */
-  column: QueryGetCategoriesOrderByColumn;
-  /** The direction that is used for ordering. */
-  order: SortOrder;
-};
-
-/** Allowed column names for Query.GetCategories.orderBy. */
-export enum QueryGetCategoriesOrderByColumn {
-  Name = 'NAME'
-}
-
-
 /** Represents an Anchor Transaction in the Stellar network */
 export type AnchorTransation = {
   __typename?: 'AnchorTransation';
@@ -210,6 +187,10 @@ export type Business = {
   description?: Maybe<Scalars['String']>;
   /** Array of document URLs. */
   documents?: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Number of followers this business has */
+  followerCount: Scalars['Int'];
+  /** Followers of this business */
+  followers: Array<BusinessFollowers>;
   /** Unique identifier for the business. */
   id: Scalars['String'];
   /** Business location. */
@@ -234,6 +215,27 @@ export type Business = {
   wallet?: Maybe<Wallet>;
   /** Business website URL. */
   website?: Maybe<Scalars['String']>;
+};
+
+/** Business follower relationship tracking. */
+export type BusinessFollowers = {
+  __typename?: 'BusinessFollowers';
+  /** User ID who is following (auth_user_id) */
+  auth_user_id: Scalars['Int'];
+  /** Associated business */
+  business: Business;
+  /** Business ID being followed */
+  business_id: Scalars['Int'];
+  /** When the follow relationship was created */
+  created_at: Scalars['DateTime'];
+  /** Unique identifier */
+  id: Scalars['ID'];
+  /** When the follow relationship was last updated */
+  updated_at: Scalars['DateTime'];
+  /** User who is following */
+  user: User;
+  /** Unique UUID */
+  uuid: Scalars['String'];
 };
 
 /**
@@ -1501,10 +1503,12 @@ export type Order = {
   taxDetails?: Maybe<Scalars['String']>;
   /** Total Amount */
   totalAmount: Scalars['Float'];
+  /** The attached transaction */
+  transaction?: Maybe<Transaction>;
   /** Order Updated At */
   updatedAt: Scalars['String'];
   /** The attached user */
-  user: User;
+  user?: Maybe<User>;
   /** UUID */
   uuid: Scalars['String'];
 };
@@ -1909,6 +1913,8 @@ export type Query = {
   GetBusinessScheduleForDay?: Maybe<BusinessSchedule>;
   /** Get all business schedules for a business */
   GetBusinessSchedules: BusinessSchedulePaginator;
+  /** Get categories with limit */
+  GetCategories: Array<Category>;
   /** Get a conversation */
   GetConversation?: Maybe<Conversation>;
   /** Get country information for verification */
@@ -2053,6 +2059,11 @@ export type QueryGetBusinessSchedulesArgs = {
   orderBy?: InputMaybe<Array<QueryGetBusinessSchedulesOrderByOrderByClause>>;
   page?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<QueryGetBusinessSchedulesWhereWhereConditions>;
+};
+
+
+export type QueryGetCategoriesArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
 };
 
 
